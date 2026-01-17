@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minifigures Collection - LEGO Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Minifigs Theme - Playful Yellow */
+        body {
+            background: linear-gradient(135deg, #FFF5E5 0%, #FFE5E5 50%, #FFF9E5 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle silhouette pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(90deg, transparent, transparent 45px, rgba(255, 213, 0, 0.03) 45px, rgba(255, 213, 0, 0.03) 46px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FFD500 0%, #E3000B 50%, #006DB7 100%);
+            box-shadow: 0 6px 30px rgba(255, 213, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animacja shine */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shine 4s infinite;
+            z-index: 1;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .header-left {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #E3000B 0%, #C50009 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #C50009 0%, #A00007 100%);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px) scale(1.05);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Header Actions Group */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Buy Button */
+        .header .btn-buy {
+            background: linear-gradient(135deg, #006DB7 0%, #005a96 100%) !important;
+            color: white !important;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 109, 183, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .header .btn-buy:hover {
+            background: linear-gradient(135deg, #005a96 0%, #004d7d 100%) !important;
+            box-shadow: 0 6px 25px rgba(0, 109, 183, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Log In Button */
+        .btn-login {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .btn-login:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(255, 213, 0, 0.1);
+        }
+
+        .sidebar-title {
+            border-bottom: 3px solid #E3000B;
+            color: #FFD500;
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            border-left-color: #E3000B;
+            box-shadow: 0 8px 30px rgba(255, 213, 0, 0.15);
+        }
+
+        .card-type.minifigure {
+            background: linear-gradient(135deg, #FFD500 0%, #E5C200 100%);
+            box-shadow: 0 2px 5px rgba(255, 213, 0, 0.3);
+        }
+
+        .card-status.owned {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .card-status.wishlist {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 152, 0, 0.1) 100%);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .search-box input:focus {
+            border-color: #E3000B;
+            box-shadow: 0 0 0 3px rgba(227, 0, 11, 0.15);
+        }
+
+        .btn-icon.active {
+            background: linear-gradient(135deg, #E3000B 0%, #C50009 100%);
+        }
+
+        /* Decorative elements */
+        .collection-area::before {
+            content: '👤';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 4rem;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <a href="index.html" class="back-link">&larr; Back to Home</a>
+                <div class="logo-container">
+                    <span class="logo-icon">👤</span>
+                    <h1 class="logo">Minifigures</h1>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary" id="addItemBtn">+ Add Minifigure</button>
+                <button class="btn btn-buy" id="buyBtn">🛒 Buy</button>
+                <button class="btn btn-login" id="loginBtn">
+                    <span class="login-icon">👤</span>
+                    <span class="login-text">Log In</span>
+                    <span class="user-dropdown-arrow" style="display: none;">▼</span>
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <button class="user-dropdown-item logout-item" id="logoutDropdownBtn">
+                            <span class="user-dropdown-icon">🚪</span>
+                            <span>Log Out</span>
+                        </button>
+                    </div>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar">
+                <h2 class="sidebar-title">Filters</h2>
+
+                <!-- Type filter removed - this is minifigures only page -->
+
+                <div class="filter-group">
+                    <label for="filterTheme">Theme</label>
+                    <select id="filterTheme">
+                        <option value="all">All Themes</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterStatus">Status</label>
+                    <select id="filterStatus">
+                        <option value="all">All</option>
+                        <option value="owned">Owned</option>
+                        <option value="wishlist">Wishlist</option>
+                        <option value="sold">Sold</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterCondition">Condition</label>
+                    <select id="filterCondition">
+                        <option value="all">All</option>
+                        <option value="new">New</option>
+                        <option value="used">Used</option>
+                        <option value="sealed">Sealed</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Year Range</label>
+                    <div class="year-range">
+                        <input type="number" id="yearMin" placeholder="Min" min="1949" max="2030">
+                        <span>-</span>
+                        <input type="number" id="yearMax" placeholder="Max" min="1949" max="2030">
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" id="clearFiltersBtn">Clear Filters</button>
+            </aside>
+
+            <!-- Collection Area -->
+            <section class="collection-area">
+                <!-- Search and Sort Bar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search by name, figure number, or notes...">
+                    </div>
+                    <div class="toolbar-controls">
+                        <div class="sort-control">
+                            <label for="sortBy">Sort:</label>
+                            <select id="sortBy">
+                                <option value="name">Name</option>
+                                <option value="number">Figure Number</option>
+                                <option value="theme">Theme</option>
+                                <option value="year">Year</option>
+                                <option value="price">Price</option>
+                                <option value="dateAdded">Date Added</option>
+                            </select>
+                            <button class="btn-icon" id="sortOrderBtn" title="Toggle sort order">
+                                <span class="sort-icon">&#9650;</span>
+                            </button>
+                        </div>
+                        <div class="view-toggle">
+                            <button class="btn-icon active" id="gridViewBtn" title="Grid view">
+                                <span class="grid-icon">&#9638;&#9638;</span>
+                            </button>
+                            <button class="btn-icon" id="listViewBtn" title="List view">
+                                <span class="list-icon">&#9776;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collection Grid -->
+                <div class="collection-grid" id="collectionGrid">
+                    <!-- Items will be rendered here -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <p>No minifigures found.</p>
+                    <p>Add your first minifigure or try different filters.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Stats -->
+        <footer class="footer">
+            <div class="stats" id="stats">
+                <span class="stat-item"><strong id="totalItems">0</strong> minifigures</span>
+                <span class="stat-item">Value: <strong id="totalValue">$0.00</strong></span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Minifigure</h2>
+                <button class="btn-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+
+                <!-- Type is always minifigure, hidden field -->
+                <input type="hidden" id="itemType" value="minifigure">
+
+                <div class="form-group">
+                    <label for="itemName">Name *</label>
+                    <input type="text" id="itemName" required placeholder="e.g., Luke Skywalker">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemNumber">Figure Number</label>
+                    <input type="text" id="itemNumber" placeholder="e.g., sw0999">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemTheme">Theme *</label>
+                    <input type="text" id="itemTheme" required list="themesList" placeholder="e.g., Star Wars">
+                    <datalist id="themesList"></datalist>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemYear">Year</label>
+                        <input type="number" id="itemYear" min="1949" max="2030" placeholder="2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemStatus">Status *</label>
+                        <select id="itemStatus" required>
+                            <option value="owned">Owned</option>
+                            <option value="wishlist">Wishlist</option>
+                            <option value="sold">Sold</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemPrice">Price Paid ($)</label>
+                        <input type="number" id="itemPrice" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCondition">Condition</label>
+                        <select id="itemCondition">
+                            <option value="new">New</option>
+                            <option value="used">Used</option>
+                            <option value="sealed">Sealed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemLocation">Location</label>
+                    <input type="text" id="itemLocation" placeholder="e.g., Minifig drawer 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemNotes">Notes</label>
+                    <textarea id="itemNotes" rows="3" placeholder="Additional notes..."></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="deleteModalOverlay">
+        <div class="modal modal-small">
+            <div class="modal-header">
+                <h2>Confirm Delete</h2>
+                <button class="btn-close" id="deleteModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="deleteItemName"></span>"?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" id="deleteCancelBtn">Cancel</button>
+                <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div class="modal-overlay" id="authModalOverlay">
+        <div class="modal modal-auth">
+            <div class="modal-header">
+                <h2 id="authModalTitle">Log In</h2>
+                <button class="btn-close" id="authModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form id="loginForm" style="display: block;">
+                    <div class="login-required-info" style="background: rgba(255, 213, 0, 0.1); border-left: 4px solid #FFD500; padding: 12px; margin-bottom: 16px; border-radius: 4px;">
+                        <p style="margin: 0; color: #333; font-size: 0.95rem;">
+                            <strong>🔒 Login Required</strong>
+                        </p>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">
+                            Please log in to view and manage your Minifigures collection.
+                        </p>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginEmail">Email *</label>
+                        <input type="email" id="loginEmail" required placeholder="your@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password *</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block">Log In</button>
+                    </div>
+                    <p class="auth-switch">
+                        Don't have an account? <a href="#" id="showRegisterLink">Register</a>
+                    </p>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="registerEmail">Email *</label>
+                        <input type="email" id="registerEmail" required placeholder="your@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password *</label>
+                        <input type="password" id="registerPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+                        <small class="form-hint">Minimum 6 characters</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm">Confirm Password *</label>
+                        <input type="password" id="registerPasswordConfirm" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    </div>
+                    <p class="auth-switch">
+                        Already have an account? <a href="#" id="showLoginLink">Log In</a>
+                    </p>
+                </form>
+
+                <!-- Verification Code Form -->
+                <div id="verificationForm" style="display: none;">
+                    <p class="verification-message">
+                        ✉️ A 4-digit verification code has been displayed in the browser console.
+                        <br><small>(Open DevTools with F12 to see the code)</small>
+                    </p>
+                    <div class="form-group">
+                        <label for="verificationCode">Verification Code *</label>
+                        <input type="text" id="verificationCode" required maxlength="4" pattern="[0-9]{4}" placeholder="1234" autocomplete="off">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" id="verifyCodeBtn">Verify</button>
+                        <button type="button" class="btn btn-secondary" id="resendCodeBtn">Resend Code</button>
+                    </div>
+                    <p class="auth-switch">
+                        <a href="#" id="backToLoginLink">&larr; Back to Login</a>
+                    </p>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="authLoading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p style="text-align: center; margin-top: 1rem;">Processing...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy Modal -->
+    <div class="modal-overlay" id="buyModalOverlay">
+        <div class="modal modal-buy">
+            <div class="modal-header">
+                <h2 id="buyModalTitle">🛒 Buy Minifigures</h2>
+                <button class="btn-close" id="buyModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Store links will be dynamically inserted here -->
+                <div id="buyModalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification" id="notification">
+        <span id="notificationMessage"></span>
+    </div>
+
+    <!-- Login Required Overlay (hidden by default) -->
+    <div id="loginRequiredOverlay" class="login-required-overlay" style="display: none;">
+        <div class="login-required-content">
+            <div class="login-required-icon">🔒</div>
+            <h2>Login Required</h2>
+            <p>You must log in to view and manage your Minifigures collection.</p>
+            <p class="loading-text">Checking authentication status...</p>
+            <div class="login-required-actions" id="loginRequiredActions" style="display: none;">
+                <button class="btn btn-primary" id="loginRequiredLoginBtn">Log In</button>
+                <button class="btn btn-secondary" id="loginRequiredBackBtn">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Firebase Compat SDK (loaded from CDN - works with file:// protocol) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
+    <script src="js/shared/firebase-config.js"></script>
+    <script src="js/shared/auth.js"></script>
+    <script src="js/shared/firestore-storage.js"></script>
+    <script src="js/shared/buy-links.js"></script>
+
+    <!-- Initialize Auth after all modules loaded -->
+    <script>
+        // Initialize Auth module
+        if (window.Auth) {
+            window.Auth.init();
+            console.log('🔐 Auth module initialized');
+        } else {
+            console.error('❌ Auth module not loaded');
+        }
+    </script>
+
+    <!-- Application Scripts -->
+    <script src="js/minifigs/data.js"></script>
+    <script src="js/minifigs/storage.js"></script>
+    <script src="js/minifigs/ui.js"></script>
+    <script src="js/minifigs/app.js"></script>
+
+</body>
+</html>
