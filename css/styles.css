@@ -945,28 +945,59 @@ body {
     padding: var(--spacing-lg) 0;
 }
 
-/* Logged In State for Login Button */
+/* Login Button - Stable Layout */
+.btn-login,
+.btn-user {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 120px;
+    max-width: 200px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-login .login-text,
+.btn-user .user-name {
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-login .login-icon,
+.btn-user .user-icon {
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+.btn-login:hover,
+.btn-user:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Logged In State */
 .btn-login.logged-in {
-    background: rgba(76, 175, 80, 0.15);
-    border-color: rgba(76, 175, 80, 0.4);
-    color: #2e7d32;
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.5);
 }
 
 .btn-login.logged-in:hover {
-    background: rgba(76, 175, 80, 0.25);
-    border-color: rgba(76, 175, 80, 0.6);
-}
-
-/* User Dropdown Menu Styles */
-.btn-login {
-    position: relative !important;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-login .login-icon {
-    margin-right: 6px;
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.7);
 }
 
 .user-dropdown-arrow {
@@ -980,29 +1011,29 @@ body {
 }
 
 .user-dropdown-menu {
-    position: absolute !important;
-    top: calc(100% + 8px) !important;
-    right: 0 !important;
-    left: auto !important;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: auto;
     background: white;
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
     min-width: 200px;
     max-width: 250px;
     overflow: hidden;
-    display: none !important;
+    display: none;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 10001 !important;
+    z-index: 10001;
 }
 
 .user-dropdown-menu.active {
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 .user-dropdown-item {

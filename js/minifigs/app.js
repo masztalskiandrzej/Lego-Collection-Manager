@@ -21,7 +21,8 @@ const App = {
         view: 'grid',
         // Authentication state
         user: null,
-        isAuthenticated: false
+        isAuthenticated: false,
+        dropdownListenersAttached: false
     },
 
     /**
@@ -59,14 +60,10 @@ const App = {
             const isLoggedIn = await window.Auth.waitForAuthState();
             console.log('🔓 Auth state determined:', isLoggedIn ? 'Logged in' : 'Not logged in');
 
-            // REQUIRES authentication - show login overlay if not logged in
+            // REQUIRES authentication - redirect to login page if not logged in
             if (!isLoggedIn) {
-                console.warn('🔒 User not authenticated - showing login overlay');
-                this.showLoginRequiredOverlay();
-
-                // Bind events so buttons work
-                this.bindEvents();
-                console.log('✅ Login overlay active, waiting for user action...');
+                console.warn('🔒 User not authenticated - redirecting to login page');
+                window.location.href = 'login.html';
                 return;
             }
 
@@ -94,6 +91,22 @@ const App = {
         document.getElementById('addItemBtn').addEventListener('click', () => {
             UI.showModal();
         });
+
+        // User button - logout
+        const userBtn = document.getElementById('userBtn');
+        if (userBtn) {
+            userBtn.addEventListener('click', async () => {
+                if (confirm('Czy chcesz się wylogować?')) {
+                    try {
+                        await window.Auth.logout();
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                        UI.showNotification('Błąd wylogowania: ' + error.message, 'error');
+                    }
+                }
+            });
+        }
 
         // Search input
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -233,45 +246,6 @@ const App = {
 
         // ===== AUTHENTICATION EVENT LISTENERS =====
 
-        // Login button in header
-        const loginBtn = document.getElementById('loginBtn');
-        const userDropdownMenu = document.getElementById('userDropdownMenu');
-        const logoutDropdownBtn = document.getElementById('logoutDropdownBtn');
-
-        if (loginBtn) {
-            loginBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent event bubbling
-
-                // Check if user is authenticated
-                if (window.Auth && window.Auth.isAuthenticated()) {
-                    // User is logged in - toggle dropdown menu
-                    this.toggleUserDropdown();
-                } else {
-                    // User is not logged in - redirect to login page
-                    window.location.href = 'login.html';
-                }
-            });
-        }
-
-        // Attach dropdown listeners (logout button, click outside)
-        this.attachDropdownListeners();
-
-        // Logout dropdown button
-        if (logoutDropdownBtn) {
-            logoutDropdownBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.hideUserDropdown();
-                this.handleLogout();
-            });
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (userDropdownMenu && userDropdownMenu.classList.contains('active') && e.target !== loginBtn) {
-                this.hideUserDropdown();
-            }
-        });
-
         // Auth modal close button
         const authModalCloseBtn = document.getElementById('authModalCloseBtn');
         if (authModalCloseBtn) {
@@ -390,7 +364,7 @@ const App = {
         const loginRequiredBackBtn = document.getElementById('loginRequiredBackBtn');
         if (loginRequiredBackBtn) {
             loginRequiredBackBtn.addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = 'login.html';
             });
         }
     },
@@ -589,103 +563,16 @@ const App = {
     },
 
     updateAuthUI(isLoggedIn) {
-        const loginBtn = document.getElementById('loginBtn');
-        if (!loginBtn) return;
+        const userBtn = document.getElementById('userBtn');
+        const userName = document.getElementById('userName');
+
+        if (!userBtn || !userName) return;
 
         if (isLoggedIn) {
             const email = this.state.user ? this.state.user.email : '';
             const username = email.split('@')[0];
-
-            // Update button structure - WITH dropdown menu
-            loginBtn.innerHTML = `
-                <span class="login-icon">👤</span>
-                <span class="login-text">${username}</span>
-                <span class="user-dropdown-arrow" style="display: inline-block; margin-left: 6px;">▼</span>
-                <div class="user-dropdown-menu" id="userDropdownMenu">
-                    <button class="user-dropdown-item logout-item" id="logoutDropdownBtn">
-                        <span class="user-dropdown-icon">🚪</span>
-                        <span>Log Out</span>
-                    </button>
-                </div>
-            `;
-
-            loginBtn.classList.add('logged-in');
-            loginBtn.title = `Logged in as ${email}`;
-
-            // Re-attach dropdown listeners since we recreated the elements
-            this.attachDropdownListeners();
-        } else {
-            loginBtn.innerHTML = `
-                <span class="login-icon">👤</span>
-                <span class="login-text">Log In</span>
-            `;
-
-            loginBtn.classList.remove('logged-in');
-            loginBtn.title = 'Click to log in';
-        }
-    },
-
-    attachDropdownListeners() {
-        const logoutDropdownBtn = document.getElementById('logoutDropdownBtn');
-        if (logoutDropdownBtn) {
-            logoutDropdownBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const confirm = window.confirm('Are you sure you want to log out?');
-                if (confirm) {
-                    try {
-                        await window.Auth.logout();
-                        UI.showNotification('Logged out successfully', 'success');
-
-                        // Redirect to login page
-                        setTimeout(() => {
-                            window.location.href = 'login.html';
-                        }, 500);
-                    } catch (error) {
-                        console.error('❌ Logout error:', error);
-                        UI.showNotification('Error logging out: ' + error.message, 'error');
-                    }
-                }
-            });
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            const loginBtn = document.getElementById('loginBtn');
-            const dropdown = document.getElementById('userDropdownMenu');
-
-            if (loginBtn && dropdown && !loginBtn.contains(e.target)) {
-                this.hideUserDropdown();
-            }
-        });
-    },
-
-    toggleUserDropdown() {
-        const loginBtn = document.getElementById('loginBtn');
-        const userDropdownMenu = document.getElementById('userDropdownMenu');
-
-        if (!loginBtn || !userDropdownMenu) return;
-
-        const isActive = userDropdownMenu.classList.contains('active');
-
-        if (isActive) {
-            this.hideUserDropdown();
-        } else {
-            userDropdownMenu.classList.add('active');
-            loginBtn.classList.add('dropdown-active');
-        }
-    },
-
-    hideUserDropdown() {
-        const loginBtn = document.getElementById('loginBtn');
-        const userDropdownMenu = document.getElementById('userDropdownMenu');
-
-        if (userDropdownMenu) {
-            userDropdownMenu.classList.remove('active');
-        }
-        if (loginBtn) {
-            loginBtn.classList.remove('dropdown-active');
+            userName.textContent = username;
+            userBtn.title = `Zalogowany jako ${email} - kliknij aby się wylogować`;
         }
     },
 

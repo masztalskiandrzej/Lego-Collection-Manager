@@ -7,18 +7,10 @@
     <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-    <!-- Login Button (Fixed Position) -->
-    <button class="home-login-btn" id="homeLoginBtn">
-        <span class="login-icon">👤</span>
-        <span class="login-text">Log In</span>
-        <span class="user-dropdown-arrow" style="display: none;">▼</span>
-        <!-- User Dropdown Menu -->
-        <div class="user-dropdown-menu" id="userDropdownMenu">
-            <button class="user-dropdown-item logout-item" id="logoutDropdownBtn">
-                <span class="user-dropdown-icon">🚪</span>
-                <span>Log Out</span>
-            </button>
-        </div>
+    <!-- User Button (Top Right) -->
+    <button class="btn btn-user" id="userBtn">
+        <span class="user-icon">👤</span>
+        <span class="user-name" id="userName">Loading...</span>
     </button>
 
     <div class="panels-container panels-2">
@@ -41,115 +33,54 @@
         </a>
     </div>
 
-    <!-- Authentication Modal -->
-    <div class="modal-overlay" id="authModalOverlay">
-        <div class="modal modal-auth">
-            <div class="modal-header">
-                <h2 id="authModalTitle">Log In</h2>
-                <button class="btn-close" id="authModalCloseBtn">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- Login Form -->
-                <form id="loginForm" style="display: block;">
-                    <div class="form-group">
-                        <label for="loginEmail">Email *</label>
-                        <input type="email" id="loginEmail" required placeholder="your@email.com" autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password *</label>
-                        <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-block">Log In</button>
-                    </div>
-                    <p class="auth-switch">
-                        Don't have an account? <a href="#" id="showRegisterLink">Register</a>
-                    </p>
-                </form>
-
-                <!-- Register Form -->
-                <form id="registerForm" style="display: none;">
-                    <div class="form-group">
-                        <label for="registerEmail">Email *</label>
-                        <input type="email" id="registerEmail" required placeholder="your@email.com" autocomplete="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">Password *</label>
-                        <input type="password" id="registerPassword" required minlength="6" placeholder="••••••••" autocomplete="new-password">
-                        <small class="form-hint">Minimum 6 characters</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPasswordConfirm">Confirm Password *</label>
-                        <input type="password" id="registerPasswordConfirm" required minlength="6" placeholder="••••••••" autocomplete="new-password">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary btn-block">Register</button>
-                    </div>
-                    <p class="auth-switch">
-                        Already have an account? <a href="#" id="showLoginLink">Log In</a>
-                    </p>
-                </form>
-
-                <!-- Verification Code Form -->
-                <div id="verificationForm" style="display: none;">
-                    <p class="verification-message">
-                        ✉️ A 4-digit verification code has been displayed in the browser console.
-                        <br><small>(Open DevTools with F12 to see the code)</small>
-                    </p>
-                    <div class="form-group">
-                        <label for="verificationCode">Verification Code *</label>
-                        <input type="text" id="verificationCode" required maxlength="4" pattern="[0-9]{4}" placeholder="1234" autocomplete="off">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-primary" id="verifyCodeBtn">Verify</button>
-                        <button type="button" class="btn btn-secondary" id="resendCodeBtn">Resend Code</button>
-                    </div>
-                    <p class="auth-switch">
-                        <a href="#" id="backToLoginLink">&larr; Back to Login</a>
-                    </p>
-                </div>
-
-                <!-- Loading Spinner -->
-                <div id="authLoading" style="display: none;">
-                    <div class="spinner"></div>
-                    <p style="text-align: center; margin-top: 1rem;">Processing...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div class="notification" id="notification">
-        <span id="notificationMessage"></span>
-    </div>
-
     <!-- Scripts -->
-    <!-- Firebase & Shared Modules (ES6 Module) -->
-    <script type="module">
-        import Auth from './js/shared/auth.js';
-        import createFirestoreStorage from './js/shared/firestore-storage.js';
+    <!-- Firebase Compat SDK (loaded from CDN - works with file:// protocol) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-        // Make modules globally available for non-module scripts
-        window.Auth = Auth;
-        window.createFirestoreStorage = createFirestoreStorage;
+    <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
+    <script src="js/shared/firebase-config.js"></script>
+    <script src="js/shared/auth.js"></script>
 
-        // Initialize Auth
-        Auth.init();
+    <!-- Initialize Auth and check login state -->
+    <script>
+        // Initialize Auth module
+        if (window.Auth) {
+            window.Auth.init();
+            console.log('🔐 Auth module initialized');
 
-        console.log('🔐 Auth module loaded and initialized');
+            // Check auth state and redirect to login if not authenticated
+            window.Auth.waitForAuthState().then(isLoggedIn => {
+                if (!isLoggedIn || !window.Auth.isAuthenticated()) {
+                    console.log('🔒 Not logged in, redirecting to login page...');
+                    window.location.href = 'login.html';
+                } else {
+                    console.log('✅ User is logged in, showing home page');
+                    // Update user button with username
+                    const email = window.Auth.getUserEmail();
+                    const username = email ? email.split('@')[0] : 'User';
+                    document.getElementById('userName').textContent = username;
+                }
+            });
+        } else {
+            console.error('❌ Auth module not loaded');
+            // If Auth not available, redirect to login
+            window.location.href = 'login.html';
+        }
 
-        // Check auth state and redirect to login if not authenticated
-        Auth.waitForAuthState().then(isLoggedIn => {
-            if (!isLoggedIn || !Auth.isAuthenticated()) {
-                console.log('🔒 Not logged in, redirecting to login page...');
-                window.location.href = 'login.html';
-            } else {
-                console.log('✅ User is logged in, showing home page');
+        // User button click - logout
+        document.getElementById('userBtn').addEventListener('click', async () => {
+            if (confirm('Czy chcesz się wylogować?')) {
+                try {
+                    await window.Auth.logout();
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    alert('Błąd wylogowania: ' + error.message);
+                }
             }
         });
     </script>
-
-    <!-- Home auth handler -->
-    <script src="js/shared/home-auth.js"></script>
 </body>
 </html>
