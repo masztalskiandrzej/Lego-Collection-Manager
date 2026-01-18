@@ -440,39 +440,114 @@ const App = {
     },
 
     /**
-     * Handle image file selection
+     * Handle image file selection with compression
      * @param {File} file - Selected image file
      */
     handleImageSelection(file) {
-        if (!file) return;
+        console.log('🖼️ handleImageSelection called with:', file);
+
+        if (!file) {
+            console.warn('⚠️ No file provided');
+            return;
+        }
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
+            console.error('❌ Not an image file:', file.type);
             UI.showNotification('Please select an image file', 'error');
             return;
         }
 
-        // Validate file size (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            UI.showNotification('Image file must be smaller than 5MB', 'error');
+        // Validate file size (max 10MB before compression)
+        if (file.size > 10 * 1024 * 1024) {
+            console.error('❌ File too large:', file.size);
+            UI.showNotification('Image file must be smaller than 10MB', 'error');
             return;
         }
 
-        // Read file and show preview
+        console.log('📁 Original file size:', (file.size / 1024).toFixed(2) + ' KB');
+
+        // Read and compress image
         const reader = new FileReader();
         reader.onload = (e) => {
-            UI.showImagePreview(e.target.result);
+            const img = new Image();
+            img.onload = () => {
+                // Create canvas for compression
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Calculate new dimensions (max 600px)
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // Draw and compress (quality 0.6)
+                ctx.drawImage(img, 0, 0, width, height);
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+
+                const compressedSizeKB = (compressedDataUrl.length * 0.75 / 1024).toFixed(2);
+                console.log('✅ Image compressed:', img.width + 'x' + img.height + ' → ' + Math.round(width) + 'x' + Math.round(height));
+                console.log('📦 Compressed size:', compressedSizeKB + ' KB');
+
+                // Warn if still too large for Firestore
+                if (parseFloat(compressedSizeKB) > 500) {
+                    console.warn('⚠️ Image is large (' + compressedSizeKB + ' KB). May cause issues.');
+                    UI.showNotification('Image is large. Consider using a smaller image.', 'warning');
+                }
+
+                // Show preview and store compressed data URL
+                console.log('🔍 DEBUG: UI object:', UI);
+                console.log('🔍 DEBUG: UI.showImagePreview:', typeof UI.showImagePreview);
+
+                if (typeof UI.showImagePreview === 'function') {
+                    UI.showImagePreview(compressedDataUrl);
+                    console.log('✅ UI.currentImageUrl set, length:', compressedDataUrl.length);
+                } else {
+                    // Fallback - set directly
+                    console.warn('⚠️ UI.showImagePreview not available, setting directly');
+                    const preview = document.getElementById('imagePreview');
+                    const previewImg = document.getElementById('imagePreviewImg');
+                    if (preview && previewImg) {
+                        previewImg.src = compressedDataUrl;
+                        preview.style.display = 'block';
+                        UI.currentImageUrl = compressedDataUrl;
+                        console.log('✅ Preview set directly, length:', compressedDataUrl.length);
+                    }
+                }
+
+                // Update file name display
+                const fileName = document.getElementById('imageFileName');
+                if (fileName) {
+                    fileName.textContent = file.name + ' (compressed: ' + compressedSizeKB + ' KB)';
+                }
+            };
+            img.onerror = () => {
+                console.error('❌ Error loading image');
+                UI.showNotification('Error loading image', 'error');
+            };
+            img.src = e.target.result;
         };
         reader.onerror = () => {
+            console.error('❌ Error reading file');
             UI.showNotification('Error reading image file', 'error');
         };
         reader.readAsDataURL(file);
-
-        // Update file name display
-        const fileName = document.getElementById('imageFileName');
-        if (fileName) {
-            fileName.textContent = file.name;
-        }
     },
 
     /**

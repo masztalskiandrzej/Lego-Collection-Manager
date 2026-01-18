@@ -347,20 +347,15 @@ const UI = {
             notes: document.getElementById('itemNotes').value.trim()
         };
 
-        // Include current image URL if exists (from preview image src)
-        const preview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('imagePreviewImg');
-
+        // Include current image URL if exists (use stored currentImageUrl)
         console.log('🔍 getFormData - checking for image:', {
-            previewExists: !!preview,
-            previewImgExists: !!previewImg,
-            previewDisplay: preview ? preview.style.display : 'N/A',
-            previewImgSrc: previewImg ? (previewImg.src ? previewImg.src.substring(0, 50) + '...' : 'empty') : 'N/A'
+            currentImageUrl: this.currentImageUrl ? this.currentImageUrl.substring(0, 50) + '...' : 'none',
+            currentImageUrlLength: this.currentImageUrl ? this.currentImageUrl.length : 0
         });
 
-        if (previewImg && previewImg.src && preview && preview.style.display !== 'none') {
-            formData.imageUrl = previewImg.src;
-            console.log('✅ Image URL included in form data:', formData.imageUrl.substring(0, 50) + '...');
+        if (this.currentImageUrl) {
+            formData.imageUrl = this.currentImageUrl;
+            console.log('✅ Image URL included in form data, length:', formData.imageUrl.length);
         } else {
             formData.imageUrl = null;
             console.log('ℹ️ No image URL in form data');
