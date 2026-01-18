@@ -222,6 +222,15 @@ const App = {
             });
         }
 
+        // Get Image button - fetch official photo from BrickLink CDN
+        const fetchImageBtn = document.getElementById('fetchImageBtn');
+        if (fetchImageBtn) {
+            console.log('✅ Adding Get Image button listener');
+            fetchImageBtn.addEventListener('click', () => {
+                this.handleFetchImage();
+            });
+        }
+
         // Delete modal controls
         document.getElementById('deleteModalCloseBtn').addEventListener('click', () => {
             UI.hideDeleteModal();
@@ -558,6 +567,71 @@ const App = {
     },
 
     /**
+     * Handle Get Image button - fetch official photo from BrickLink CDN
+     */
+    async handleFetchImage() {
+        console.log('🖼️ handleFetchImage called');
+
+        // Get figure number from input
+        const figureNumberInput = document.getElementById('itemNumber');
+        const figureNumber = figureNumberInput ? figureNumberInput.value.trim() : '';
+
+        if (!figureNumber) {
+            alert('Please enter a figure number first (e.g., sw0999)');
+            figureNumberInput.focus();
+            return;
+        }
+
+        console.log('📦 Fetching image for figure:', figureNumber);
+
+        // Try multiple image URL formats for minifigures
+        const imageUrls = [
+            // BrickLink CDN - Minifigure format
+            `https://img.bricklink.com/ItemImage/MN/0/${figureNumber}.png`,
+            `https://img.bricklink.com/ItemImage/MN/0/${figureNumber}.jpg`,
+            // Try with variant
+            `https://img.bricklink.com/ItemImage/MN/0/${figureNumber}-1.png`,
+            `https://img.bricklink.com/ItemImage/MN/0/${figureNumber}-1.jpg`
+        ];
+
+        let success = false;
+        let lastError = null;
+
+        for (const imageUrl of imageUrls) {
+            try {
+                console.log('🔗 Trying:', imageUrl);
+
+                // Try to fetch the image
+                const response = await fetch(imageUrl, { method: 'HEAD' });
+
+                if (response.ok) {
+                    console.log('✅ Image found:', imageUrl);
+
+                    // Display the image preview
+                    UI.showImagePreview(imageUrl);
+
+                    // Update file name
+                    const fileName = document.getElementById('imageFileName');
+                    if (fileName) {
+                        fileName.textContent = `Official image: ${figureNumber}`;
+                    }
+
+                    success = true;
+                    break;
+                }
+            } catch (error) {
+                console.log('❌ Failed:', imageUrl, error.message);
+                lastError = error;
+            }
+        }
+
+        if (!success) {
+            alert(`Could not find official image for figure "${figureNumber}".\n\nMake sure the figure number is correct (e.g., sw0999, sw0001, col001).\n\nYou can still upload your own photo manually.`);
+            console.error('❌ All image URLs failed:', lastError);
+        }
+    },
+
+    /**
      * Clear all filters
      */
     clearFilters() {
@@ -813,6 +887,7 @@ const App = {
 
             const buyModal = document.getElementById('buyModalOverlay');
             const buyModalContent = document.getElementById('buyModalContent');
+            const legoComLink = document.getElementById('legoComStoreLink');
 
             if (!buyModal || !buyModalContent) {
                 console.error('❌ Buy modal elements not found');
@@ -820,6 +895,18 @@ const App = {
             }
 
             const collectionType = 'minifigsCollection';
+
+            // Set LEGO.com link URL
+            if (legoComLink) {
+                if (item && item.figureNumber) {
+                    // Search for this minifigure on LEGO.com
+                    legoComLink.href = `https://www.lego.com/en-US/search?q=${encodeURIComponent(item.figureNumber)}`;
+                } else {
+                    // Go to LEGO.com Minifigures section
+                    legoComLink.href = 'https://www.lego.com/en-US/categories/minifigures';
+                }
+            }
+
             const linksHTML = window.BuyLinks.generateStoreLinksHTML(item, collectionType);
             buyModalContent.innerHTML = linksHTML;
             buyModal.classList.add('active');
@@ -982,6 +1069,157 @@ const App = {
             console.error('Resend error:', error);
             UI.showNotification(error.message, 'error');
         }
+    },
+
+    // ===== AI VISION METHODS =====
+
+    /**
+     * Handle Auto-Fill by Figure Number button click
+     * Fetches data from BrickSet API and auto-fills the form
+     */
+    async handleAutoFillByNumber() {
+        console.log('🔍 Auto-Fill button clicked');
+
+        // Get figure number from input
+        const figureNumberInput = document.getElementById('autoFillSetNumber');
+        const figureNumber = figureNumberInput ? figureNumberInput.value.trim() : '';
+
+        if (!figureNumber) {
+            this.showAutoFillStatus('warning', '⚠️ Please enter a figure number first.');
+            UI.showNotification('Please enter a figure number.', 'warning');
+            return;
+        }
+
+        const autoFillBtn = document.getElementById('autoFillBtn');
+        const originalText = autoFillBtn.innerHTML;
+
+        try {
+            // Show loading state
+            console.log('⏳ Fetching data for figure number:', figureNumber);
+            autoFillBtn.disabled = true;
+            autoFillBtn.innerHTML = '<span class="ai-loading-spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(51,51,51,0.3); border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite;"></span> Loading...';
+            this.showAutoFillStatus('info', '🔍 Fetching data from BrickSet...');
+
+            // Debug: Check what's on window
+            console.log('🔍 window.AIVision check:', {
+                exists: typeof window.AIVision !== 'undefined',
+                value: window.AIVision,
+                keys: window.AIVision ? Object.keys(window.AIVision) : 'N/A'
+            });
+
+            // Initialize AIVision if needed
+            if (window.AIVision && !window.AIVision.isInitialized) {
+                console.log('🔧 Initializing AIVision...');
+                await window.AIVision.init();
+            }
+
+            // Check if AIVision module is available
+            if (!window.AIVision) {
+                console.error('❌ AIVision not found on window object!');
+                console.log('📋 Available window properties:', Object.keys(window).filter(k => k.includes('AI') || k.includes('Vision')));
+                throw new Error('AIVision module not loaded');
+            }
+
+            // Fetch data from BrickSet
+            const result = await window.AIVision.recognizeByNumber(figureNumber, 'minifigure');
+
+            if (!result.success || !result.data) {
+                this.showAutoFillStatus('warning', `⚠️ Figure "${figureNumber}" not found in BrickSet database.`);
+                UI.showNotification(`Figure ${figureNumber} not found. Check the number and try again.`, 'warning');
+                return;
+            }
+
+            const data = result.data;
+            console.log('✅ BrickSet data received:', data);
+
+            // Populate form fields
+            this.populateFormFromAI(data);
+
+            // Fetch and display image if available
+            if (data.imageUrl) {
+                this.showAutoFillStatus('info', '🖼️ Downloading official image from BrickSet...');
+                const imageDataUrl = await window.AIVision.fetchImageAsBase64(data.imageUrl);
+
+                if (imageDataUrl) {
+                    // Show image preview
+                    UI.showImagePreview(imageDataUrl);
+                    console.log('✅ Image downloaded and displayed');
+                }
+            }
+
+            // Show success message
+            this.showAutoFillStatus('success', `✅ "${data.name}" - Form filled with ${data.theme || '?'}, ${data.year || '?'}${data.pricePaid ? ', $' + data.pricePaid : ''}`);
+            UI.showNotification(`Figure data auto-filled from BrickSet!${data.imageUrl ? ' Image downloaded.' : ''}`, 'success');
+
+            // Update button state
+            autoFillBtn.innerHTML = '✅ Done!';
+
+            // Clear the input field
+            figureNumberInput.value = '';
+
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                autoFillBtn.innerHTML = originalText;
+                autoFillBtn.disabled = false;
+            }, 3000);
+
+        } catch (error) {
+            console.error('❌ Auto-Fill error:', error);
+            this.showAutoFillStatus('error', `❌ Error: ${error.message}`);
+            UI.showNotification('Auto-Fill failed: ' + error.message, 'error');
+
+            // Reset button
+            autoFillBtn.innerHTML = originalText;
+            autoFillBtn.disabled = false;
+        }
+    },
+
+    /**
+     * Show Auto-Fill status message
+     * @param {string} type - 'info', 'success', 'warning', 'error'
+     * @param {string} message - Status message
+     */
+    showAutoFillStatus(type, message) {
+        const statusEl = document.getElementById('autoFillStatus');
+        if (!statusEl) return;
+
+        statusEl.className = `ai-status ${type}`;
+        statusEl.textContent = message;
+        statusEl.style.display = 'block';
+    },
+
+    /**
+     * Populate form fields with AI-recognized data
+     * @param {Object} data - Recognized item data
+     */
+    populateFormFromAI(data) {
+        console.log('📝 Populating form with AI data:', data);
+
+        // Helper function to set value if exists
+        const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el && value) {
+                el.value = value;
+                console.log(`  ✓ ${id} = ${value}`);
+            }
+        };
+
+        // Populate fields based on data availability
+        if (data.name) setValue('itemName', data.name);
+        if (data.figureNumber) setValue('itemNumber', data.figureNumber);
+        if (data.theme) setValue('itemTheme', data.theme);
+        if (data.year) setValue('itemYear', data.year);
+        if (data.pricePaid) setValue('itemPrice', data.pricePaid);
+
+        // Add a note about AI recognition
+        const notesEl = document.getElementById('itemNotes');
+        if (notesEl) {
+            const existingNotes = notesEl.value.trim();
+            const aiNote = '\n\n[AI recognized from photo]';
+            notesEl.value = existingNotes ? existingNotes + aiNote : aiNote.substring(0, aiNote.length);
+        }
+
+        console.log('✅ Form populated successfully');
     },
 
     async handleLogout() {

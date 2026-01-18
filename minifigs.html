@@ -216,6 +216,7 @@
                 </div>
             </div>
             <div class="header-actions">
+                <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Visit LEGO.com">🧱 LEGO.com</a>
                 <button class="btn btn-primary" id="addItemBtn">+ Add Minifigure</button>
                 <button class="btn btn-buy" id="buyBtn">🛒 Buy</button>
                 <button class="btn btn-user" id="userBtn">
@@ -347,7 +348,11 @@
 
                 <div class="form-group">
                     <label for="itemNumber">Figure Number</label>
-                    <input type="text" id="itemNumber" placeholder="e.g., sw0999">
+                    <div class="input-with-button">
+                        <input type="text" id="itemNumber" placeholder="e.g., sw0999">
+                        <button type="button" class="btn btn-small btn-secondary" id="fetchImageBtn" title="Fetch official image from BrickLink">📷 Get Image</button>
+                    </div>
+                    <small class="text-muted">Enter figure number and click "Get Image" to fetch official photo</small>
                 </div>
 
                 <div class="form-group">
@@ -443,7 +448,14 @@
                 <button class="btn-close" id="buyModalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Store links will be dynamically inserted here -->
+                <!-- LEGO.com Official Store - Priority Link -->
+                <a href="#" class="store-link-btn store-link-lego" id="legoComStoreLink" target="_blank" rel="noopener">
+                    <span class="store-icon">🧱</span>
+                    <span class="store-name">LEGO.com Official Store</span>
+                    <span class="store-arrow">→</span>
+                </a>
+                <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 16px 0;">
+                <!-- Other store links will be dynamically inserted here -->
                 <div id="buyModalContent"></div>
             </div>
         </div>
@@ -466,6 +478,7 @@
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
     <script src="js/shared/buy-links.js"></script>
+    <script src="js/shared/ai-vision.js"></script>
 
     <!-- Initialize Auth after all modules loaded -->
     <script>

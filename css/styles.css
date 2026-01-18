@@ -740,6 +740,28 @@ body {
     flex: 1;
 }
 
+/* Input with button (for Get Image feature) */
+.input-with-button {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.input-with-button input {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border: 1px solid #ddd;
+    border-radius: var(--radius-sm);
+}
+
+.input-with-button button {
+    white-space: nowrap;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
 .form-actions {
     display: flex;
     justify-content: flex-end;
@@ -1164,6 +1186,29 @@ body {
     gap: 8px;
 }
 
+.btn-lego {
+    background: linear-gradient(135deg, #E3000B 0%, #C50009 100%);
+    color: white;
+    text-decoration: none;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(227, 0, 11, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-lego:hover {
+    background: linear-gradient(135deg, #C50009 0%, #A00007 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(227, 0, 11, 0.4);
+    color: white;
+}
+
 .btn-buy:hover {
     background: linear-gradient(135deg, #F57C00 0%, #E65100 100%);
     transform: translateY(-2px);
@@ -1228,6 +1273,32 @@ body {
     cursor: pointer;
     position: relative;
     overflow: hidden;
+}
+
+/* Special LEGO.com link - highlighted */
+.store-link-lego {
+    border-color: #E3000B;
+    background: linear-gradient(135deg, rgba(227, 0, 11, 0.05) 0%, rgba(197, 0, 9, 0.05) 100%);
+    font-weight: 700;
+}
+
+.store-link-lego::before {
+    background: #E3000B;
+}
+
+.store-link-lego .store-name {
+    color: #E3000B;
+}
+
+.store-link-lego:hover {
+    background: rgba(227, 0, 11, 0.1);
+    border-color: #C50009;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(227, 0, 11, 0.2);
+}
+
+.store-link-lego:hover .store-name {
+    color: #C50009;
 }
 
 .store-link-btn::before {
@@ -1417,4 +1488,220 @@ body {
 .login-required-actions .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   AI Vision - Auto-Fill Button Styles
+   ======================================== */
+
+/* AI Auto-Fill Section */
+.ai-autofill-section {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.05) 0%, rgba(123, 31, 162, 0.05) 100%);
+    border: 2px dashed rgba(156, 39, 176, 0.3);
+    border-radius: var(--radius-md);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.ai-autofill-section.active {
+    border-style: solid;
+    border-color: rgba(156, 39, 176, 0.5);
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.08) 0%, rgba(123, 31, 162, 0.08) 100%);
+}
+
+/* AI Button */
+.btn-ai {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ai::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-ai:hover::before {
+    left: 100%;
+}
+
+.btn-ai:hover {
+    background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+}
+
+.btn-ai:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-ai:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-ai:disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+}
+
+/* AI Icon Animation */
+.btn-ai .ai-icon {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-ai:hover .ai-icon {
+    transform: scale(1.1) rotate(10deg);
+}
+
+/* AI Loading Spinner */
+.ai-loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: ai-spin 1s linear infinite;
+}
+
+@keyframes ai-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* AI Helper Text */
+.ai-helper-text {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-sm);
+    line-height: 1.4;
+}
+
+.ai-autofill-section.active .ai-helper-text {
+    color: rgba(156, 39, 176, 0.8);
+}
+
+/* AI Status Messages */
+.ai-status {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    text-align: left;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-status.info {
+    background: rgba(33, 150, 243, 0.1);
+    color: #1976D2;
+    border-left: 3px solid #1976D2;
+}
+
+.ai-status.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #388E3C;
+    border-left: 3px solid #388E3C;
+}
+
+.ai-status.error {
+    background: rgba(244, 67, 54, 0.1);
+    color: #D32F2F;
+    border-left: 3px solid #D32F2F;
+}
+
+.ai-status.warning {
+    background: rgba(255, 152, 0, 0.1);
+    color: #F57C00;
+    border-left: 3px solid #F57C00;
+}
+
+/* AI Progress Bar */
+.ai-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(156, 39, 176, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: var(--spacing-sm);
+}
+
+.ai-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #9C27B0, #7B1FA2);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+/* AI Confidence Indicator */
+.ai-confidence {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.05);
+    margin-top: var(--spacing-xs);
+}
+
+.ai-confidence.high {
+    background: rgba(76, 175, 80, 0.15);
+    color: #388E3C;
+}
+
+.ai-confidence.medium {
+    background: rgba(255, 152, 0, 0.15);
+    color: #F57C00;
+}
+
+.ai-confidence.low {
+    background: rgba(244, 67, 54, 0.15);
+    color: #D32F2F;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .btn-ai {
+        width: 100%;
+        padding: 14px 20px;
+    }
+
+    .ai-helper-text {
+        font-size: 0.8rem;
+    }
 }

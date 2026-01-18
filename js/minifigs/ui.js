@@ -214,6 +214,18 @@ const UI = {
 
         // Store current image URL for reference
         this.currentImageUrl = null;
+
+        // Hide AI Auto-Fill section
+        const aiSection = document.getElementById('aiAutoFillSection');
+        if (aiSection) {
+            aiSection.style.display = 'none';
+        }
+
+        // Hide AI status
+        const aiStatus = document.getElementById('aiStatus');
+        if (aiStatus) {
+            aiStatus.style.display = 'none';
+        }
     },
 
     /**
