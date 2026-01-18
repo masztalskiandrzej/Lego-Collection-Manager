@@ -20,6 +20,8 @@ const Auth = {
     initialAuthStatePromise: null,
     _auth: null,
     _db: null,
+    _functions: null,
+    emailServiceEnabled: true, // Set to false to fallback to console logging
 
     /**
      * Inicjalizacja modułu autentykacji
@@ -33,6 +35,15 @@ const Auth = {
 
         this._auth = window.getFirebaseAuth();
         this._db = window.getFirebaseDb();
+        this._functions = window.getFirebaseFunctions ? window.getFirebaseFunctions() : null;
+
+        // Check if Cloud Functions are available
+        if (this._functions) {
+            console.log('📧 Email service: Cloud Functions enabled');
+        } else {
+            console.log('📧 Email service: Fallback to console (Cloud Functions not available)');
+            this.emailServiceEnabled = false;
+        }
 
         // Twórz promise dla początkowego stanu autentykacji
         this.initialAuthStatePromise = new Promise((resolve) => {
@@ -68,6 +79,43 @@ const Auth = {
     },
 
     /**
+     * Wyślij email z kodem weryfikacyjnym przez Cloud Function
+     * @param {string} email - Adres email odbiorcy
+     * @param {string} code - 4-cyfrowy kod weryfikacyjny
+     * @returns {Promise<{success: boolean, method: string}>}
+     */
+    async sendVerificationEmail(email, code) {
+        // Try Cloud Function first
+        if (this.emailServiceEnabled && this._functions) {
+            try {
+                const sendEmail = this._functions.httpsCallable('sendVerificationEmail');
+                const result = await sendEmail({
+                    email: email,
+                    code: code,
+                    language: 'pl'
+                });
+
+                if (result.data.success) {
+                    console.log('📧 Email weryfikacyjny wysłany na:', email);
+                    return { success: true, method: 'cloud_function' };
+                }
+            } catch (error) {
+                console.warn('⚠️ Cloud Function email failed:', error.message);
+                // Fallback to console
+            }
+        }
+
+        // Fallback: Display code in console (for development or if email fails)
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('📧 KOD WERYFIKACYJNY:', code);
+        console.log('   Email:', email);
+        console.log('   (Cloud Functions not deployed - code shown in console)');
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+        return { success: true, method: 'console_fallback' };
+    },
+
+    /**
      * Zarejestruj nowego użytkownika
      * @param {string} email - Email użytkownika
      * @param {string} password - Hasło (min. 6 znaków)
@@ -99,19 +147,9 @@ const Auth = {
 
             console.log('✅ Dane użytkownika zapisane w Firestore');
 
-            // Wyślij email weryfikacyjny Firebase (opcjonalnie, jako backup)
-            try {
-                await user.sendEmailVerification();
-                console.log('📧 Email weryfikacyjny Firebase wysłany');
-            } catch (emailError) {
-                console.warn('⚠️ Nie udało się wysłać emaila Firebase:', emailError.message);
-            }
-
-            // TYMCZASOWE: Wyświetl kod w konsoli
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('📧 KOD WERYFIKACYJNY:', this.verificationCode);
-            console.log('   (w produkcji zostanie wysłany na email)');
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            // Wyślij email z kodem weryfikacyjnym
+            const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
+            console.log('📧 Email verification method:', emailResult.method);
 
             return {
                 success: true,
@@ -201,12 +239,10 @@ const Auth = {
                     codeResentAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
 
-            // Wyświetl nowy kod (TYMCZASOWE)
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('📧 NOWY KOD WERYFIKACYJNY:', this.verificationCode);
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            // Wyślij email z nowym kodem
+            const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
+            console.log('✅ Nowy kod wysłany, method:', emailResult.method);
 
-            console.log('✅ Kod wysłany ponownie');
             return this.verificationCode;
         } catch (error) {
             console.error('❌ Błąd wysyłania kodu:', error);
