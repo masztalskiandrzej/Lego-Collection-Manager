@@ -5,163 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LEGO Collection Manager</title>
     <link rel="stylesheet" href="css/home.css">
-    <style>
-        /* Home Page Theme - Matching Sets/Minifigs */
-        body {
-            background: linear-gradient(135deg, #FFE5E5 0%, #E5F5FF 50%, #FFF5E5 100%);
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Subtle brick pattern overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(227, 0, 11, 0.05) 50px, rgba(227, 0, 11, 0.05) 51px),
-                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(227, 0, 11, 0.05) 50px, rgba(227, 0, 11, 0.05) 51px);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .app-container {
-            position: relative;
-            z-index: 1;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #E3000B 0%, #006DB7 50%, #FFD500 100%);
-            box-shadow: 0 6px 30px rgba(227, 0, 11, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Animacja shine */
-        .header::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shine 4s infinite;
-            z-index: 1;
-        }
-
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .header-left {
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        .logo {
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.4);
-            text-transform: uppercase;
-        }
-
-        .back-link {
-            color: rgba(255, 255, 255, 0.9);
-            text-decoration: none;
-            font-size: 0.9rem;
-            padding: 8px 14px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .back-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Header Actions Group */
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* User Button - matching sets/minifigs styling */
-        .btn-user {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn-user:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-user:active {
-            transform: translateY(0);
-        }
-    </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <div class="logo-container">
-                    <span class="logo-icon">🏠</span>
-                    <h1 class="logo">Home</h1>
-                </div>
-            </div>
-            <div class="header-actions">
-                <button class="btn btn-user" id="userBtn">
-                    <span class="user-icon">👤</span>
-                    <span class="user-name" id="userName">Loading...</span>
-                </button>
-            </div>
-        </header>
+    <!-- User Button (Top Right) -->
+    <button class="btn btn-user" id="userBtn">
+        <span class="user-icon">👤</span>
+        <span class="user-name" id="userName">Loading...</span>
+    </button>
 
-        <div class="panels-container panels-2">
+    <div class="panels-container panels-2">
         <a href="sets.html" class="panel panel-sets">
             <div class="panel-overlay"></div>
             <div class="panel-content">
@@ -179,7 +31,6 @@
                 <p class="panel-description">Manage your LEGO minifigures collection</p>
             </div>
         </a>
-    </div>
     </div>
 
     <!-- Scripts -->
