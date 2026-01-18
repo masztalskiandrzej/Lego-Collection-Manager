@@ -34,10 +34,10 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #E3000B 0%, #006DB7 50%, #FFD500 100%);
-            box-shadow: 0 6px 30px rgba(227, 0, 11, 0.4);
+            background: linear-gradient(135deg, #001f3f 0%, #FFD500 100%);
+            box-shadow: 0 6px 30px rgba(0, 31, 63, 0.4);
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         /* Animacja shine */
@@ -89,17 +89,18 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #006DB7 0%, #005a96 100%);
+            background: linear-gradient(135deg, #FFD500 0%, #E5C200 100%);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             z-index: 2;
+            color: #001f3f;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #005a96 0%, #004d7d 100%);
+            background: linear-gradient(135deg, #E5C200 0%, #CCB000 100%);
             box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
             transform: translateY(-3px) scale(1.05);
         }
@@ -137,25 +138,25 @@
 
         /* Buy Button */
         .header .btn-buy {
-            background: linear-gradient(135deg, #FFD500 0%, #E5C200 100%) !important;
-            color: #333 !important;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%) !important;
+            color: white !important;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(255, 213, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 31, 63, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
         .header .btn-buy:hover {
-            background: linear-gradient(135deg, #E5C200 0%, #CCB000 100%) !important;
-            box-shadow: 0 6px 25px rgba(255, 213, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #003366 0%, #004d99 100%) !important;
+            box-shadow: 0 6px 25px rgba(0, 31, 63, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
 
         .sidebar {
             background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 4px 20px rgba(227, 0, 11, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 31, 63, 0.1);
         }
 
         .sidebar-title {
             border-bottom: 3px solid #FFD500;
-            color: #E3000B;
+            color: #001f3f;
         }
 
         .item-card {
@@ -166,12 +167,12 @@
 
         .item-card:hover {
             border-left-color: #FFD500;
-            box-shadow: 0 8px 30px rgba(227, 0, 11, 0.15);
+            box-shadow: 0 8px 30px rgba(0, 31, 63, 0.15);
         }
 
         .card-type.set {
-            background: linear-gradient(135deg, #006DB7 0%, #005a96 100%);
-            box-shadow: 0 2px 5px rgba(0, 109, 183, 0.3);
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            box-shadow: 0 2px 5px rgba(0, 31, 63, 0.3);
         }
 
         .card-status.owned {
@@ -185,12 +186,13 @@
         }
 
         .search-box input:focus {
-            border-color: #006DB7;
-            box-shadow: 0 0 0 3px rgba(0, 109, 183, 0.15);
+            border-color: #FFD500;
+            box-shadow: 0 0 0 3px rgba(255, 213, 0, 0.15);
         }
 
         .btn-icon.active {
-            background: linear-gradient(135deg, #006DB7 0%, #005a96 100%);
+            background: linear-gradient(135deg, #FFD500 0%, #E5C200 100%);
+            color: #001f3f;
         }
 
         /* Decorative elements */
@@ -210,12 +212,33 @@
         <!-- Header -->
         <header class="header">
             <div class="header-left">
-                <a href="index.html" class="back-link">&larr; Back to Home</a>
+                <div class="hamburger-container">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
                 <div class="logo-container">
-                    <span class="logo-icon">🧱</span>
+                    <img src="images/lego-icon.png" class="logo-icon img" alt="LEGO">
                     <h1 class="logo">Sets</h1>
                 </div>
             </div>
+
+            <!-- Navigation Dropdown (moved outside header-left for proper stacking) -->
+            <nav class="nav-dropdown" id="navDropdown" aria-hidden="true">
+                <div class="nav-dropdown-header">Navigation</div>
+                <a href="index.html" class="nav-dropdown-item nav-dropdown-home">
+                    <span class="nav-dropdown-icon">🏠</span>
+                    <span>Back to Home</span>
+                    <span class="nav-dropdown-arrow">→</span>
+                </a>
+                <a href="minifigs.html" class="nav-dropdown-item nav-dropdown-secondary">
+                    <img src="images/minifig-icon.png" class="nav-dropdown-icon img" alt="Minifigures">
+                    <span>Go to Minifigures</span>
+                    <span class="nav-dropdown-arrow">→</span>
+                </a>
+            </nav>
             <div class="header-actions">
                 <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Visit LEGO.com">🧱 LEGO.com</a>
                 <button class="btn btn-primary" id="addItemBtn">+ Add Set</button>
@@ -474,6 +497,9 @@
         <span id="notificationMessage"></span>
     </div>
 
+    <!-- Navigation Dropdown Overlay -->
+    <div class="nav-dropdown-overlay" id="navDropdownOverlay"></div>
+
     <!-- Scripts -->
 
     <!-- Firebase Compat SDK (loaded from CDN - works with file:// protocol) -->
@@ -505,6 +531,67 @@
     <script src="js/sets/storage.js"></script>
     <script src="js/sets/ui.js"></script>
     <script src="js/sets/app.js"></script>
+
+    <!-- Hamburger Menu Script -->
+    <script>
+        (function() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const navDropdown = document.getElementById('navDropdown');
+            const navDropdownOverlay = document.getElementById('navDropdownOverlay');
+
+            if (!hamburgerBtn || !navDropdown || !navDropdownOverlay) return;
+
+            function toggleMenu(e) {
+                e.stopPropagation();
+                const isActive = hamburgerBtn.classList.contains('active');
+
+                if (isActive) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+            }
+
+            function openMenu() {
+                hamburgerBtn.classList.add('active');
+                hamburgerBtn.setAttribute('aria-expanded', 'true');
+                navDropdown.classList.add('active');
+                navDropdown.setAttribute('aria-hidden', 'false');
+                navDropdownOverlay.classList.add('active');
+                document.body.style.overflow = '';
+            }
+
+            function closeMenu() {
+                hamburgerBtn.classList.remove('active');
+                hamburgerBtn.setAttribute('aria-expanded', 'false');
+                navDropdown.classList.remove('active');
+                navDropdown.setAttribute('aria-hidden', 'true');
+                navDropdownOverlay.classList.remove('active');
+            }
+
+            hamburgerBtn.addEventListener('click', toggleMenu);
+
+            // Close when clicking outside dropdown
+            document.addEventListener('click', (e) => {
+                if (!navDropdown.classList.contains('active')) return;
+
+                // Check if click was inside dropdown or hamburger button
+                const clickedInsideDropdown = navDropdown.contains(e.target);
+                const clickedHamburgerBtn = hamburgerBtn.contains(e.target);
+
+                if (!clickedInsideDropdown && !clickedHamburgerBtn) {
+                    closeMenu();
+                }
+            });
+
+            // Close menu on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && hamburgerBtn.classList.contains('active')) {
+                    closeMenu();
+                }
+            });
+        })();
+    </script>
 
 </body>
 </html>

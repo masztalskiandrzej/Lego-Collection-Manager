@@ -40,11 +40,11 @@ body, html {
 
 /* Panel Backgrounds */
 .panel-sets {
-    background: linear-gradient(135deg, #E3000B 0%, #FFD500 50%, #006DB7 100%);
+    background: linear-gradient(135deg, #001f3f 0%, #FFD500 100%) !important;
 }
 
 .panel-minifigs {
-    background: linear-gradient(135deg, #FFD500 0%, #E3000B 50%, #006DB7 100%);
+    background: linear-gradient(135deg, #FFD500 0%, #001f3f 100%) !important;
 }
 
 /* Panel Overlay */
