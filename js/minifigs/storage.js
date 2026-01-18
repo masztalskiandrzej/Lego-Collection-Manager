@@ -64,10 +64,18 @@ const Storage = {
      * @returns {Promise<Array>} Array of collection items
      */
     async getCollection() {
+        console.log('📦 Minifigs Storage: getCollection() called');
         if (!await this._shouldUseFirestore()) {
             throw new Error('Authentication required. Please log in to access your collection.');
         }
-        return await this.firestoreStorage.getCollection();
+        console.log('✅ Using Firestore storage');
+        const result = await this.firestoreStorage.getCollection();
+        console.log('📦 Got', result.length, 'items from Firestore');
+        if (result.length > 0) {
+            console.log('🔍 First item keys:', Object.keys(result[0]));
+            console.log('🔍 First item has imageUrl?', !!result[0].imageUrl);
+        }
+        return result;
     },
 
     /**

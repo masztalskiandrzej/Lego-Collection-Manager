@@ -51,11 +51,15 @@ function createFirestoreStorage(collectionType, getUserId) {
          */
         async getCollection() {
             try {
+                console.log(`🔍 Firestore getCollection() called for ${this.collectionType}`);
+
                 const userId = this.getUserId();
                 if (!userId) {
                     console.warn('⚠️ No user authenticated, returning empty collection');
                     return [];
                 }
+
+                console.log('✅ User authenticated:', userId);
 
                 const db = this._getDb();
                 if (!db) {
@@ -63,9 +67,15 @@ function createFirestoreStorage(collectionType, getUserId) {
                     return [];
                 }
 
+                console.log('✅ Firestore DB initialized');
+
                 const collectionPath = this.getCollectionPath();
+                console.log('📂 Collection path:', collectionPath);
+
                 const collectionRef = db.collection(collectionPath);
                 const querySnapshot = await collectionRef.orderBy('dateAdded', 'desc').get();
+
+                console.log('📜 Query snapshot received, docs:', querySnapshot.docs.length);
 
                 const items = [];
                 querySnapshot.forEach((doc) => {
@@ -86,9 +96,18 @@ function createFirestoreStorage(collectionType, getUserId) {
                 });
 
                 console.log(`📦 Loaded ${items.length} items from Firestore (${this.collectionType})`);
+                if (items.length > 0) {
+                    console.log('🔍 First item:', {
+                        id: items[0].id,
+                        name: items[0].name,
+                        hasImageUrl: !!items[0].imageUrl,
+                        imageUrlPreview: items[0].imageUrl ? items[0].imageUrl.substring(0, 100) + '...' : 'none'
+                    });
+                }
                 return items;
             } catch (error) {
                 console.error('❌ Error loading from Firestore:', error);
+                console.error('Error details:', error.code, error.message);
                 // Fallback to empty array
                 return [];
             }
