@@ -189,6 +189,39 @@ const App = {
             this.handleFormSubmit();
         });
 
+        // Image upload handlers
+        const imageUploadBtn = document.getElementById('imageUploadBtn');
+        const imageFileInput = document.getElementById('itemImageFile');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+
+        console.log('🔍 Image upload elements:', { imageUploadBtn, imageFileInput, removeImageBtn });
+
+        if (imageUploadBtn && imageFileInput) {
+            console.log('✅ Adding image upload event listeners');
+            imageUploadBtn.addEventListener('click', () => {
+                console.log('📸 Upload button clicked');
+                imageFileInput.click();
+            });
+
+            imageFileInput.addEventListener('change', (e) => {
+                console.log('📁 File selected:', e.target.files[0]);
+                this.handleImageSelection(e.target.files[0]);
+            });
+        } else {
+            console.error('❌ Image upload elements not found:', {
+                imageUploadBtn: !!imageUploadBtn,
+                imageFileInput: !!imageFileInput
+            });
+        }
+
+        if (removeImageBtn) {
+            console.log('✅ Adding remove image button listener');
+            removeImageBtn.addEventListener('click', () => {
+                console.log('🗑️ Remove image button clicked');
+                this.handleRemoveImage();
+            });
+        }
+
         // Delete modal controls
         document.getElementById('deleteModalCloseBtn').addEventListener('click', () => {
             UI.hideDeleteModal();
@@ -394,13 +427,22 @@ const App = {
      * Handle form submission for add/edit
      */
     async handleFormSubmit() {
+        console.log('💾 Form submission started');
         const formData = UI.getFormData();
+
+        console.log('📋 Form data received:', {
+            ...formData,
+            imageUrl: formData.imageUrl ? formData.imageUrl.substring(0, 100) + '...' : 'none',
+            imageUrlLength: formData.imageUrl ? formData.imageUrl.length : 0
+        });
 
         try {
             if (formData.id) {
+                console.log('✏️ Updating existing item:', formData.id);
                 await Storage.updateItem(formData.id, formData);
                 UI.showNotification('Set updated successfully!', 'success');
             } else {
+                console.log('➕ Adding new item');
                 delete formData.id;
                 await Storage.addItem(formData);
                 UI.showNotification('Set added successfully!', 'success');
@@ -425,6 +467,61 @@ const App = {
             UI.hideDeleteModal();
             await this.refresh();
         }
+    },
+
+    /**
+     * Handle image file selection
+     * @param {File} file - Selected image file
+     */
+    handleImageSelection(file) {
+        console.log('🖼️ handleImageSelection called with:', file);
+
+        if (!file) {
+            console.warn('⚠️ No file provided');
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            console.error('❌ Not an image file:', file.type);
+            UI.showNotification('Please select an image file', 'error');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            console.error('❌ File too large:', file.size);
+            UI.showNotification('Image file must be smaller than 5MB', 'error');
+            return;
+        }
+
+        console.log('✅ File validated, reading as data URL...');
+
+        // Read file and show preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            console.log('✅ File loaded, showing preview');
+            UI.showImagePreview(e.target.result);
+        };
+        reader.onerror = () => {
+            console.error('❌ Error reading file');
+            UI.showNotification('Error reading image file', 'error');
+        };
+        reader.readAsDataURL(file);
+
+        // Update file name display
+        const fileName = document.getElementById('imageFileName');
+        if (fileName) {
+            fileName.textContent = file.name;
+            console.log('📝 File name updated:', file.name);
+        }
+    },
+
+    /**
+     * Handle remove image button
+     */
+    handleRemoveImage() {
+        UI.resetImageUpload();
     },
 
     /**
@@ -456,6 +553,18 @@ const App = {
      */
     async getFilteredCollection() {
         let items = await Storage.getCollection();
+        console.log('📦 Retrieved', items.length, 'items from Storage');
+
+        if (items.length > 0) {
+            console.log('🔍 First item from Storage:', {
+                id: items[0].id,
+                name: items[0].name,
+                hasImageUrl: !!items[0].imageUrl,
+                imageUrlPreview: items[0].imageUrl ? items[0].imageUrl.substring(0, 50) + '...' : 'none',
+                allKeys: Object.keys(items[0])
+            });
+        }
+
         const { filters, sort } = this.state;
 
         // Apply search filter
@@ -549,6 +658,17 @@ const App = {
      */
     async renderFilteredCollection() {
         const items = await this.getFilteredCollection();
+        console.log('🎨 Rendering collection with', items.length, 'items');
+
+        if (items.length > 0) {
+            console.log('📦 Sample item:', {
+                id: items[0].id,
+                name: items[0].name,
+                hasImageUrl: !!items[0].imageUrl,
+                imageUrlPreview: items[0].imageUrl ? items[0].imageUrl.substring(0, 50) + '...' : 'none'
+            });
+        }
+
         UI.renderCollection(items);
     },
 
@@ -556,6 +676,8 @@ const App = {
      * Full refresh of the UI
      */
     async refresh() {
+        console.log('🔄 Refreshing UI...');
+
         const themes = await Storage.getThemes();
         UI.renderThemeFilter(themes);
 
@@ -563,6 +685,8 @@ const App = {
         UI.renderStats(stats);
 
         await this.renderFilteredCollection();
+
+        console.log('✅ Refresh complete');
     },
 
     // ===== AUTHENTICATION METHODS =====

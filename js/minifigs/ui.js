@@ -64,6 +64,8 @@ const UI = {
      * @returns {string} HTML string
      */
     createItemCard(item) {
+        console.log('🎨 Creating card for item:', item.name, 'with imageUrl:', item.imageUrl ? item.imageUrl.substring(0, 50) + '...' : 'none');
+
         // All items are minifigures
         const number = item.figureNumber;
         const numberLabel = '#';
@@ -84,6 +86,8 @@ const UI = {
             : `<div class="card-image no-image">
                 <span class="placeholder-icon">&#9786;</span>
                </div>`;
+
+        console.log('🖼️ Image HTML generated:', imageHtml.substring(0, 100) + '...');
 
         return `
             <div class="item-card" data-id="${item.id}">
@@ -164,6 +168,9 @@ const UI = {
         document.getElementById('itemId').value = '';
         document.getElementById('itemType').value = 'minifigure';
 
+        // Reset image upload state
+        this.resetImageUpload();
+
         if (item) {
             // Edit mode
             title.textContent = 'Edit Minifigure';
@@ -177,6 +184,11 @@ const UI = {
             document.getElementById('itemCondition').value = item.condition || 'new';
             document.getElementById('itemLocation').value = item.location || '';
             document.getElementById('itemNotes').value = item.notes || '';
+
+            // Show existing image if available
+            if (item.imageUrl) {
+                this.showImagePreview(item.imageUrl);
+            }
         } else {
             // Add mode
             title.textContent = 'Add Minifigure';
@@ -184,6 +196,54 @@ const UI = {
 
         modal.classList.add('active');
         document.getElementById('itemName').focus();
+    },
+
+    /**
+     * Reset image upload state
+     */
+    resetImageUpload() {
+        const fileInput = document.getElementById('itemImageFile');
+        const fileName = document.getElementById('imageFileName');
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('imagePreviewImg');
+
+        if (fileInput) fileInput.value = '';
+        if (fileName) fileName.textContent = 'No file chosen';
+        if (preview) preview.style.display = 'none';
+        if (previewImg) previewImg.src = '';
+
+        // Store current image URL for reference
+        this.currentImageUrl = null;
+    },
+
+    /**
+     * Show image preview
+     * @param {string} imageUrl - URL of the image to preview
+     */
+    showImagePreview(imageUrl) {
+        console.log('🖼️ showImagePreview called with:', imageUrl ? imageUrl.substring(0, 50) + '...' : 'null');
+
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('imagePreviewImg');
+        const fileName = document.getElementById('imageFileName');
+
+        if (preview && previewImg) {
+            previewImg.src = imageUrl;
+            preview.style.display = 'block';
+            this.currentImageUrl = imageUrl;
+
+            // Update file name to show existing image
+            if (fileName) {
+                if (imageUrl.startsWith('data:')) {
+                    fileName.textContent = 'New image selected';
+                } else {
+                    fileName.textContent = 'Current image';
+                }
+            }
+            console.log('✅ Preview displayed');
+        } else {
+            console.error('❌ Preview elements not found:', { preview: !!preview, previewImg: !!previewImg });
+        }
     },
 
     /**
@@ -266,7 +326,7 @@ const UI = {
      * @returns {Object} Form data object
      */
     getFormData() {
-        return {
+        const formData = {
             id: document.getElementById('itemId').value || null,
             type: 'minifigure',
             name: document.getElementById('itemName').value.trim(),
@@ -279,6 +339,27 @@ const UI = {
             location: document.getElementById('itemLocation').value.trim(),
             notes: document.getElementById('itemNotes').value.trim()
         };
+
+        // Include current image URL if exists (from preview image src)
+        const preview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('imagePreviewImg');
+
+        console.log('🔍 getFormData - checking for image:', {
+            previewExists: !!preview,
+            previewImgExists: !!previewImg,
+            previewDisplay: preview ? preview.style.display : 'N/A',
+            previewImgSrc: previewImg ? (previewImg.src ? previewImg.src.substring(0, 50) + '...' : 'empty') : 'N/A'
+        });
+
+        if (previewImg && previewImg.src && preview && preview.style.display !== 'none') {
+            formData.imageUrl = previewImg.src;
+            console.log('✅ Image URL included in form data:', formData.imageUrl.substring(0, 50) + '...');
+        } else {
+            formData.imageUrl = null;
+            console.log('ℹ️ No image URL in form data');
+        }
+
+        return formData;
     },
 
     /**

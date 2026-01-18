@@ -123,6 +123,25 @@ function createFirestoreStorage(collectionType, getUserId) {
                 // Generate unique ID
                 const id = this.generateId();
 
+                // Log what we're saving (especially imageUrl)
+                console.log('📝 Saving item to Firestore:', {
+                    id,
+                    name: item.name,
+                    hasImageUrl: !!item.imageUrl,
+                    imageUrlLength: item.imageUrl ? item.imageUrl.length : 0,
+                    imageUrlPreview: item.imageUrl ? item.imageUrl.substring(0, 100) + '...' : 'none'
+                });
+
+                // Check image size
+                if (item.imageUrl) {
+                    const imageSizeKB = item.imageUrl.length * 0.00065; // Approx base64 to KB
+                    console.log(`🖼️ Image size: ${imageSizeKB.toFixed(2)} KB (Firestore limit: ~1024 KB per document)`);
+
+                    if (imageSizeKB > 900) {
+                        console.warn('⚠️ Image is very large and may exceed Firestore document size limit!');
+                    }
+                }
+
                 // Add metadata
                 const itemData = {
                     ...item,
@@ -138,6 +157,13 @@ function createFirestoreStorage(collectionType, getUserId) {
                 return id;
             } catch (error) {
                 console.error('❌ Error adding item to Firestore:', error);
+
+                // Check if error is related to document size
+                if (error.code === 'resource-exhausted' || error.message.includes('size')) {
+                    console.error('❌ Document too large! Image is probably too big for Firestore.');
+                    throw new Error('Zdjęcie jest zbyt duże! Proszę wybrać mniejsze zdjęcie (maks. 500KB zalecane).');
+                }
+
                 throw error;
             }
         },
@@ -162,6 +188,25 @@ function createFirestoreStorage(collectionType, getUserId) {
 
                 const collectionPath = this.getCollectionPath();
 
+                // Log what we're updating (especially imageUrl)
+                console.log('📝 Updating item in Firestore:', {
+                    id,
+                    name: updates.name,
+                    hasImageUrl: !!updates.imageUrl,
+                    imageUrlLength: updates.imageUrl ? updates.imageUrl.length : 0,
+                    imageUrlPreview: updates.imageUrl ? updates.imageUrl.substring(0, 100) + '...' : 'none'
+                });
+
+                // Check image size
+                if (updates.imageUrl) {
+                    const imageSizeKB = updates.imageUrl.length * 0.00065;
+                    console.log(`🖼️ Image size: ${imageSizeKB.toFixed(2)} KB (Firestore limit: ~1024 KB per document)`);
+
+                    if (imageSizeKB > 900) {
+                        console.warn('⚠️ Image is very large and may exceed Firestore document size limit!');
+                    }
+                }
+
                 // Add lastModified timestamp
                 const updateData = {
                     ...updates,
@@ -173,6 +218,13 @@ function createFirestoreStorage(collectionType, getUserId) {
                 console.log('✅ Item updated in Firestore:', id);
             } catch (error) {
                 console.error('❌ Error updating item in Firestore:', error);
+
+                // Check if error is related to document size
+                if (error.code === 'resource-exhausted' || error.message.includes('size')) {
+                    console.error('❌ Document too large! Image is probably too big for Firestore.');
+                    throw new Error('Zdjęcie jest zbyt duże! Proszę wybrać mniejsze zdjęcie (maks. 500KB zalecane).');
+                }
+
                 throw error;
             }
         },

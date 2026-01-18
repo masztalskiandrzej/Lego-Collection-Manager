@@ -189,6 +189,39 @@ const App = {
             this.handleFormSubmit();
         });
 
+        // Image upload handlers
+        const imageUploadBtn = document.getElementById('imageUploadBtn');
+        const imageFileInput = document.getElementById('itemImageFile');
+        const removeImageBtn = document.getElementById('removeImageBtn');
+
+        console.log('🔍 Image upload elements:', { imageUploadBtn, imageFileInput, removeImageBtn });
+
+        if (imageUploadBtn && imageFileInput) {
+            console.log('✅ Adding image upload event listeners');
+            imageUploadBtn.addEventListener('click', () => {
+                console.log('📸 Upload button clicked');
+                imageFileInput.click();
+            });
+
+            imageFileInput.addEventListener('change', (e) => {
+                console.log('📁 File selected:', e.target.files[0]);
+                this.handleImageSelection(e.target.files[0]);
+            });
+        } else {
+            console.error('❌ Image upload elements not found:', {
+                imageUploadBtn: !!imageUploadBtn,
+                imageFileInput: !!imageFileInput
+            });
+        }
+
+        if (removeImageBtn) {
+            console.log('✅ Adding remove image button listener');
+            removeImageBtn.addEventListener('click', () => {
+                console.log('🗑️ Remove image button clicked');
+                this.handleRemoveImage();
+            });
+        }
+
         // Delete modal controls
         document.getElementById('deleteModalCloseBtn').addEventListener('click', () => {
             UI.hideDeleteModal();
@@ -404,6 +437,49 @@ const App = {
             UI.hideDeleteModal();
             await this.refresh();
         }
+    },
+
+    /**
+     * Handle image file selection
+     * @param {File} file - Selected image file
+     */
+    handleImageSelection(file) {
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            UI.showNotification('Please select an image file', 'error');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            UI.showNotification('Image file must be smaller than 5MB', 'error');
+            return;
+        }
+
+        // Read file and show preview
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            UI.showImagePreview(e.target.result);
+        };
+        reader.onerror = () => {
+            UI.showNotification('Error reading image file', 'error');
+        };
+        reader.readAsDataURL(file);
+
+        // Update file name display
+        const fileName = document.getElementById('imageFileName');
+        if (fileName) {
+            fileName.textContent = file.name;
+        }
+    },
+
+    /**
+     * Handle remove image button
+     */
+    handleRemoveImage() {
+        UI.resetImageUpload();
     },
 
     /**
