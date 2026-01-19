@@ -2170,3 +2170,83 @@ body {
     height: 80px;
     object-fit: contain;
 }
+
+/* ===== Keyboard Shortcuts Modal ===== */
+.modal-shortcuts {
+    max-width: 400px;
+}
+
+.shortcuts-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.shortcut-item:last-child {
+    border-bottom: none;
+}
+
+.shortcut-item kbd {
+    display: inline-block;
+    min-width: 36px;
+    padding: 6px 10px;
+    background: linear-gradient(180deg, #f8f8f8, #e8e8e8);
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 0 #c0c0c0, inset 0 1px 0 #fff;
+    color: #333;
+}
+
+.shortcut-item span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.shortcuts-note {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid #f0f0f0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.shortcuts-note kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    background: linear-gradient(180deg, #f8f8f8, #e8e8e8);
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 0.8rem;
+    box-shadow: 0 1px 0 #c0c0c0;
+}
+
+/* Dark mode for shortcuts */
+[data-theme="dark"] .shortcut-item {
+    border-bottom-color: var(--card-border);
+}
+
+[data-theme="dark"] .shortcut-item kbd,
+[data-theme="dark"] .shortcuts-note kbd {
+    background: linear-gradient(180deg, #2a2a4a, #1a1a3a);
+    border-color: #3a3a5a;
+    color: #e8e8e8;
+    box-shadow: 0 2px 0 #0a0a1a, inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+[data-theme="dark"] .shortcuts-note {
+    border-top-color: var(--card-border);
+}

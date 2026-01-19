@@ -430,6 +430,76 @@ const App = {
                 window.location.href = 'login.html';
             });
         }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        if (window.KeyboardShortcuts) {
+            window.KeyboardShortcuts.init({
+                closeModal: () => {
+                    UI.hideModal();
+                    UI.hideDeleteModal();
+                    this.hideBuyModal();
+                },
+                newItem: () => UI.showModal(),
+                focusSearch: () => {
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) searchInput.focus();
+                },
+                gridView: () => {
+                    this.state.view = 'grid';
+                    const gridBtn = document.getElementById('viewGridBtn');
+                    const listBtn = document.getElementById('viewListBtn');
+                    const grid = document.getElementById('collectionGrid');
+                    if (gridBtn) gridBtn.classList.add('active');
+                    if (listBtn) listBtn.classList.remove('active');
+                    if (grid) grid.classList.remove('list-view');
+                },
+                listView: () => {
+                    this.state.view = 'list';
+                    const gridBtn = document.getElementById('viewGridBtn');
+                    const listBtn = document.getElementById('viewListBtn');
+                    const grid = document.getElementById('collectionGrid');
+                    if (gridBtn) gridBtn.classList.remove('active');
+                    if (listBtn) listBtn.classList.add('active');
+                    if (grid) grid.classList.add('list-view');
+                },
+                toggleTheme: () => {
+                    if (window.Theme) window.Theme.toggle();
+                },
+                filterAll: () => {
+                    const filterStatus = document.getElementById('filterStatus');
+                    if (filterStatus) {
+                        filterStatus.value = 'all';
+                        this.state.filters.status = 'all';
+                        this.renderFilteredCollection();
+                    }
+                },
+                filterOwned: () => {
+                    const filterStatus = document.getElementById('filterStatus');
+                    if (filterStatus) {
+                        filterStatus.value = 'owned';
+                        this.state.filters.status = 'owned';
+                        this.renderFilteredCollection();
+                    }
+                },
+                filterWishlist: () => {
+                    const filterStatus = document.getElementById('filterStatus');
+                    if (filterStatus) {
+                        filterStatus.value = 'wishlist';
+                        this.state.filters.status = 'wishlist';
+                        this.renderFilteredCollection();
+                    }
+                },
+                filterSold: () => {
+                    const filterStatus = document.getElementById('filterStatus');
+                    if (filterStatus) {
+                        filterStatus.value = 'sold';
+                        this.state.filters.status = 'sold';
+                        this.renderFilteredCollection();
+                    }
+                }
+            });
+            console.log('⌨️ Keyboard shortcuts configured');
+        }
     },
 
     /**
