@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="css/home.css?v=2">
 </head>
 <body>
+    <!-- Theme Toggle Button (Bottom Right) -->
+    <button class="btn-theme-home" id="themeToggleBtn" title="Toggle Dark Mode">🌙</button>
+
     <!-- User Button (Top Right) -->
     <button class="btn btn-user" id="userBtn">
         <span class="user-icon">👤</span>
@@ -43,9 +46,24 @@
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/auth.js"></script>
+    <script src="js/shared/theme.js"></script>
 
-    <!-- Initialize Auth and check login state -->
+    <!-- Initialize modules and check login state -->
     <script>
+        // Initialize Theme module
+        if (window.Theme) {
+            window.Theme.init();
+            console.log('🎨 Theme module initialized');
+
+            // Theme toggle button event
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    window.Theme.toggle();
+                });
+            }
+        }
+
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();

@@ -11,6 +11,9 @@
     <div class="bg-gradient"></div>
     <div class="bg-pattern"></div>
 
+    <!-- Theme Toggle Button -->
+    <button class="btn-theme-login" id="themeToggleBtn" title="Toggle Dark Mode">🌙</button>
+
     <!-- Login Container -->
     <div class="login-container">
         <!-- Logo & Header -->
@@ -161,9 +164,24 @@
     <!-- Shared Modules (Regular Scripts) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/auth.js"></script>
+    <script src="js/shared/theme.js"></script>
 
-    <!-- Initialize Auth and check if already logged in -->
+    <!-- Initialize modules and check if already logged in -->
     <script>
+        // Initialize Theme module
+        if (window.Theme) {
+            window.Theme.init();
+            console.log('🎨 Theme module initialized');
+
+            // Theme toggle button event
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    window.Theme.toggle();
+                });
+            }
+        }
+
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();
