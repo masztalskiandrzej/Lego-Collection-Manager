@@ -241,17 +241,6 @@
                 <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Visit LEGO.com">🧱 LEGO.com</a>
                 <button class="btn btn-primary" id="addItemBtn">+ Add Minifigure</button>
                 <button class="btn btn-buy" id="buyBtn">🛒 Buy</button>
-                <!-- Export/Import Dropdown -->
-                <div class="export-import-dropdown">
-                    <button class="btn btn-secondary" id="exportImportBtn">📁 Export/Import</button>
-                    <div class="export-import-menu" id="exportImportMenu">
-                        <button class="export-import-item" id="exportJSONBtn">📄 Export JSON</button>
-                        <button class="export-import-item" id="exportCSVBtn">📊 Export CSV</button>
-                        <hr>
-                        <button class="export-import-item" id="importJSONBtn">📥 Import JSON</button>
-                    </div>
-                </div>
-                <button class="btn btn-theme" id="themeToggleBtn" title="Toggle Dark Mode">🌙</button>
                 <button class="btn btn-user" id="userBtn">
                     <span class="user-icon">👤</span>
                     <span class="user-name" id="userName">Loading...</span>
@@ -513,29 +502,13 @@
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/auth.js"></script>
-    <script src="js/shared/theme.js"></script>
     <script src="js/shared/keyboard-shortcuts.js"></script>
-    <script src="js/shared/export-import.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
     <script src="js/shared/buy-links.js"></script>
     <script src="js/shared/ai-vision.js"></script>
 
     <!-- Initialize modules after all loaded -->
     <script>
-        // Initialize Theme module
-        if (window.Theme) {
-            window.Theme.init();
-            console.log('🎨 Theme module initialized');
-
-            // Theme toggle button event
-            const themeToggleBtn = document.getElementById('themeToggleBtn');
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', () => {
-                    window.Theme.toggle();
-                });
-            }
-        }
-
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();

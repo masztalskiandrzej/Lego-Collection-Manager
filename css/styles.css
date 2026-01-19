@@ -39,247 +39,6 @@
     --transition-normal: 0.25s ease;
 }
 
-/* ===== Dark Mode Variables ===== */
-[data-theme="dark"] {
-    /* UI Colors - Dark */
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-tertiary: #0f3460;
-    --text-primary: #e8e8e8;
-    --text-secondary: #b0b0b0;
-    --text-muted: #808080;
-
-    /* Card & Surface Colors */
-    --card-bg: #16213e;
-    --card-border: #0f3460;
-    --card-hover-border: #FFD500;
-
-    /* Input & Form Colors */
-    --input-bg: #0f3460;
-    --input-border: #1a4a7a;
-    --input-focus: #006DB7;
-
-    /* Modal Colors */
-    --modal-bg: #16213e;
-    --modal-overlay: rgba(0, 0, 0, 0.8);
-
-    /* Status Colors - Adjusted for dark bg */
-    --status-owned: #5acea4;
-    --status-wishlist: #ffb347;
-    --status-sold: #a0a0a0;
-}
-
-/* Dark mode base styles */
-[data-theme="dark"] body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: var(--text-primary);
-}
-
-/* Dark mode sidebar */
-[data-theme="dark"] .sidebar {
-    background: rgba(22, 33, 62, 0.95);
-    border-color: var(--card-border);
-}
-
-[data-theme="dark"] .sidebar-title {
-    color: var(--text-primary);
-}
-
-/* Dark mode cards */
-[data-theme="dark"] .item-card {
-    background: rgba(22, 33, 62, 0.98);
-    border-color: var(--card-border);
-}
-
-[data-theme="dark"] .item-card:hover {
-    border-color: var(--card-hover-border);
-}
-
-[data-theme="dark"] .card-header {
-    background: var(--bg-tertiary);
-    border-bottom-color: var(--card-border);
-}
-
-[data-theme="dark"] .card-body {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .card-name {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .card-info {
-    color: var(--text-secondary);
-}
-
-[data-theme="dark"] .card-actions {
-    background: var(--bg-tertiary);
-    border-top-color: var(--card-border);
-}
-
-[data-theme="dark"] .card-details {
-    background: rgba(15, 52, 96, 0.5);
-}
-
-[data-theme="dark"] .card-detail {
-    color: var(--text-secondary);
-}
-
-/* Dark mode forms */
-[data-theme="dark"] .search-box input,
-[data-theme="dark"] .filter-group select,
-[data-theme="dark"] .filter-group input,
-[data-theme="dark"] .form-group input,
-[data-theme="dark"] .form-group select,
-[data-theme="dark"] .form-group textarea {
-    background: var(--input-bg);
-    border-color: var(--input-border);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .search-box input::placeholder,
-[data-theme="dark"] .form-group input::placeholder,
-[data-theme="dark"] .form-group textarea::placeholder {
-    color: var(--text-muted);
-}
-
-[data-theme="dark"] .filter-group label {
-    color: var(--text-secondary);
-}
-
-/* Dark mode buttons */
-[data-theme="dark"] .btn-secondary {
-    background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-    color: var(--text-primary);
-    border: 1px solid var(--input-border);
-}
-
-[data-theme="dark"] .btn-secondary:hover {
-    background: linear-gradient(135deg, #1a4a7a 0%, #0f3460 100%);
-}
-
-[data-theme="dark"] .btn-icon {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border-color: var(--input-border);
-}
-
-[data-theme="dark"] .btn-icon:hover,
-[data-theme="dark"] .btn-icon.active {
-    background: var(--lego-yellow);
-    color: #001f3f;
-}
-
-/* Dark mode modals */
-[data-theme="dark"] .modal-overlay {
-    background: var(--modal-overlay);
-}
-
-[data-theme="dark"] .modal {
-    background: var(--bg-secondary);
-    border: 1px solid var(--card-border);
-}
-
-[data-theme="dark"] .modal-header {
-    background: var(--bg-tertiary);
-    border-bottom-color: var(--card-border);
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .modal-header h2 {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .modal-body {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .form-actions {
-    background: var(--bg-tertiary);
-    border-top-color: var(--card-border);
-}
-
-/* Dark mode footer */
-[data-theme="dark"] .footer {
-    background: rgba(22, 33, 62, 0.95);
-    border-top-color: var(--card-border);
-    color: var(--text-secondary);
-}
-
-[data-theme="dark"] .stat-item {
-    color: var(--text-primary);
-}
-
-/* Dark mode toolbar */
-[data-theme="dark"] .toolbar {
-    background: rgba(22, 33, 62, 0.8);
-}
-
-[data-theme="dark"] .sort-control label {
-    color: var(--text-secondary);
-}
-
-[data-theme="dark"] .sort-control select {
-    background: var(--input-bg);
-    border-color: var(--input-border);
-    color: var(--text-primary);
-}
-
-/* Dark mode notifications */
-[data-theme="dark"] .notification {
-    background: var(--bg-secondary);
-    border-color: var(--card-border);
-    color: var(--text-primary);
-}
-
-/* Dark mode empty state */
-[data-theme="dark"] .empty-state {
-    color: var(--text-secondary);
-}
-
-/* Dark mode dropdown menus */
-[data-theme="dark"] .dropdown-menu,
-[data-theme="dark"] .nav-dropdown {
-    background: var(--bg-secondary);
-    border-color: var(--card-border);
-}
-
-[data-theme="dark"] .dropdown-item,
-[data-theme="dark"] .nav-dropdown-link {
-    color: var(--text-primary);
-}
-
-[data-theme="dark"] .dropdown-item:hover,
-[data-theme="dark"] .nav-dropdown-link:hover {
-    background: var(--bg-tertiary);
-}
-
-/* Theme toggle button */
-.btn-theme {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 8px 14px;
-    border-radius: var(--radius-md);
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 44px;
-}
-
-.btn-theme:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
-}
-
-.btn-theme:active {
-    transform: translateY(0);
-}
-
 /* ===== Reset & Base ===== */
 * {
     margin: 0;
@@ -2249,4 +2008,228 @@ body {
 
 [data-theme="dark"] .shortcuts-note {
     border-top-color: var(--card-border);
+}
+
+/* ===== Export/Import Dropdown ===== */
+.export-import-container {
+    position: relative;
+    display: inline-block;
+}
+
+.export-import-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    margin-top: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.export-import-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.export-import-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.export-import-item:first-child {
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.export-import-item:last-child {
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.export-import-item:hover {
+    background: var(--bg-primary);
+}
+
+.export-import-item .item-icon {
+    font-size: 1.1rem;
+}
+
+.export-import-divider {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 4px 0;
+}
+
+/* Dark mode dropdown */
+[data-theme="dark"] .export-import-menu {
+    background: var(--bg-secondary);
+    border-color: var(--card-border);
+}
+
+[data-theme="dark"] .export-import-item {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .export-import-item:hover {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .export-import-divider {
+    border-top-color: var(--card-border);
+}
+
+/* ===== Import Modal ===== */
+.modal-import {
+    max-width: 450px;
+}
+
+.import-file-input {
+    display: none;
+}
+
+.import-file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    border: 2px dashed #d0d0d0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    background: var(--bg-primary);
+}
+
+.import-file-label:hover {
+    border-color: var(--lego-blue);
+    background: rgba(0, 109, 183, 0.05);
+}
+
+.import-file-label .file-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.import-file-label .file-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.import-file-label .file-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: var(--spacing-xs);
+}
+
+.import-file-selected {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--status-owned);
+    font-size: 0.9rem;
+    display: none;
+}
+
+.import-file-selected.show {
+    display: block;
+}
+
+.import-options {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+}
+
+.import-options label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.import-options input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Progress bar */
+.import-progress {
+    margin-top: var(--spacing-md);
+    display: none;
+}
+
+.import-progress.show {
+    display: block;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--lego-blue), var(--lego-yellow));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    text-align: center;
+    margin-top: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Dark mode import modal */
+[data-theme="dark"] .import-file-label {
+    background: var(--bg-tertiary);
+    border-color: var(--input-border);
+}
+
+[data-theme="dark"] .import-file-label:hover {
+    border-color: var(--lego-blue);
+    background: rgba(0, 109, 183, 0.1);
+}
+
+[data-theme="dark"] .import-options {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .progress-bar {
+    background: var(--bg-tertiary);
+}
+
+/* Export/Import button style */
+.btn-export {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    border: none;
 }
