@@ -393,6 +393,49 @@ const App = {
             });
         }
 
+        // ===== EXPORT/IMPORT EVENT LISTENERS =====
+
+        const exportImportBtn = document.getElementById('exportImportBtn');
+        const exportImportMenu = document.getElementById('exportImportMenu');
+
+        if (exportImportBtn && exportImportMenu) {
+            exportImportBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportImportMenu.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!exportImportBtn.contains(e.target) && !exportImportMenu.contains(e.target)) {
+                    exportImportMenu.classList.remove('active');
+                }
+            });
+        }
+
+        const exportJSONBtn = document.getElementById('exportJSONBtn');
+        if (exportJSONBtn) {
+            exportJSONBtn.addEventListener('click', () => {
+                exportImportMenu.classList.remove('active');
+                this.handleExportJSON();
+            });
+        }
+
+        const exportCSVBtn = document.getElementById('exportCSVBtn');
+        if (exportCSVBtn) {
+            exportCSVBtn.addEventListener('click', () => {
+                exportImportMenu.classList.remove('active');
+                this.handleExportCSV();
+            });
+        }
+
+        const importJSONBtn = document.getElementById('importJSONBtn');
+        if (importJSONBtn) {
+            importJSONBtn.addEventListener('click', () => {
+                exportImportMenu.classList.remove('active');
+                this.showImportModal();
+            });
+        }
+
         // ===== LOGIN REQUIRED OVERLAY EVENT LISTENERS =====
 
         const loginRequiredLoginBtn = document.getElementById('loginRequiredLoginBtn');
@@ -1302,6 +1345,123 @@ const App = {
         } catch (error) {
             console.error('Logout error:', error);
             UI.showNotification('Error logging out: ' + error.message, 'error');
+        }
+    },
+
+    // ===== EXPORT/IMPORT METHODS =====
+
+    /**
+     * Handle export to JSON
+     */
+    async handleExportJSON() {
+        try {
+            console.log('📤 Exporting to JSON...');
+
+            if (!window.ExportImport) {
+                UI.showNotification('Export module not loaded', 'error');
+                return;
+            }
+
+            const result = await window.ExportImport.exportJSON('minifigsCollection', async () => {
+                return await Storage.getCollection();
+            });
+
+            UI.showNotification(`Exported ${result.count} minifigures to JSON`, 'success');
+        } catch (error) {
+            console.error('❌ Export JSON error:', error);
+            UI.showNotification('Export failed: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Handle export to CSV
+     */
+    async handleExportCSV() {
+        try {
+            console.log('📤 Exporting to CSV...');
+
+            if (!window.ExportImport) {
+                UI.showNotification('Export module not loaded', 'error');
+                return;
+            }
+
+            const result = await window.ExportImport.exportCSV('minifigsCollection', async () => {
+                return await Storage.getCollection();
+            });
+
+            UI.showNotification(`Exported ${result.count} minifigures to CSV`, 'success');
+        } catch (error) {
+            console.error('❌ Export CSV error:', error);
+            UI.showNotification('Export failed: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Show import modal - using file input prompt
+     */
+    showImportModal() {
+        // Create a simple file input for import
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.json';
+
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.name.endsWith('.json')) {
+                UI.showNotification('Please select a JSON file', 'error');
+                return;
+            }
+
+            const skipDuplicates = confirm('Skip duplicate items (same figure number)?');
+            await this.handleImport(file, skipDuplicates);
+        };
+
+        fileInput.click();
+    },
+
+    /**
+     * Handle import from JSON
+     */
+    async handleImport(file, skipDuplicates = true) {
+        try {
+            console.log('📥 Starting import...');
+
+            if (!window.ExportImport) {
+                UI.showNotification('Import module not loaded', 'error');
+                return;
+            }
+
+            const results = await window.ExportImport.importJSON(
+                file,
+                'minifigsCollection',
+                Storage,
+                {
+                    skipDuplicates: skipDuplicates,
+                    onProgress: (percent) => {
+                        console.log(`Import progress: ${percent}%`);
+                    }
+                }
+            );
+
+            let resultText = `Imported: ${results.imported} minifigures`;
+            if (results.skipped > 0) {
+                resultText += ` | Skipped: ${results.skipped} duplicates`;
+            }
+            if (results.errors > 0) {
+                resultText += ` | Errors: ${results.errors}`;
+            }
+
+            UI.showNotification(`Import complete! ${results.imported} minifigures imported.`, 'success');
+            console.log('✅ Import results:', resultText);
+
+            // Refresh collection after import
+            await this.refresh();
+
+        } catch (error) {
+            console.error('❌ Import error:', error);
+            UI.showNotification('Import failed: ' + error.message, 'error');
         }
     }
 };
