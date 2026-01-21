@@ -4,6 +4,9 @@
  */
 
 const App = {
+    // Pagination settings
+    PAGE_SIZE: 50,
+
     // Current state
     state: {
         filters: {
@@ -19,6 +22,15 @@ const App = {
             ascending: true
         },
         view: 'grid',
+        // Pagination state
+        pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            pageSize: 50,
+            totalItems: 0
+        },
+        // Cached filtered items (for pagination)
+        filteredItems: [],
         // Authentication state
         user: null,
         isAuthenticated: false,
@@ -111,32 +123,38 @@ const App = {
         // Search input
         document.getElementById('searchInput').addEventListener('input', (e) => {
             this.state.filters.search = e.target.value;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         // Filter controls (no type filter for sets only)
         document.getElementById('filterTheme').addEventListener('change', (e) => {
             this.state.filters.theme = e.target.value;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('filterStatus').addEventListener('change', (e) => {
             this.state.filters.status = e.target.value;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('filterCondition').addEventListener('change', (e) => {
             this.state.filters.condition = e.target.value;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('yearMin').addEventListener('change', (e) => {
             this.state.filters.yearMin = e.target.value ? parseInt(e.target.value) : null;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('yearMax').addEventListener('change', (e) => {
             this.state.filters.yearMax = e.target.value ? parseInt(e.target.value) : null;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
@@ -148,12 +166,14 @@ const App = {
         // Sort controls
         document.getElementById('sortBy').addEventListener('change', (e) => {
             this.state.sort.by = e.target.value;
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('sortOrderBtn').addEventListener('click', () => {
             this.state.sort.ascending = !this.state.sort.ascending;
             UI.updateSortIcon(this.state.sort.ascending);
+            this.resetPagination();
             this.renderFilteredCollection();
         });
 
@@ -248,6 +268,27 @@ const App = {
 
         document.getElementById('deleteConfirmBtn').addEventListener('click', () => {
             this.handleDelete();
+        });
+
+        // Pagination event listeners
+        document.getElementById('paginationFirst').addEventListener('click', () => {
+            this.goToPage(1);
+        });
+
+        document.getElementById('paginationPrev').addEventListener('click', () => {
+            if (this.state.pagination.currentPage > 1) {
+                this.goToPage(this.state.pagination.currentPage - 1);
+            }
+        });
+
+        document.getElementById('paginationNext').addEventListener('click', () => {
+            if (this.state.pagination.currentPage < this.state.pagination.totalPages) {
+                this.goToPage(this.state.pagination.currentPage + 1);
+            }
+        });
+
+        document.getElementById('paginationLast').addEventListener('click', () => {
+            this.goToPage(this.state.pagination.totalPages);
         });
 
         // Collection grid event delegation for edit/delete/buy buttons
@@ -752,12 +793,13 @@ const App = {
         document.getElementById('yearMax').value = '';
         document.getElementById('searchInput').value = '';
 
+        this.resetPagination();
         this.renderFilteredCollection();
     },
 
     /**
      * Apply filters and sort to collection
-     * @returns {Promise<Array>} Filtered and sorted items
+     * @returns {Promise<Array>} Filtered and sorted items (all items, not paginated)
      */
     async getFilteredCollection() {
         let items = await Storage.getCollection();
@@ -858,15 +900,91 @@ const App = {
             return sort.ascending ? comparison : -comparison;
         });
 
+        // Store filtered items in cache for pagination
+        this.state.filteredItems = items;
+
         return items;
     },
 
     /**
-     * Render filtered collection
+     * Render filtered collection with pagination
      */
     async renderFilteredCollection() {
-        const items = await this.getFilteredCollection();
-        console.log('🎨 Rendering collection with', items.length, 'items');
+        // Get all filtered items
+        const allItems = await this.getFilteredCollection();
+        console.log('🎨 Rendering collection with', allItems.length, 'total items');
+
+        const totalItems = allItems.length;
+        const totalPages = Math.ceil(totalItems / this.PAGE_SIZE) || 1;
+        const currentPage = this.state.pagination.currentPage;
+
+        // Ensure current page is valid
+        if (currentPage > totalPages) {
+            this.state.pagination.currentPage = totalPages;
+        }
+
+        // Get items for current page
+        const startIndex = (this.state.pagination.currentPage - 1) * this.PAGE_SIZE;
+        const endIndex = startIndex + this.PAGE_SIZE;
+        const itemsToShow = allItems.slice(startIndex, endIndex);
+
+        console.log(`📄 Page ${this.state.pagination.currentPage}: showing items ${startIndex + 1}-${Math.min(endIndex, totalItems)} of ${totalItems}`);
+
+        // Update pagination state
+        this.state.pagination = {
+            currentPage: this.state.pagination.currentPage,
+            totalPages: totalPages,
+            pageSize: this.PAGE_SIZE,
+            totalItems: totalItems
+        };
+
+        // Render items
+        if (itemsToShow.length > 0) {
+            console.log('📦 Sample item:', {
+                id: itemsToShow[0].id,
+                name: itemsToShow[0].name,
+                hasImageUrl: !!itemsToShow[0].imageUrl,
+                imageUrlPreview: itemsToShow[0].imageUrl ? itemsToShow[0].imageUrl.substring(0, 50) + '...' : 'none'
+            });
+        }
+
+        UI.renderCollection(itemsToShow);
+
+        // Render pagination controls
+        UI.renderPagination({
+            currentPage: this.state.pagination.currentPage,
+            totalPages: this.state.pagination.totalPages,
+            pageSize: this.state.pagination.pageSize,
+            totalItems: this.state.pagination.totalItems,
+            hasNext: this.state.pagination.currentPage < this.state.pagination.totalPages,
+            hasPrev: this.state.pagination.currentPage > 1
+        });
+    },
+
+    /**
+     * Navigate to a specific page
+     * @param {number} pageNum - Page number to go to
+     */
+    goToPage(pageNum) {
+        const totalPages = this.state.pagination.totalPages;
+
+        if (pageNum < 1 || pageNum > totalPages) {
+            return;
+        }
+
+        this.state.pagination.currentPage = pageNum;
+        this.renderFilteredCollection();
+
+        // Scroll to top of collection
+        document.querySelector('.collection-area').scrollIntoView({ behavior: 'smooth' });
+    },
+
+    /**
+     * Reset pagination to first page (call when filters change)
+     */
+    resetPagination() {
+        this.state.pagination.currentPage = 1;
+    }
 
         if (items.length > 0) {
             console.log('📦 Sample item:', {

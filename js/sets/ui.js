@@ -19,7 +19,17 @@ const UI = {
         // Stats elements
         totalItems: null,
         totalPieces: null,
-        totalValue: null
+        totalValue: null,
+        // Pagination elements
+        pagination: null,
+        paginationFirst: null,
+        paginationPrev: null,
+        paginationNext: null,
+        paginationLast: null,
+        paginationCurrent: null,
+        paginationTotal: null,
+        paginationShowing: null,
+        paginationTotalItems: null
     },
 
     /**
@@ -40,6 +50,16 @@ const UI = {
         this.elements.totalItems = document.getElementById('totalItems');
         this.elements.totalPieces = document.getElementById('totalPieces');
         this.elements.totalValue = document.getElementById('totalValue');
+        // Pagination elements
+        this.elements.pagination = document.getElementById('pagination');
+        this.elements.paginationFirst = document.getElementById('paginationFirst');
+        this.elements.paginationPrev = document.getElementById('paginationPrev');
+        this.elements.paginationNext = document.getElementById('paginationNext');
+        this.elements.paginationLast = document.getElementById('paginationLast');
+        this.elements.paginationCurrent = document.getElementById('paginationCurrent');
+        this.elements.paginationTotal = document.getElementById('paginationTotal');
+        this.elements.paginationShowing = document.getElementById('paginationShowing');
+        this.elements.paginationTotalItems = document.getElementById('paginationTotalItems');
     },
 
     /**
@@ -384,5 +404,58 @@ const UI = {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
+    },
+
+    /**
+     * Render pagination controls
+     * @param {Object} paginationState - Pagination state object
+     */
+    renderPagination(paginationState) {
+        const {
+            currentPage,
+            totalPages,
+            pageSize,
+            totalItems,
+            hasNext,
+            hasPrev
+        } = paginationState;
+
+        const pagination = this.elements.pagination;
+
+        if (totalPages <= 1) {
+            pagination.style.display = 'none';
+            return;
+        }
+
+        pagination.style.display = 'flex';
+
+        // Update page numbers
+        this.elements.paginationCurrent.textContent = currentPage;
+        this.elements.paginationTotal.textContent = totalPages;
+        this.elements.paginationTotalItems.textContent = totalItems.toLocaleString();
+
+        // Calculate showing range (e.g., "1-50")
+        const startItem = (currentPage - 1) * pageSize + 1;
+        const endItem = Math.min(currentPage * pageSize, totalItems);
+        this.elements.paginationShowing.textContent = `${startItem}-${endItem}`;
+
+        // Update button states
+        this.elements.paginationFirst.disabled = !hasPrev;
+        this.elements.paginationPrev.disabled = !hasPrev;
+        this.elements.paginationNext.disabled = !hasNext;
+        this.elements.paginationLast.disabled = !hasNext;
+    },
+
+    /**
+     * Show/hide pagination
+     * @param {boolean} show - Whether to show pagination
+     */
+    togglePagination(show) {
+        const pagination = this.elements.pagination;
+        if (show) {
+            pagination.style.display = 'flex';
+        } else {
+            pagination.style.display = 'none';
+        }
     }
 };
