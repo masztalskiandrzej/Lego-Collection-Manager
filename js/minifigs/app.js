@@ -489,9 +489,39 @@ const App = {
 
         try {
             if (formData.id) {
+                // Check for duplicate figure number (excluding current item)
+                if (formData.figureNumber) {
+                    const duplicate = await Storage.checkDuplicateByFigureNumber(formData.figureNumber, formData.id);
+                    if (duplicate) {
+                        console.warn('⚠️ Duplicate figure number found:', duplicate);
+                        const confirmed = confirm(
+                            `⚠️ A minifigure with number "${formData.figureNumber}" already exists in your collection:\n\n` +
+                            `Name: ${duplicate.name || 'N/A'}\n` +
+                            `Status: ${duplicate.status || 'N/A'}\n\n` +
+                            `Do you want to save anyway?`
+                        );
+                        if (!confirmed) {
+                            return;
+                        }
+                    }
+                }
+
                 await Storage.updateItem(formData.id, formData);
                 UI.showNotification('Minifigure updated successfully!', 'success');
             } else {
+                // Check for duplicate figure number
+                if (formData.figureNumber) {
+                    const duplicate = await Storage.checkDuplicateByFigureNumber(formData.figureNumber);
+                    if (duplicate) {
+                        console.warn('⚠️ Duplicate figure number found:', duplicate);
+                        UI.showNotification(
+                            `⚠️ Minifigure "${formData.figureNumber}" already exists: ${duplicate.name || 'N/A'}`,
+                            'warning'
+                        );
+                        return;
+                    }
+                }
+
                 delete formData.id;
                 await Storage.addItem(formData);
                 UI.showNotification('Minifigure added successfully!', 'success');

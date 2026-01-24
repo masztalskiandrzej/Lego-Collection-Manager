@@ -559,10 +559,42 @@ const App = {
         try {
             if (formData.id) {
                 console.log('✏️ Updating existing item:', formData.id);
+
+                // Check for duplicate set number (excluding current item)
+                if (formData.setNumber) {
+                    const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber, formData.id);
+                    if (duplicate) {
+                        console.warn('⚠️ Duplicate set number found:', duplicate);
+                        const confirmed = confirm(
+                            `⚠️ A set with number "${formData.setNumber}" already exists in your collection:\n\n` +
+                            `Name: ${duplicate.name || 'N/A'}\n` +
+                            `Status: ${duplicate.status || 'N/A'}\n\n` +
+                            `Do you want to save anyway?`
+                        );
+                        if (!confirmed) {
+                            return;
+                        }
+                    }
+                }
+
                 await Storage.updateItem(formData.id, formData);
                 UI.showNotification('Set updated successfully!', 'success');
             } else {
                 console.log('➕ Adding new item');
+
+                // Check for duplicate set number
+                if (formData.setNumber) {
+                    const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber);
+                    if (duplicate) {
+                        console.warn('⚠️ Duplicate set number found:', duplicate);
+                        UI.showNotification(
+                            `⚠️ Set "${formData.setNumber}" already exists: ${duplicate.name || 'N/A'}`,
+                            'warning'
+                        );
+                        return;
+                    }
+                }
+
                 delete formData.id;
                 await Storage.addItem(formData);
                 UI.showNotification('Set added successfully!', 'success');

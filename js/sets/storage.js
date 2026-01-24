@@ -207,5 +207,31 @@ const Storage = {
             };
         }
         return await this.firestoreStorage.getStats();
+    },
+
+    /**
+     * Check if a set number already exists in the collection
+     * @param {string} setNumber - The set number to check
+     * @param {string} excludeId - Optional ID to exclude (for edits)
+     * @returns {Promise<Object|null>} The existing item if found, null otherwise
+     */
+    async checkDuplicateBySetNumber(setNumber, excludeId = null) {
+        console.log('🔍 Checking for duplicate set number:', setNumber, 'excludeId:', excludeId);
+        if (!await this._shouldUseFirestore()) {
+            return null;
+        }
+
+        const collection = await this.getCollection();
+        const duplicate = collection.find(item =>
+            item.setNumber && item.setNumber.toString() === setNumber.toString() && item.id !== excludeId
+        );
+
+        if (duplicate) {
+            console.log('⚠️ Duplicate found:', duplicate);
+        } else {
+            console.log('✅ No duplicate found');
+        }
+
+        return duplicate || null;
     }
 };

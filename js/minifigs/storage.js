@@ -206,5 +206,31 @@ const Storage = {
             };
         }
         return await this.firestoreStorage.getStats();
+    },
+
+    /**
+     * Check if a figure number already exists in the collection
+     * @param {string} figureNumber - The figure number to check
+     * @param {string} excludeId - Optional ID to exclude (for edits)
+     * @returns {Promise<Object|null>} The existing item if found, null otherwise
+     */
+    async checkDuplicateByFigureNumber(figureNumber, excludeId = null) {
+        console.log('🔍 Checking for duplicate figure number:', figureNumber, 'excludeId:', excludeId);
+        if (!await this._shouldUseFirestore()) {
+            return null;
+        }
+
+        const collection = await this.getCollection();
+        const duplicate = collection.find(item =>
+            item.figureNumber && item.figureNumber.toString() === figureNumber.toString() && item.id !== excludeId
+        );
+
+        if (duplicate) {
+            console.log('⚠️ Duplicate found:', duplicate);
+        } else {
+            console.log('✅ No duplicate found');
+        }
+
+        return duplicate || null;
     }
 };
