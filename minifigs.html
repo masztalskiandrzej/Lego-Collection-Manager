@@ -46,6 +46,9 @@
             box-shadow: 0 6px 30px rgba(255, 213, 0, 0.4);
             position: relative;
             overflow-x: hidden;
+            height: 70px;
+            display: flex;
+            align-items: center;
         }
 
         /* Animacja shine */
@@ -69,16 +72,21 @@
         .header-left {
             position: relative;
             z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 4px;
         }
 
         .logo-icon {
-            font-size: 2rem;
+            font-size: 1.75rem;
+            height: 3.5rem;
+            width: auto;
             filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
             animation: float 3s ease-in-out infinite;
         }

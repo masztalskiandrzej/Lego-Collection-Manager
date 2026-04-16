@@ -629,7 +629,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 10000;
     opacity: 0;
     visibility: hidden;
     transition: opacity var(--transition-normal), visibility var(--transition-normal);
@@ -651,6 +651,8 @@ body {
     transform: translateY(-20px);
     transition: transform var(--transition-normal);
     pointer-events: auto;
+    position: relative;
+    z-index: 10001;
 }
 
 .modal-overlay.active .modal {
@@ -1913,8 +1915,8 @@ body {
 
 /* ===== Logo Icons - Images ===== */
 .logo-icon.img {
-    width: 50px;
-    height: 50px;
+    width: auto;
+    height: 4.2rem;
     object-fit: contain;
 }
 

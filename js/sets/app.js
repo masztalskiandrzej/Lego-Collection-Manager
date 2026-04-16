@@ -1016,18 +1016,6 @@ const App = {
      */
     resetPagination() {
         this.state.pagination.currentPage = 1;
-    }
-
-        if (items.length > 0) {
-            console.log('📦 Sample item:', {
-                id: items[0].id,
-                name: items[0].name,
-                hasImageUrl: !!items[0].imageUrl,
-                imageUrlPreview: items[0].imageUrl ? items[0].imageUrl.substring(0, 50) + '...' : 'none'
-            });
-        }
-
-        UI.renderCollection(items);
     },
 
     /**
