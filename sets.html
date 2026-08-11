@@ -258,6 +258,9 @@
             </nav>
             <div class="header-actions">
                 <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Visit LEGO.com">🧱 LEGO.com</a>
+                <button class="btn btn-export-header" id="exportBtn" title="Export & Share" onclick="showExportDialog()">
+                    <span class="export-icon">📤</span>
+                </button>
                 <button class="btn btn-primary" id="addItemBtn">+ Add Set</button>
                 <button class="btn btn-buy" id="buyBtn">🛒 Buy</button>
                 <button class="btn btn-settings" id="settingsBtn" title="Settings">
@@ -532,6 +535,128 @@
         </div>
     </div>
 
+    <!-- Export/Share Modal -->
+    <div class="modal-overlay" id="exportModalOverlay">
+        <div class="modal modal-export">
+            <div class="modal-header">
+                <h2>📤 Export & Share</h2>
+                <button class="btn-close" id="exportModalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Export Summary -->
+                <div id="exportSummary" class="export-summary">
+                    <h3>📊 Collection Summary</h3>
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <span class="stat-label">Total Items:</span>
+                            <span class="stat-value" id="summaryTotalItems">0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">Total Value:</span>
+                            <span class="stat-value" id="summaryTotalValue">$0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">Themes:</span>
+                            <span class="stat-value" id="summaryThemes">0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="stat-label">With Images:</span>
+                            <span class="stat-value" id="summaryImages">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-section">
+                    <h3 class="export-section-title">Export Data</h3>
+                    <div class="export-options">
+                        <button class="btn btn-export" id="exportCSVBtn">
+                            <span class="export-icon">📊</span>
+                            <span class="export-text">
+                                <span class="export-title">Export to CSV</span>
+                                <span class="export-desc">Spreadsheet-compatible format</span>
+                            </span>
+                        </button>
+                        <button class="btn btn-export" id="exportJSONBtn">
+                            <span class="export-icon">📦</span>
+                            <span class="export-text">
+                                <span class="export-title">Export to JSON</span>
+                                <span class="export-desc">Full backup with metadata</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Social Sharing -->
+                <div class="export-section">
+                    <h3 class="export-section-title">Social Sharing</h3>
+                    <div class="export-options">
+                        <button class="btn btn-export" id="generateCardBtn">
+                            <span class="export-icon">🎨</span>
+                            <span class="export-text">
+                                <span class="export-title">Generate Collection Card</span>
+                                <span class="export-desc">Beautiful image for social media</span>
+                            </span>
+                        </button>
+                        <button class="btn btn-export" id="generateQRBtn">
+                            <span class="export-icon">📱</span>
+                            <span class="export-text">
+                                <span class="export-title">Generate QR Code</span>
+                                <span class="export-desc">Share collection link</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Import -->
+                <div class="export-section">
+                    <h3 class="export-section-title">Import Data</h3>
+                    <div class="import-container">
+                        <input type="file" id="importFileInput" accept=".json" style="display: none;">
+                        <button class="btn btn-import" id="importJSONBtn">
+                            <span class="export-icon">📥</span>
+                            <span class="export-text">
+                                <span class="export-title">Import from JSON</span>
+                                <span class="export-desc">Restore from backup file</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Public Link -->
+                <div class="export-section">
+                    <h3 class="export-section-title">Public Sharing</h3>
+                    <button class="btn btn-export btn-full-width" id="publicLinkBtn">
+                        <span class="export-icon">🔗</span>
+                        <span class="export-text">
+                            <span class="export-title">Generate Public Link</span>
+                            <span class="export-desc">Create shareable collection URL</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Collection Card Preview Modal -->
+    <div class="modal-overlay" id="cardPreviewModalOverlay">
+        <div class="modal modal-card-preview">
+            <div class="modal-header">
+                <h2>🎨 Your Collection Card</h2>
+                <button class="btn-close" id="cardPreviewCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cardPreviewContainer" class="card-preview-container">
+                    <div class="card-preview-placeholder">Generating collection card...</div>
+                </div>
+                <div class="card-preview-actions">
+                    <button class="btn btn-primary" id="downloadCardBtn">📥 Download Card</button>
+                    <button class="btn btn-share" id="shareCardTwitterBtn">🐦 Share on Twitter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="modal modal-settings">
@@ -554,8 +679,21 @@
                     </div>
                 </div>
                 <div class="settings-section">
-                    <h3 class="settings-section-title">More options coming soon...</h3>
-                    <p class="settings-hint">Additional settings will be added in future updates.</p>
+                    <h3 class="settings-section-title">Data Management</h3>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <span class="settings-item-label">Export Collection</span>
+                            <span class="settings-item-description">Export your data to CSV or JSON</span>
+                        </div>
+                        <button class="btn btn-secondary" id="exportSettingsBtn">📤 Export</button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-item-info">
+                            <span class="settings-item-label">Import Collection</span>
+                            <span class="settings-item-description">Import data from backup file</span>
+                        </div>
+                        <button class="btn btn-secondary" id="importSettingsBtn">📥 Import</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -582,6 +720,10 @@
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/keyboard-shortcuts.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
+    <script src="js/shared/image-handler.js"></script>
+    <script src="js/shared/buy-links.js"></script>
+    <script src="js/shared/export-import.js"></script>
+    <script src="js/shared/social-sharing.js"></script>
     <script src="js/shared/buy-links.js"></script>
     <script src="js/shared/ai-vision.js"></script>
 
@@ -717,6 +859,448 @@
                 });
             }
         })();
+    </script>
+
+    <!-- Export/Share Dialog Function -->
+    <script>
+        // Wait for modules to be available
+        let moduleCheckInterval = null;
+        let modulesReady = false;
+
+        function checkModulesReady() {
+            const available = {
+                Storage: typeof window.Storage !== 'undefined',
+                ExportImport: typeof window.ExportImport !== 'undefined',
+                SocialSharing: typeof window.SocialSharing !== 'undefined',
+                Auth: typeof window.Auth !== 'undefined'
+            };
+            console.log('🔍 Module availability check:', available);
+            return available.Storage && available.ExportImport && available.SocialSharing;
+        }
+
+        async function loadCollectionData() {
+            try {
+                console.log('📦 Loading collection data...');
+
+                // Check if Storage module is available
+                if (!window.Storage) {
+                    console.error('❌ Storage module not available');
+                    document.getElementById('summaryTotalItems').textContent = 'N/A';
+                    document.getElementById('summaryTotalValue').textContent = 'N/A';
+                    document.getElementById('summaryThemes').textContent = 'N/A';
+                    document.getElementById('summaryImages').textContent = 'N/A';
+                    return;
+                }
+
+                // Check if user is authenticated
+                if (!window.Auth || !window.Auth.isAuthenticated()) {
+                    console.warn('⚠️ User not authenticated');
+                    document.getElementById('summaryTotalItems').textContent = 'Login required';
+                    document.getElementById('summaryTotalValue').textContent = 'Login required';
+                    document.getElementById('summaryThemes').textContent = 'Login required';
+                    document.getElementById('summaryImages').textContent = 'Login required';
+                    return;
+                }
+
+                const collection = await window.Storage.getCollection();
+                console.log('✅ Collection loaded:', collection.length, 'items');
+
+                if (!collection || collection.length === 0) {
+                    // Show empty stats
+                    document.getElementById('summaryTotalItems').textContent = '0';
+                    document.getElementById('summaryTotalValue').textContent = '$0';
+                    document.getElementById('summaryThemes').textContent = '0';
+                    document.getElementById('summaryImages').textContent = '0/0';
+                    return;
+                }
+
+                // Check if ExportImport module is available
+                if (!window.ExportImport) {
+                    console.error('❌ ExportImport module not available');
+                    // Show basic stats without detailed summary
+                    document.getElementById('summaryTotalItems').textContent = collection.length;
+                    document.getElementById('summaryTotalValue').textContent = 'N/A';
+                    document.getElementById('summaryThemes').textContent = 'N/A';
+                    document.getElementById('summaryImages').textContent = 'N/A';
+                    return;
+                }
+
+                // Calculate summary
+                const summary = window.ExportImport.getExportSummary(collection);
+                console.log('📊 Collection summary:', summary);
+
+                // Update UI with real data
+                document.getElementById('summaryTotalItems').textContent = summary.totalItems;
+                document.getElementById('summaryTotalValue').textContent = `$${Math.round(summary.totalValue)}`;
+                document.getElementById('summaryThemes').textContent = summary.themes.length;
+                document.getElementById('summaryImages').textContent = `${summary.itemsWithImages}/${summary.totalItems}`;
+
+                console.log('✅ Stats updated successfully');
+            } catch (error) {
+                console.error('❌ Error loading collection data:', error);
+                // Show error stats with user-friendly message
+                document.getElementById('summaryTotalItems').textContent = 'Error';
+                document.getElementById('summaryTotalValue').textContent = 'Error';
+                document.getElementById('summaryThemes').textContent = 'Error';
+                document.getElementById('summaryImages').textContent = 'Error';
+                console.error('Full error details:', error.message, error.stack);
+            }
+        }
+
+        function showExportDialog() {
+            console.log('📤 Export button clicked!');
+            const exportModal = document.getElementById('exportModalOverlay');
+            if (exportModal) {
+                exportModal.classList.add('active');
+                console.log('✅ Export modal opened');
+
+                // Load collection data when modal opens
+                if (checkModulesReady()) {
+                    loadCollectionData();
+                } else {
+                    // Wait for modules to be ready
+                    console.log('⏳ Waiting for modules to load...');
+                    let attempts = 0;
+                    const maxAttempts = 50; // Increase to 5 seconds
+
+                    moduleCheckInterval = setInterval(() => {
+                        attempts++;
+                        console.log(`⏳ Module check attempt ${attempts}/${maxAttempts}`);
+
+                        // Log current state
+                        console.log('Current module state:', {
+                            Storage: typeof window.Storage,
+                            ExportImport: typeof window.ExportImport,
+                            SocialSharing: typeof window.SocialSharing
+                        });
+
+                        if (checkModulesReady()) {
+                            clearInterval(moduleCheckInterval);
+                            console.log('✅ Modules ready, loading data');
+                            loadCollectionData();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(moduleCheckInterval);
+                            console.error('❌ Modules failed to load after 5 seconds');
+                            console.error('Final state:', {
+                                Storage: typeof window.Storage,
+                                ExportImport: typeof window.ExportImport,
+                                SocialSharing: typeof window.SocialSharing
+                            });
+
+                            // Show helpful error
+                            let missingModules = [];
+                            if (typeof window.Storage === 'undefined') missingModules.push('Storage');
+                            if (typeof window.ExportImport === 'undefined') missingModules.push('ExportImport');
+                            if (typeof window.SocialSharing === 'undefined') missingModules.push('SocialSharing');
+
+                            alert('Required modules not available: ' + missingModules.join(', ') + '\n\nPlease refresh the page and ensure you are logged in.');
+                        }
+                    }, 100);
+                }
+            } else {
+                console.error('❌ Export modal not found');
+                alert('Export modal not found in the page');
+            }
+        }
+
+        // Close export modal function
+        function closeExportDialog() {
+            const exportModal = document.getElementById('exportModalOverlay');
+            if (exportModal) {
+                exportModal.classList.remove('active');
+            }
+        }
+
+        // Bind close button
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM Content Loaded');
+            console.log('🔍 Checking available modules:');
+            console.log('- Storage:', typeof window.Storage);
+            console.log('- ExportImport:', typeof window.ExportImport);
+            console.log('- SocialSharing:', typeof window.SocialSharing);
+            console.log('- Auth:', typeof window.Auth);
+
+            const exportModalCloseBtn = document.getElementById('exportModalCloseBtn');
+            if (exportModalCloseBtn) {
+                exportModalCloseBtn.addEventListener('click', closeExportDialog);
+            }
+
+            // Close on click outside
+            const exportModal = document.getElementById('exportModalOverlay');
+            if (exportModal) {
+                exportModal.addEventListener('click', function(e) {
+                    if (e.target === exportModal) {
+                        closeExportDialog();
+                    }
+                });
+            }
+
+            // Export functions
+            setupExportFunctions();
+        });
+
+        function setupExportFunctions() {
+            console.log('🔧 Setting up export functions...');
+            console.log('🔍 Available modules:', {
+                Storage: typeof window.Storage,
+                ExportImport: typeof window.ExportImport,
+                SocialSharing: typeof window.SocialSharing,
+                Auth: typeof window.Auth
+            });
+
+            // Export to CSV
+            const exportCSVBtn = document.getElementById('exportCSVBtn');
+            if (exportCSVBtn) {
+                exportCSVBtn.onclick = async function() {
+                    try {
+                        console.log('📊 Exporting to CSV...');
+
+                        // Check if modules are available
+                        if (!window.Storage) {
+                            alert('Storage module not loaded. Please refresh the page and ensure you are logged in.');
+                            console.error('❌ Storage module not available');
+                            return;
+                        }
+                        if (!window.ExportImport) {
+                            alert('Export module not loaded. Please refresh the page.');
+                            console.error('❌ ExportImport module not available');
+                            return;
+                        }
+                        if (!window.Auth || !window.Auth.isAuthenticated()) {
+                            alert('Please log in to export your collection.');
+                            console.error('❌ User not authenticated');
+                            return;
+                        }
+
+                        const collection = await window.Storage.getCollection();
+                        window.ExportImport.exportToCSV(collection, 'sets');
+                        alert('Collection exported to CSV successfully!');
+                        console.log('✅ CSV export complete');
+                    } catch (error) {
+                        console.error('❌ CSV export error:', error);
+                        alert('Error exporting to CSV: ' + error.message);
+                    }
+                };
+            }
+
+            // Export to JSON
+            const exportJSONBtn = document.getElementById('exportJSONBtn');
+            if (exportJSONBtn) {
+                exportJSONBtn.onclick = async function() {
+                    try {
+                        console.log('📦 Exporting to JSON...');
+
+                        if (!window.Storage || !window.Auth?.isAuthenticated()) {
+                            alert('Please log in to export your collection.');
+                            return;
+                        }
+                        if (!window.ExportImport) {
+                            alert('Export module not loaded. Please refresh the page.');
+                            return;
+                        }
+
+                        const collection = await window.Storage.getCollection();
+                        const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
+                        const metadata = { username, exportDate: new Date().toISOString() };
+                        window.ExportImport.exportToJSON(collection, 'sets', metadata);
+                        alert('Collection exported to JSON successfully!');
+                        console.log('✅ JSON export complete');
+                    } catch (error) {
+                        console.error('❌ JSON export error:', error);
+                        alert('Error exporting to JSON: ' + error.message);
+                    }
+                };
+            }
+
+            // Generate Collection Card
+            const generateCardBtn = document.getElementById('generateCardBtn');
+            if (generateCardBtn) {
+                generateCardBtn.onclick = async function() {
+                    try {
+                        console.log('🎨 Generating collection card...');
+
+                        if (!window.Storage || !window.Auth?.isAuthenticated()) {
+                            alert('Please log in to generate collection cards.');
+                            return;
+                        }
+                        if (!window.ExportImport || !window.SocialSharing) {
+                            alert('Required modules not loaded. Please refresh the page.');
+                            return;
+                        }
+
+                        const collection = await window.Storage.getCollection();
+                        const summary = window.ExportImport.getExportSummary(collection);
+                        const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
+                        const cardDataUrl = await window.SocialSharing.generateCollectionCard(summary, username, 'sets');
+
+                        const cardPreviewModal = document.getElementById('cardPreviewModalOverlay');
+                        const cardPreviewContainer = document.getElementById('cardPreviewContainer');
+
+                        if (cardPreviewContainer) {
+                            cardPreviewContainer.innerHTML = `<img src="${cardDataUrl}" alt="Collection Card" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">`;
+                        }
+
+                        if (cardPreviewModal) {
+                            cardPreviewModal.classList.add('active');
+                        }
+
+                        // Setup card preview actions
+                        setupCardPreviewActions(cardDataUrl, summary);
+                        console.log('✅ Collection card generated');
+                    } catch (error) {
+                        console.error('❌ Card generation error:', error);
+                        alert('Error generating card: ' + error.message);
+                    }
+                };
+            }
+
+            // Generate QR Code
+            const generateQRBtn = document.getElementById('generateQRBtn');
+            if (generateQRBtn) {
+                generateQRBtn.onclick = async function() {
+                    try {
+                        console.log('📱 Generating QR code...');
+
+                        if (!window.SocialSharing) {
+                            alert('Social sharing module not loaded. Please refresh the page.');
+                            return;
+                        }
+
+                        const collectionUrl = window.location.href;
+                        const qrDataUrl = await window.SocialSharing.generateQRCode(collectionUrl);
+
+                        const link = document.createElement('a');
+                        link.href = qrDataUrl;
+                        link.download = 'collection-qr-code.png';
+                        link.click();
+
+                        alert('QR code generated and downloaded!');
+                        console.log('✅ QR code generated');
+                    } catch (error) {
+                        console.error('❌ QR code generation error:', error);
+                        alert('Error generating QR code: ' + error.message);
+                    }
+                };
+            }
+
+            // Public Link
+            const publicLinkBtn = document.getElementById('publicLinkBtn');
+            if (publicLinkBtn) {
+                publicLinkBtn.onclick = async function() {
+                    try {
+                        console.log('🔗 Generating public link...');
+
+                        if (!window.Auth || !window.Auth.isAuthenticated()) {
+                            alert('You must be logged in to create public links');
+                            return;
+                        }
+                        if (!window.ExportImport) {
+                            alert('Export module not loaded. Please refresh the page.');
+                            return;
+                        }
+
+                        const userId = window.Auth.getUserId();
+                        const publicLink = window.ExportImport.generatePublicLink(userId, 'sets');
+                        await navigator.clipboard.writeText(publicLink);
+                        alert('Public link copied to clipboard!\n\n' + publicLink);
+                        console.log('✅ Public link generated');
+                    } catch (error) {
+                        console.error('❌ Public link error:', error);
+                        alert('Error creating public link: ' + error.message);
+                    }
+                };
+            }
+
+            // Import from JSON
+            const importJSONBtn = document.getElementById('importJSONBtn');
+            const importFileInput = document.getElementById('importFileInput');
+            if (importJSONBtn && importFileInput) {
+                importJSONBtn.onclick = function() {
+                    importFileInput.click();
+                };
+            }
+
+            if (importFileInput) {
+                importFileInput.onchange = async function(e) {
+                    try {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        if (!window.Storage || !window.Auth?.isAuthenticated()) {
+                            alert('Please log in to import items.');
+                            return;
+                        }
+                        if (!window.ExportImport) {
+                            alert('Export module not loaded. Please refresh the page.');
+                            return;
+                        }
+
+                        if (!confirm('This will import items and add them to your existing collection. Continue?')) {
+                            return;
+                        }
+
+                        console.log('📥 Importing from JSON...');
+                        const importedData = await window.ExportImport.importFromJSON(file);
+
+                        let importCount = 0;
+                        for (const item of importedData.data) {
+                            item.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                            await window.Storage.addItem(item);
+                            importCount++;
+                        }
+
+                        alert(`Successfully imported ${importCount} items!`);
+                        closeExportDialog();
+                        console.log('✅ Import complete');
+                        setTimeout(() => location.reload(), 1000);
+                    } catch (error) {
+                        console.error('❌ Import error:', error);
+                        alert('Error importing: ' + error.message);
+                    }
+                };
+            }
+
+            console.log('✅ Export functions setup complete');
+        }
+
+        function setupCardPreviewActions(cardDataUrl, summary) {
+            // Close button
+            const cardPreviewCloseBtn = document.getElementById('cardPreviewCloseBtn');
+            if (cardPreviewCloseBtn) {
+                cardPreviewCloseBtn.onclick = function() {
+                    document.getElementById('cardPreviewModalOverlay').classList.remove('active');
+                };
+            }
+
+            // Close on click outside
+            const cardPreviewModal = document.getElementById('cardPreviewModalOverlay');
+            if (cardPreviewModal) {
+                cardPreviewModal.onclick = function(e) {
+                    if (e.target === cardPreviewModal) {
+                        cardPreviewModal.classList.remove('active');
+                    }
+                };
+            }
+
+            // Download button
+            const downloadCardBtn = document.getElementById('downloadCardBtn');
+            if (downloadCardBtn) {
+                downloadCardBtn.onclick = function() {
+                    window.SocialSharing.downloadImage(cardDataUrl, 'lego-collection-card.png');
+                    alert('Collection card downloaded!');
+                };
+            }
+
+            // Share on Twitter button
+            const shareCardTwitterBtn = document.getElementById('shareCardTwitterBtn');
+            if (shareCardTwitterBtn) {
+                shareCardTwitterBtn.onclick = function() {
+                    const shareText = window.SocialSharing.generateShareText(summary, 'sets');
+                    const shareUrl = window.location.href;
+                    window.SocialSharing.shareOnSocialMedia('twitter', shareText, shareUrl, cardDataUrl);
+                };
+            }
+        }
     </script>
 
 </body>

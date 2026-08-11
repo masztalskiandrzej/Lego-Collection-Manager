@@ -234,3 +234,6 @@ const Storage = {
         return duplicate || null;
     }
 };
+
+// Export globally
+window.Storage = Storage;
