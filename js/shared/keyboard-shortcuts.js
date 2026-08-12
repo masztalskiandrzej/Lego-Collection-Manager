@@ -27,7 +27,6 @@ const KeyboardShortcuts = {
      */
     init(callbacks) {
         if (this.initialized) {
-            console.log('⌨️ Keyboard shortcuts already initialized');
             return;
         }
 
@@ -36,7 +35,6 @@ const KeyboardShortcuts = {
 
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
 
-        console.log('⌨️ Keyboard shortcuts initialized');
     },
 
     /**
@@ -197,4 +195,3 @@ const KeyboardShortcuts = {
 // Make globally available
 window.KeyboardShortcuts = KeyboardShortcuts;
 
-console.log('⌨️ Keyboard shortcuts module loaded');

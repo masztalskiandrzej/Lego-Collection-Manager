@@ -15,7 +15,6 @@ const ExportImport = {
      */
     exportToCSV(collection, collectionType = 'sets') {
         try {
-            console.log(`📊 Exporting ${collectionType} to CSV...`);
 
             if (!collection || collection.length === 0) {
                 throw new Error('Collection is empty');
@@ -76,11 +75,9 @@ const ExportImport = {
                 'text/csv'
             );
 
-            console.log(`✅ Successfully exported ${collection.length} items to CSV`);
             return true;
 
         } catch (error) {
-            console.error('❌ Error exporting to CSV:', error);
             throw error;
         }
     },
@@ -94,7 +91,6 @@ const ExportImport = {
      */
     exportToJSON(collection, collectionType = 'sets', metadata = {}) {
         try {
-            console.log(`📦 Exporting ${collectionType} to JSON...`);
 
             if (!collection || collection.length === 0) {
                 throw new Error('Collection is empty');
@@ -124,11 +120,9 @@ const ExportImport = {
                 'application/json'
             );
 
-            console.log(`✅ Successfully exported ${collection.length} items to JSON`);
             return true;
 
         } catch (error) {
-            console.error('❌ Error exporting to JSON:', error);
             throw error;
         }
     },
@@ -142,7 +136,6 @@ const ExportImport = {
      */
     generatePublicLink(userId, collectionType = 'sets', options = {}) {
         try {
-            console.log(`🔗 Generating public link for ${collectionType}...`);
 
             // Default display options
             const defaultOptions = {
@@ -165,11 +158,9 @@ const ExportImport = {
             // Store share configuration (in a real app, this would go to Firestore)
             this.storeShareConfig(shareToken, userId, collectionType, displayOptions);
 
-            console.log(`✅ Public link generated: ${publicUrl}`);
             return publicUrl;
 
         } catch (error) {
-            console.error('❌ Error generating public link:', error);
             throw error;
         }
     },
@@ -183,7 +174,6 @@ const ExportImport = {
     importFromJSON(file) {
         return new Promise((resolve, reject) => {
             try {
-                console.log('📥 Importing collection from JSON...');
 
                 const reader = new FileReader();
 
@@ -196,11 +186,9 @@ const ExportImport = {
                             throw new Error('Invalid JSON structure');
                         }
 
-                        console.log(`✅ Successfully imported ${importedData.data.length} items`);
                         resolve(importedData);
 
                     } catch (error) {
-                        console.error('❌ Error parsing JSON:', error);
                         reject(new Error('Invalid JSON file format'));
                     }
                 };
@@ -212,7 +200,6 @@ const ExportImport = {
                 reader.readAsText(file);
 
             } catch (error) {
-                console.error('❌ Error in importFromJSON:', error);
                 reject(error);
             }
         });
@@ -226,7 +213,6 @@ const ExportImport = {
      */
     async importFromBrickLink(bricklinkUsername, collectionType = 'sets') {
         try {
-            console.log(`🧱 Importing from BrickLink: ${bricklinkUsername}...`);
 
             // BrickLink API requires OAuth authentication
             // This is a placeholder for future implementation
@@ -237,8 +223,6 @@ const ExportImport = {
                 : `https://api.bricklink.com/store/users/${bricklinkUsername}/inventories`;
 
             // TODO: Implement proper OAuth authentication
-            console.log('⚠️ BrickLink API import requires OAuth setup');
-            console.log('📋 API Endpoint:', apiEndpoint);
 
             throw new Error('BrickLink API integration requires OAuth setup. This feature is planned for future implementation.');
 
@@ -249,7 +233,6 @@ const ExportImport = {
             // 4. Return array of items
 
         } catch (error) {
-            console.error('❌ Error importing from BrickLink:', error);
             throw error;
         }
     },
@@ -310,9 +293,7 @@ const ExportImport = {
             shares[token] = shareConfig;
             localStorage.setItem('publicShares', JSON.stringify(shares));
 
-            console.log(`✅ Share config stored for token: ${token}`);
         } catch (error) {
-            console.error('❌ Error storing share config:', error);
         }
     },
 
@@ -339,9 +320,7 @@ const ExportImport = {
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            console.log(`✅ Download triggered: ${filename}`);
         } catch (error) {
-            console.error('❌ Error triggering download:', error);
             throw error;
         }
     },
@@ -384,4 +363,3 @@ const ExportImport = {
 
 // Export module globally (for non-module loading)
 window.ExportImport = ExportImport;
-console.log('📦 Export/Import module loaded');

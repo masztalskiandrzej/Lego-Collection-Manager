@@ -3,10 +3,11 @@
 ## Spis treści
 1. [Wymagania](#wymagania)
 2. [Konfiguracja Resend (Email)](#konfiguracja-resend)
-3. [Deployment Firebase Functions](#deployment-functions)
-4. [Deployment Firebase Hosting](#deployment-hosting)
-5. [Weryfikacja działania](#weryfikacja)
-6. [Troubleshooting](#troubleshooting)
+3. [Konfiguracja Rebrickable (wyszukiwanie zestawów)](#konfiguracja-rebrickable)
+4. [Deployment Firebase Functions](#deployment-functions)
+5. [Deployment Firebase Hosting](#deployment-hosting)
+6. [Weryfikacja działania](#weryfikacja)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -30,6 +31,7 @@ firebase login
 ### Konta wymagane:
 - **Firebase** - https://console.firebase.google.com (już skonfigurowane)
 - **Resend** - https://resend.com (darmowe - 100 emaili/dzień)
+- **Rebrickable** - https://rebrickable.com/api/ (darmowy tier - auto-fill danych zestawów i minifigurek)
 
 ---
 
@@ -83,6 +85,35 @@ firebase functions:config:get
 
 ---
 
+## Konfiguracja Rebrickable
+
+Funkcja `lookupLegoItem` wyszukuje dane zestawów i minifigurek po numerze
+(auto-fill w formularzu dodawania). Wywołuje API Rebrickable **po stronie serwera**,
+dzięki czemu klucz API nie trafia do przeglądarki.
+
+### Krok 1: Pobierz API Key
+
+1. Wejdź na https://rebrickable.com/api/
+2. Zaloguj się / zarejestruj (darmowe konto)
+3. Skopiuj swój **API key** (Settings → API)
+
+### Krok 2: Zapisz API Key w functions/.env
+
+Klucz Rebrickable **nie może** znajdować się w kodzie klienta (jest publicznie widoczny).
+Przechowujemy go w pliku `functions/.env` — funkcja `lookupLegoItem` czyta go przez
+`process.env.REBRICKABLE_API_KEY`. Plik `functions/.env` jest w `.gitignore`, więc
+nigdy nie trafia do repozytorium.
+
+```
+REBRICKABLE_API_KEY=twoj_klucz_rebrickable
+```
+
+> **Plan Blaze:** po przejściu na plan Blaze można użyć Secret Manager
+> (`firebase functions:secrets:set REBRICKABLE_API_KEY` + `runWith({ secrets })`)
+> — zalecane, zanim aplikacja stanie się publiczna.
+
+---
+
 ## Deployment Functions
 
 ### Krok 1: Zainstaluj zależności
@@ -103,6 +134,7 @@ firebase deploy --only functions
 ```
 ✔  functions[sendVerificationEmail(europe-west1)]: Successful create operation.
 ✔  functions[resendVerificationCode(europe-west1)]: Successful create operation.
+✔  functions[lookupLegoItem(europe-west1)]: Successful create operation.
 ✔  Deploy complete!
 ```
 
@@ -114,6 +146,7 @@ firebase deploy --only functions
 4. Powinieneś zobaczyć:
    - `sendVerificationEmail` (europe-west1)
    - `resendVerificationCode` (europe-west1)
+   - `lookupLegoItem` (europe-west1)
 
 ---
 
@@ -249,12 +282,16 @@ firebaseFunctions = firebase.app().functions('europe-west1');
 # 1. Skonfiguruj Resend API key
 firebase functions:config:set resend.api_key="re_TWOJ_KLUCZ"
 
-# 2. Zainstaluj zależności functions
+# 2. Skonfiguruj Rebrickable API key (auto-fill danych zestawów)
+#    Dodaj do functions/.env (plik jest gitignored):
+#    REBRICKABLE_API_KEY=twoj_klucz
+
+# 3. Zainstaluj zależności functions
 cd functions && npm install && cd ..
 
-# 3. Deploy wszystkiego
+# 4. Deploy wszystkiego
 firebase deploy
 
-# 4. Gotowe!
+# 5. Gotowe!
 # Otwórz: https://collectionmanager-database.web.app
 ```

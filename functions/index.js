@@ -1,12 +1,15 @@
 /**
- * Firebase Cloud Functions - Email Verification Service
+ * Firebase Cloud Functions
  *
- * Uses Resend API to send verification codes
+ * - sendVerificationEmail / resendVerificationCode: 4-digit codes via Resend.
+ * - lookupLegoItem: proxies the Rebrickable API server-side, so the API key
+ *   stays in Secret Manager and is never shipped to the browser.
  *
- * Setup:
- * 1. Get Resend API key from https://resend.com/api-keys
- * 2. Add to functions/.env: RESEND_API_KEY=re_xxxxxxxxx
- * 3. Deploy: firebase deploy --only functions
+ * Secrets (see DEPLOYMENT.md):
+ * - RESEND_API_KEY       - Resend API key
+ * - REBRICKABLE_API_KEY  - Rebrickable API key (functions/.env, gitignored)
+ *
+ * Deploy: firebase deploy --only functions
  */
 
 const functions = require('firebase-functions');
@@ -154,6 +157,103 @@ exports.resendVerificationCode = functions
     });
 
 /**
+ * Look up a LEGO set or minifigure on Rebrickable (server-side).
+ *
+ * Keeps the Rebrickable API key out of the client. The key is read from
+ * `process.env.REBRICKABLE_API_KEY`, set in `functions/.env` (gitignored,
+ * never committed). On the Blaze plan you could swap this for Secret Manager
+ * + runWith({ secrets }).
+ *
+ * Called from client with: { itemNumber, itemType }  (itemType: 'set' | 'minifigure')
+ * Returns mapped item data, or null if not found.
+ */
+exports.lookupLegoItem = functions
+    .region('europe-west1')
+    .https.onCall(async (data, context) => {
+        // Only signed-in users can trigger lookups (prevents anonymous key burn).
+        if (!context.auth) {
+            throw new functions.https.HttpsError(
+                'unauthenticated',
+                'You must be signed in to use this feature.'
+            );
+        }
+
+        const { itemNumber, itemType = 'set' } = data || {};
+
+        if (!itemNumber) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'itemNumber is required'
+            );
+        }
+
+        const apiKey = process.env.REBRICKABLE_API_KEY;
+        if (!apiKey) {
+            console.error('REBRICKABLE_API_KEY is not configured');
+            throw new functions.https.HttpsError(
+                'internal',
+                'Lookup service is not configured.'
+            );
+        }
+
+        const endpoint = itemType === 'minifigure' ? 'minifigs' : 'sets';
+        const baseUrl = 'https://rebrickable.com/api/v3/lego';
+
+        const fetchItem = async (num) => {
+            const res = await fetch(`${baseUrl}/${endpoint}/${num}/?key=${apiKey}`);
+            if (!res.ok) return null;
+            return res.json();
+        };
+
+        try {
+            let json = await fetchItem(itemNumber);
+
+            // Sets are often stored with a "-1" variant suffix; retry if not found.
+            if (!json && itemType === 'set' && !itemNumber.includes('-')) {
+                json = await fetchItem(`${itemNumber}-1`);
+            }
+
+            if (!json) return null;
+
+            return mapRebrickableData(json, itemType);
+        } catch (error) {
+            console.error('Rebrickable lookup failed:', error);
+            return null;
+        }
+    });
+
+/**
+ * Map a Rebrickable API response to the app's item schema.
+ */
+function mapRebrickableData(data, itemType) {
+    if (!data) return null;
+
+    if (itemType === 'set') {
+        // Rebrickable set response: { set_num, name, year, theme_id, num_parts, set_img_url }
+        const setNum = data.set_num || '';
+        const setNumber = setNum.split('-')[0]; // drop variant like "-1"
+        return {
+            name: data.name || '',
+            theme: data.theme_id != null ? data.theme_id.toString() : '',
+            year: data.year ? parseInt(data.year) : null,
+            imageUrl: data.set_img_url || null,
+            setNumber,
+            pieceCount: data.num_parts ? parseInt(data.num_parts) : null,
+            pricePaid: null
+        };
+    }
+
+    // Rebrickable minifig response: { fig_num, name, year, theme_id, num_parts, fig_img_url }
+    return {
+        name: data.name || 'Unknown Minifigure',
+        theme: data.theme_id != null ? data.theme_id.toString() : '',
+        year: data.year ? parseInt(data.year) : null,
+        imageUrl: data.fig_img_url || null,
+        figureNumber: data.fig_num || ''
+    };
+}
+
+/**
  * Get email content based on language
  */
 function getEmailContent(code, language) {
@@ -211,7 +311,7 @@ function getEmailContent(code, language) {
                         <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
                             <p style="color: #999; font-size: 12px; margin: 0;">
                                 &copy; 2024 Collection Manager<br>
-                                Zarządzaj swoją kolekcją LEGO, książek i gier
+                                Zarządzaj swoją kolekcją LEGO
                             </p>
                         </td>
                     </tr>
@@ -276,7 +376,7 @@ function getEmailContent(code, language) {
                         <td style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e9ecef;">
                             <p style="color: #999; font-size: 12px; margin: 0;">
                                 &copy; 2024 Collection Manager<br>
-                                Manage your LEGO, Books, and Games collection
+                                Manage your LEGO collection
                             </p>
                         </td>
                     </tr>

@@ -86,7 +86,6 @@ const UI = {
      * @returns {string} HTML string
      */
     createItemCard(item) {
-        console.log('🎨 Creating card for item:', item.name, 'with imageUrl:', item.imageUrl ? item.imageUrl.substring(0, 50) + '...' : 'none');
 
         // All items are sets
         const number = item.setNumber;
@@ -109,8 +108,6 @@ const UI = {
             : `<div class="card-image no-image">
                 <span class="placeholder-icon">&#9632;</span>
                </div>`;
-
-        console.log('🖼️ Image HTML generated:', imageHtml.substring(0, 100) + '...');
 
         return `
             <div class="item-card" data-id="${item.id}">
@@ -247,7 +244,6 @@ const UI = {
      * @param {string} imageUrl - URL of the image to preview
      */
     showImagePreview(imageUrl) {
-        console.log('🖼️ showImagePreview called with:', imageUrl ? imageUrl.substring(0, 50) + '...' : 'null');
 
         const preview = document.getElementById('imagePreview');
         const previewImg = document.getElementById('imagePreviewImg');
@@ -266,9 +262,7 @@ const UI = {
                     fileName.textContent = 'Current image';
                 }
             }
-            console.log('✅ Preview displayed');
         } else {
-            console.error('❌ Preview elements not found:', { preview: !!preview, previewImg: !!previewImg });
         }
     },
 
@@ -368,17 +362,11 @@ const UI = {
         };
 
         // Include current image URL if exists (use stored currentImageUrl)
-        console.log('🔍 getFormData - checking for image:', {
-            currentImageUrl: this.currentImageUrl ? this.currentImageUrl.substring(0, 50) + '...' : 'none',
-            currentImageUrlLength: this.currentImageUrl ? this.currentImageUrl.length : 0
-        });
 
         if (this.currentImageUrl) {
             formData.imageUrl = this.currentImageUrl;
-            console.log('✅ Image URL included in form data, length:', formData.imageUrl.length);
         } else {
             formData.imageUrl = null;
-            console.log('ℹ️ No image URL in form data');
         }
 
         return formData;

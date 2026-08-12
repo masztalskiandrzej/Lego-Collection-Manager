@@ -15,9 +15,7 @@ const SocialSharing = {
      * Initialize social sharing module
      */
     init() {
-        console.log('🎨 Initializing Social Sharing module...');
         this.isInitialized = true;
-        console.log('✅ Social Sharing initialized');
     },
 
     /**
@@ -29,7 +27,6 @@ const SocialSharing = {
      */
     async generateCollectionCard(collectionData, username = 'LEGO Collector', collectionType = 'sets') {
         try {
-            console.log('🎨 Generating collection card...');
 
             // Create card HTML template
             const cardHTML = this.createCardHTML(collectionData, username, collectionType);
@@ -62,11 +59,9 @@ const SocialSharing = {
             // Cleanup
             document.body.removeChild(container);
 
-            console.log('✅ Collection card generated successfully');
             return imageDataUrl;
 
         } catch (error) {
-            console.error('❌ Error generating collection card:', error);
             throw new Error('Failed to generate collection card: ' + error.message);
         }
     },
@@ -79,7 +74,6 @@ const SocialSharing = {
      */
     async generateQRCode(url, options = {}) {
         try {
-            console.log('📱 Generating QR code...');
 
             const defaultOptions = {
                 width: 300,
@@ -106,11 +100,9 @@ const SocialSharing = {
 
             const qrDataUrl = qrCanvas.toDataURL('image/png');
 
-            console.log('✅ QR code generated successfully');
             return qrDataUrl;
 
         } catch (error) {
-            console.error('❌ Error generating QR code:', error);
             throw new Error('Failed to generate QR code: ' + error.message);
         }
     },
@@ -323,7 +315,6 @@ const SocialSharing = {
 
             script.onload = () => {
                 this.html2CanvasLibrary = window.html2canvas;
-                console.log('✅ html2canvas loaded');
                 resolve();
             };
 
@@ -349,7 +340,6 @@ const SocialSharing = {
 
             script.onload = () => {
                 this.qrCodeLibrary = window.QRCode;
-                console.log('✅ QRCode library loaded');
                 resolve();
             };
 
@@ -386,7 +376,6 @@ const SocialSharing = {
 
         if (shareUrl) {
             window.open(shareUrl, '_blank', 'width=600,height=400');
-            console.log(`📤 Opening ${platform} share dialog...`);
         } else {
             throw new Error(`Unsupported platform: ${platform}`);
         }
@@ -409,9 +398,7 @@ const SocialSharing = {
 
             document.body.removeChild(link);
 
-            console.log(`✅ Image downloaded: ${filename}`);
         } catch (error) {
-            console.error('❌ Error downloading image:', error);
             throw error;
         }
     },
@@ -437,4 +424,3 @@ Managed with LEGO Collection Manager #LEGO #Collection`;
 
 // Export module globally (for non-module loading)
 window.SocialSharing = SocialSharing;
-console.log('🎨 Social Sharing module loaded');

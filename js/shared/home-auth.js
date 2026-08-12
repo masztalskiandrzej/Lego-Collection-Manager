@@ -13,12 +13,9 @@ function waitForAuth() {
 
     if (window.Auth && window.Auth.init) {
         clearInterval(authCheckInterval);
-        console.log('✅ Auth module found after', authCheckCount * 100, 'ms');
         initHomeAuth();
     } else if (authCheckCount >= MAX_AUTH_CHECKS) {
         clearInterval(authCheckInterval);
-        console.error('❌ Auth module not found after', MAX_AUTH_CHECKS * 100, 'ms');
-        console.error('Make sure firebase-config.js and auth.js are loaded correctly');
         // Still initialize UI without Auth module
         initHomeAuth();
     }
@@ -27,18 +24,15 @@ function waitForAuth() {
 // Wait for DOM to be ready, then check for Auth module
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('📄 DOM loaded, starting Auth module check...');
         // Check every 100ms for Auth module
         authCheckInterval = setInterval(waitForAuth, 100);
     });
 } else {
     // DOM is already ready
-    console.log('📄 DOM already ready, starting Auth module check...');
     authCheckInterval = setInterval(waitForAuth, 100);
 }
 
 function initHomeAuth() {
-    console.log('🏠 Initializing home page auth...');
 
     const loginBtn = document.getElementById('homeLoginBtn');
     const authModal = document.getElementById('authModalOverlay');
@@ -170,7 +164,6 @@ function initHomeAuth() {
         });
     }
 
-    console.log('✅ Home auth initialized');
 }
 
 // ===== Modal Management =====
@@ -290,7 +283,6 @@ async function handleLogin() {
             switchToLogin();
         }
     } catch (error) {
-        console.error('Login error:', error);
         showNotification('Login failed: ' + error.message, 'error');
         switchToLogin();
     }
@@ -350,7 +342,6 @@ async function handleRegister() {
             switchToRegister();
         }
     } catch (error) {
-        console.error('Registration error:', error);
         showNotification('Registration failed: ' + error.message, 'error');
         switchToRegister();
     }
@@ -383,7 +374,6 @@ async function handleVerifyCode() {
             switchToVerification();
         }
     } catch (error) {
-        console.error('Verification error:', error);
         showNotification('Verification failed: ' + error.message, 'error');
         switchToVerification();
     }
@@ -404,7 +394,6 @@ async function handleResendCode() {
             showNotification(result.error, 'error');
         }
     } catch (error) {
-        console.error('Resend error:', error);
         showNotification('Failed to resend code: ' + error.message, 'error');
     }
 }
@@ -423,7 +412,6 @@ async function handleLogout() {
             window.location.href = 'login.html';
         }, 500);
     } catch (error) {
-        console.error('Logout error:', error);
         showNotification('Logout failed: ' + error.message, 'error');
     }
 }
@@ -485,4 +473,3 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-console.log('🏠 Home auth script loaded');

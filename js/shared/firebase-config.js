@@ -31,7 +31,6 @@ let firebaseFunctions = null;
 
 function initFirebase() {
     if (typeof firebase === 'undefined') {
-        console.error('❌ Firebase SDK not loaded! Make sure firebase-app-compat.js is included in HTML');
         return false;
     }
 
@@ -50,15 +49,11 @@ function initFirebase() {
         if (typeof firebase.functions === 'function') {
             // Use Europe region (same as Cloud Functions deployment)
             firebaseFunctions = firebase.app().functions('europe-west1');
-            console.log('✅ Firebase Functions initialized (europe-west1)');
         } else {
-            console.log('ℹ️ Firebase Functions SDK not loaded (email will fallback to console)');
         }
 
-        console.log('✅ Firebase zainicjalizowany pomyślnie');
         return true;
     } catch (error) {
-        console.error('❌ Błąd inicjalizacji Firebase:', error);
         return false;
     }
 }
@@ -70,4 +65,3 @@ window.getFirebaseAuth = function() { return firebaseAuth; };
 window.getFirebaseDb = function() { return firebaseDb; };
 window.getFirebaseFunctions = function() { return firebaseFunctions; };
 
-console.log('🔥 Firebase config loaded (compat version)');

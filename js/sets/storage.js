@@ -23,9 +23,7 @@ const Storage = {
 
         // Wait for initial auth state to be determined
         if (!window.Auth.initialAuthStateDetermined) {
-            console.log('⏳ Waiting for auth state to be determined...');
             const isLoggedIn = await window.Auth.waitForAuthState();
-            console.log('🔓 Auth state determined:', isLoggedIn ? 'Logged in' : 'Not logged in');
         }
 
         if (!window.Auth.isAuthenticated()) {
@@ -40,7 +38,6 @@ const Storage = {
             'setsCollection',
             () => window.Auth.getUserId()
         );
-        console.log('🔥 Firestore Storage initialized for Sets collection');
         this._initialized = true;
     },
 
@@ -64,16 +61,11 @@ const Storage = {
      * @returns {Promise<Array>} Array of collection items
      */
     async getCollection() {
-        console.log('📦 Sets Storage: getCollection() called');
         if (!await this._shouldUseFirestore()) {
             throw new Error('Authentication required. Please log in to access your collection.');
         }
-        console.log('✅ Using Firestore storage');
         const result = await this.firestoreStorage.getCollection();
-        console.log('📦 Got', result.length, 'items from Firestore');
         if (result.length > 0) {
-            console.log('🔍 First item keys:', Object.keys(result[0]));
-            console.log('🔍 First item has imageUrl?', !!result[0].imageUrl);
         }
         return result;
     },
@@ -83,7 +75,6 @@ const Storage = {
      */
     saveCollection(collection) {
         // Firestore saves individually, not as batch
-        console.warn('⚠️ saveCollection not used with Firestore - items are saved individually');
         return Promise.resolve(true);
     },
 
@@ -169,7 +160,6 @@ const Storage = {
      */
     async loadSampleData(sampleData) {
         if (!await this._shouldUseFirestore()) {
-            console.warn('Cannot load sample data - authentication required');
             return false;
         }
         // Sample data is now empty - this function exists for compatibility
@@ -216,7 +206,6 @@ const Storage = {
      * @returns {Promise<Object|null>} The existing item if found, null otherwise
      */
     async checkDuplicateBySetNumber(setNumber, excludeId = null) {
-        console.log('🔍 Checking for duplicate set number:', setNumber, 'excludeId:', excludeId);
         if (!await this._shouldUseFirestore()) {
             return null;
         }
@@ -227,9 +216,7 @@ const Storage = {
         );
 
         if (duplicate) {
-            console.log('⚠️ Duplicate found:', duplicate);
         } else {
-            console.log('✅ No duplicate found');
         }
 
         return duplicate || null;

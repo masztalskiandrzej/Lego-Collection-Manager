@@ -41,13 +41,11 @@ const App = {
      * Initialize the application
      */
     async init() {
-        console.log('🚀 Initializing Sets Collection Manager...');
 
         // Initialize UI
         UI.init();
 
         // Wait for Auth module to be available (polling mechanism)
-        console.log('⏳ Waiting for Auth module...');
         let authWaitCount = 0;
         const MAX_AUTH_WAIT = 50; // 5 seconds max
 
@@ -57,29 +55,22 @@ const App = {
         }
 
         if (typeof window.Auth === 'undefined') {
-            console.warn('⚠️ Auth module not available after 5 seconds - continuing without auth');
         } else {
-            console.log('✅ Auth module found after', authWaitCount * 100, 'ms');
         }
 
         // Set up auth state change listener
         if (window.Auth) {
             window.Auth.onAuthStateChanged = this.handleAuthStateChange.bind(this);
-            console.log('✅ Auth state listener configured');
 
             // Wait for initial auth state to be determined before checking
-            console.log('⏳ Waiting for auth state to be determined...');
             const isLoggedIn = await window.Auth.waitForAuthState();
-            console.log('🔓 Auth state determined:', isLoggedIn ? 'Logged in' : 'Not logged in');
 
             // REQUIRES authentication - redirect to login page if not logged in
             if (!isLoggedIn) {
-                console.warn('🔒 User not authenticated - redirecting to login page');
                 window.location.href = 'login.html';
                 return;
             }
 
-            console.log('✅ User already authenticated');
             this.state.isAuthenticated = true;
             this.state.user = {
                 email: window.Auth.getUserEmail(),
@@ -89,9 +80,7 @@ const App = {
         }
 
         // Bind event listeners (bind before auth check in case auth fails)
-        console.log('🔧 Binding event listeners...');
         this.bindEvents();
-        console.log('✅ Event listeners bound');
 
         // Initial render
         this.refresh();
@@ -115,7 +104,6 @@ const App = {
                         await window.Auth.logout();
                         window.location.href = 'login.html';
                     } catch (error) {
-                        console.error('Logout error:', error);
                         UI.showNotification('Błąd wylogowania: ' + error.message, 'error');
                     }
                 }
@@ -181,39 +169,28 @@ const App = {
 
         // Export button - open export modal (with module loading check)
         const exportBtn = document.getElementById('exportBtn');
-        console.log('🔍 Export button found:', exportBtn);
-        console.log('🔍 ExportImport module:', window.ExportImport);
 
         if (exportBtn) {
             exportBtn.addEventListener('click', (e) => {
-                console.log('🔍 Export button clicked!', e);
-                console.log('🔍 ExportImport available:', !!window.ExportImport);
 
                 if (window.ExportImport) {
-                    console.log('🔍 Calling showExportModal...');
                     this.showExportModal();
                 } else {
-                    console.log('⏳ ExportImport not loaded, waiting...');
                     // Wait for module to load
                     let attempts = 0;
                     const checkModule = setInterval(() => {
                         attempts++;
-                        console.log(`⏳ Checking for ExportImport, attempt ${attempts}`);
                         if (window.ExportImport) {
                             clearInterval(checkModule);
-                            console.log('✅ ExportImport loaded, calling showExportModal');
                             this.showExportModal();
                         } else if (attempts > 20) {
                             clearInterval(checkModule);
-                            console.error('❌ ExportImport failed to load');
                             UI.showNotification('Export module not available', 'error');
                         }
                     }, 100);
                 }
             });
-            console.log('✅ Export button event listener attached');
         } else {
-            console.error('❌ Export button not found!');
         }
 
         // View toggle
@@ -253,30 +230,19 @@ const App = {
         const imageFileInput = document.getElementById('itemImageFile');
         const removeImageBtn = document.getElementById('removeImageBtn');
 
-        console.log('🔍 Image upload elements:', { imageUploadBtn, imageFileInput, removeImageBtn });
-
         if (imageUploadBtn && imageFileInput) {
-            console.log('✅ Adding image upload event listeners');
             imageUploadBtn.addEventListener('click', () => {
-                console.log('📸 Upload button clicked');
                 imageFileInput.click();
             });
 
             imageFileInput.addEventListener('change', (e) => {
-                console.log('📁 File selected:', e.target.files[0]);
                 this.handleImageSelection(e.target.files[0]);
             });
         } else {
-            console.error('❌ Image upload elements not found:', {
-                imageUploadBtn: !!imageUploadBtn,
-                imageFileInput: !!imageFileInput
-            });
         }
 
         if (removeImageBtn) {
-            console.log('✅ Adding remove image button listener');
             removeImageBtn.addEventListener('click', () => {
-                console.log('🗑️ Remove image button clicked');
                 this.handleRemoveImage();
             });
         }
@@ -284,7 +250,6 @@ const App = {
         // Get Image button - fetch official photo from BrickLink CDN
         const fetchImageBtn = document.getElementById('fetchImageBtn');
         if (fetchImageBtn) {
-            console.log('✅ Adding Get Image button listener');
             fetchImageBtn.addEventListener('click', () => {
                 this.handleFetchImage();
             });
@@ -578,7 +543,6 @@ const App = {
                     }
                 }
             });
-            console.log('⌨️ Keyboard shortcuts configured');
         }
     },
 
@@ -586,24 +550,15 @@ const App = {
      * Handle form submission for add/edit
      */
     async handleFormSubmit() {
-        console.log('💾 Form submission started');
         const formData = UI.getFormData();
-
-        console.log('📋 Form data received:', {
-            ...formData,
-            imageUrl: formData.imageUrl ? formData.imageUrl.substring(0, 100) + '...' : 'none',
-            imageUrlLength: formData.imageUrl ? formData.imageUrl.length : 0
-        });
 
         try {
             if (formData.id) {
-                console.log('✏️ Updating existing item:', formData.id);
 
                 // Check for duplicate set number (excluding current item)
                 if (formData.setNumber) {
                     const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber, formData.id);
                     if (duplicate) {
-                        console.warn('⚠️ Duplicate set number found:', duplicate);
                         const confirmed = confirm(
                             `⚠️ A set with number "${formData.setNumber}" already exists in your collection:\n\n` +
                             `Name: ${duplicate.name || 'N/A'}\n` +
@@ -619,13 +574,11 @@ const App = {
                 await Storage.updateItem(formData.id, formData);
                 UI.showNotification('Set updated successfully!', 'success');
             } else {
-                console.log('➕ Adding new item');
 
                 // Check for duplicate set number
                 if (formData.setNumber) {
                     const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber);
                     if (duplicate) {
-                        console.warn('⚠️ Duplicate set number found:', duplicate);
                         UI.showNotification(
                             `⚠️ Set "${formData.setNumber}" already exists: ${duplicate.name || 'N/A'}`,
                             'warning'
@@ -642,7 +595,6 @@ const App = {
             UI.hideModal();
             await this.refresh();
         } catch (error) {
-            console.error('❌ Error saving item:', error);
             UI.showNotification('Error: ' + error.message, 'error');
         }
     },
@@ -665,28 +617,22 @@ const App = {
      * @param {File} file - Selected image file
      */
     handleImageSelection(file) {
-        console.log('🖼️ handleImageSelection called with:', file);
 
         if (!file) {
-            console.warn('⚠️ No file provided');
             return;
         }
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            console.error('❌ Not an image file:', file.type);
             UI.showNotification('Please select an image file', 'error');
             return;
         }
 
         // Validate file size (max 10MB before compression)
         if (file.size > 10 * 1024 * 1024) {
-            console.error('❌ File too large:', file.size);
             UI.showNotification('Image file must be smaller than 10MB', 'error');
             return;
         }
-
-        console.log('📁 Original file size:', (file.size / 1024).toFixed(2) + ' KB');
 
         // Read and compress image
         const reader = new FileReader();
@@ -723,32 +669,24 @@ const App = {
                 const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
 
                 const compressedSizeKB = (compressedDataUrl.length * 0.75 / 1024).toFixed(2);
-                console.log('✅ Image compressed:', img.width + 'x' + img.height + ' → ' + Math.round(width) + 'x' + Math.round(height));
-                console.log('📦 Compressed size:', compressedSizeKB + ' KB');
 
                 // Warn if still too large for Firestore
                 if (parseFloat(compressedSizeKB) > 500) {
-                    console.warn('⚠️ Image is large (' + compressedSizeKB + ' KB). May cause issues.');
                     UI.showNotification('Image is large. Consider using a smaller image.', 'warning');
                 }
 
                 // Show preview and store compressed data URL
-                console.log('🔍 DEBUG: UI object:', UI);
-                console.log('🔍 DEBUG: UI.showImagePreview:', typeof UI.showImagePreview);
 
                 if (typeof UI.showImagePreview === 'function') {
                     UI.showImagePreview(compressedDataUrl);
-                    console.log('✅ UI.currentImageUrl set, length:', compressedDataUrl.length);
                 } else {
                     // Fallback - set directly
-                    console.warn('⚠️ UI.showImagePreview not available, setting directly');
                     const preview = document.getElementById('imagePreview');
                     const previewImg = document.getElementById('imagePreviewImg');
                     if (preview && previewImg) {
                         previewImg.src = compressedDataUrl;
                         preview.style.display = 'block';
                         UI.currentImageUrl = compressedDataUrl;
-                        console.log('✅ Preview set directly, length:', compressedDataUrl.length);
                     }
                 }
 
@@ -759,13 +697,11 @@ const App = {
                 }
             };
             img.onerror = () => {
-                console.error('❌ Error loading image');
                 UI.showNotification('Error loading image', 'error');
             };
             img.src = e.target.result;
         };
         reader.onerror = () => {
-            console.error('❌ Error reading file');
             UI.showNotification('Error reading image file', 'error');
         };
         reader.readAsDataURL(file);
@@ -782,7 +718,6 @@ const App = {
      * Handle Get Image button - fetch official photo from BrickLink CDN
      */
     async handleFetchImage() {
-        console.log('🖼️ handleFetchImage called');
 
         // Get set number from input
         const setNumberInput = document.getElementById('itemNumber');
@@ -793,8 +728,6 @@ const App = {
             setNumberInput.focus();
             return;
         }
-
-        console.log('📦 Fetching image for set:', setNumber);
 
         // Try multiple image URL formats
         const imageUrls = [
@@ -812,13 +745,11 @@ const App = {
 
         for (const imageUrl of imageUrls) {
             try {
-                console.log('🔗 Trying:', imageUrl);
 
                 // Try to fetch the image
                 const response = await fetch(imageUrl, { method: 'HEAD' });
 
                 if (response.ok) {
-                    console.log('✅ Image found:', imageUrl);
 
                     // Display the image preview
                     UI.showImagePreview(imageUrl);
@@ -833,14 +764,12 @@ const App = {
                     break;
                 }
             } catch (error) {
-                console.log('❌ Failed:', imageUrl, error.message);
                 lastError = error;
             }
         }
 
         if (!success) {
             alert(`Could not find official image for set "${setNumber}".\n\nMake sure the set number is correct (e.g., 75192, 42155, 10283).\n\nYou can still upload your own photo manually.`);
-            console.error('❌ All image URLs failed:', lastError);
         }
     },
 
@@ -874,16 +803,8 @@ const App = {
      */
     async getFilteredCollection() {
         let items = await Storage.getCollection();
-        console.log('📦 Retrieved', items.length, 'items from Storage');
 
         if (items.length > 0) {
-            console.log('🔍 First item from Storage:', {
-                id: items[0].id,
-                name: items[0].name,
-                hasImageUrl: !!items[0].imageUrl,
-                imageUrlPreview: items[0].imageUrl ? items[0].imageUrl.substring(0, 50) + '...' : 'none',
-                allKeys: Object.keys(items[0])
-            });
         }
 
         const { filters, sort } = this.state;
@@ -983,7 +904,6 @@ const App = {
     async renderFilteredCollection() {
         // Get all filtered items
         const allItems = await this.getFilteredCollection();
-        console.log('🎨 Rendering collection with', allItems.length, 'total items');
 
         const totalItems = allItems.length;
         const totalPages = Math.ceil(totalItems / this.PAGE_SIZE) || 1;
@@ -999,8 +919,6 @@ const App = {
         const endIndex = startIndex + this.PAGE_SIZE;
         const itemsToShow = allItems.slice(startIndex, endIndex);
 
-        console.log(`📄 Page ${this.state.pagination.currentPage}: showing items ${startIndex + 1}-${Math.min(endIndex, totalItems)} of ${totalItems}`);
-
         // Update pagination state
         this.state.pagination = {
             currentPage: this.state.pagination.currentPage,
@@ -1011,12 +929,6 @@ const App = {
 
         // Render items
         if (itemsToShow.length > 0) {
-            console.log('📦 Sample item:', {
-                id: itemsToShow[0].id,
-                name: itemsToShow[0].name,
-                hasImageUrl: !!itemsToShow[0].imageUrl,
-                imageUrlPreview: itemsToShow[0].imageUrl ? itemsToShow[0].imageUrl.substring(0, 50) + '...' : 'none'
-            });
         }
 
         UI.renderCollection(itemsToShow);
@@ -1061,7 +973,6 @@ const App = {
      * Full refresh of the UI
      */
     async refresh() {
-        console.log('🔄 Refreshing UI...');
 
         const themes = await Storage.getThemes();
         UI.renderThemeFilter(themes);
@@ -1071,13 +982,11 @@ const App = {
 
         await this.renderFilteredCollection();
 
-        console.log('✅ Refresh complete');
     },
 
     // ===== AUTHENTICATION METHODS =====
 
     async handleAuthStateChange(user) {
-        console.log('🔄 Auth state changed:', user ? user.email : 'logged out');
 
         if (user) {
             this.state.user = {
@@ -1089,7 +998,6 @@ const App = {
             await this.refresh();
         } else {
             // User logged out - redirect to home page
-            console.warn('🔒 User logged out - redirecting to home');
             this.state.user = null;
             this.state.isAuthenticated = false;
             window.location.href = 'index.html';
@@ -1132,7 +1040,6 @@ const App = {
                             window.location.href = 'login.html';
                         }, 500);
                     } catch (error) {
-                        console.error('❌ Logout error:', error);
                         UI.showNotification('Error logging out: ' + error.message, 'error');
                     }
                 }
@@ -1207,21 +1114,17 @@ const App = {
     },
 
     showLoginRequiredOverlay() {
-        console.log('🔐 Checking login required overlay');
 
         // Wait for auth state to be determined first
         window.Auth.waitForAuthState().then((isLoggedIn) => {
-            console.log('🔓 Auth state for overlay:', isLoggedIn);
 
             // If already logged in, don't show overlay
             if (isLoggedIn) {
-                console.log('✅ User is authenticated, hiding overlay if visible');
                 this.hideLoginRequiredOverlay();
                 return;
             }
 
             // Only show overlay if not logged in
-            console.log('🔐 Showing login required overlay');
             const overlay = document.getElementById('loginRequiredOverlay');
             const loginRequiredActions = document.getElementById('loginRequiredActions');
             const loadingText = document.querySelector('.loading-text');
@@ -1242,7 +1145,6 @@ const App = {
                     if (loginRequiredActions) {
                         loginRequiredActions.style.display = 'flex';
                     }
-                    console.log('🔓 Auth state checked, ready for user interaction');
                 }, 500);
             }
         });
@@ -1258,7 +1160,6 @@ const App = {
     showBuyModal(item = null) {
         try {
             if (!window.BuyLinks) {
-                console.error('❌ BuyLinks module not loaded');
                 UI.showNotification('Buy Links feature not available', 'error');
                 return;
             }
@@ -1268,7 +1169,6 @@ const App = {
             const legoComLink = document.getElementById('legoComStoreLink');
 
             if (!buyModal || !buyModalContent) {
-                console.error('❌ Buy modal elements not found');
                 return;
             }
 
@@ -1289,7 +1189,6 @@ const App = {
             buyModalContent.innerHTML = linksHTML;
             buyModal.classList.add('active');
         } catch (error) {
-            console.error('❌ Error in showBuyModal:', error);
             UI.showNotification('Error opening Buy modal: ' + error.message, 'error');
         }
     },
@@ -1328,7 +1227,6 @@ const App = {
                 UI.showNotification(result.error || 'Login failed', 'error');
             }
         } catch (error) {
-            console.error('Login error:', error);
             UI.showNotification(error.message, 'error');
         } finally {
             document.getElementById('authLoading').style.display = 'none';
@@ -1403,7 +1301,6 @@ const App = {
 
             UI.showNotification('Registration successful! Check console (F12) for verification code.', 'success');
         } catch (error) {
-            console.error('Registration error:', error);
             UI.showNotification(error.message, 'error');
             document.getElementById('authLoading').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
@@ -1432,7 +1329,6 @@ const App = {
                 await this.refresh();
             }
         } catch (error) {
-            console.error('Verification error:', error);
             UI.showNotification(error.message, 'error');
             document.getElementById('authLoading').style.display = 'none';
             document.getElementById('verificationForm').style.display = 'block';
@@ -1444,7 +1340,6 @@ const App = {
             await window.Auth.resendCode();
             UI.showNotification('Verification code resent! Check console (F12).', 'success');
         } catch (error) {
-            console.error('Resend error:', error);
             UI.showNotification(error.message, 'error');
         }
     },
@@ -1456,7 +1351,6 @@ const App = {
      * Fetches data from BrickSet API and auto-fills the form
      */
     async handleAutoFillByNumber() {
-        console.log('🔍 Auto-Fill button clicked');
 
         // Get set number from input
         const setNumberInput = document.getElementById('autoFillSetNumber');
@@ -1473,28 +1367,19 @@ const App = {
 
         try {
             // Show loading state
-            console.log('⏳ Fetching data for set number:', setNumber);
             autoFillBtn.disabled = true;
             autoFillBtn.innerHTML = '<span class="ai-loading-spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite;"></span> Loading...';
             this.showAutoFillStatus('info', '🔍 Fetching data from BrickSet...');
 
             // Debug: Check what's on window
-            console.log('🔍 window.AIVision check:', {
-                exists: typeof window.AIVision !== 'undefined',
-                value: window.AIVision,
-                keys: window.AIVision ? Object.keys(window.AIVision) : 'N/A'
-            });
 
             // Initialize AIVision if needed
             if (window.AIVision && !window.AIVision.isInitialized) {
-                console.log('🔧 Initializing AIVision...');
                 await window.AIVision.init();
             }
 
             // Check if AIVision module is available
             if (!window.AIVision) {
-                console.error('❌ AIVision not found on window object!');
-                console.log('📋 Available window properties:', Object.keys(window).filter(k => k.includes('AI') || k.includes('Vision')));
                 throw new Error('AIVision module not loaded');
             }
 
@@ -1508,7 +1393,6 @@ const App = {
             }
 
             const data = result.data;
-            console.log('✅ BrickSet data received:', data);
 
             // Populate form fields
             this.populateFormFromAI(data);
@@ -1521,7 +1405,6 @@ const App = {
                 if (imageDataUrl) {
                     // Show image preview
                     UI.showImagePreview(imageDataUrl);
-                    console.log('✅ Image downloaded and displayed');
                 }
             }
 
@@ -1542,7 +1425,6 @@ const App = {
             }, 3000);
 
         } catch (error) {
-            console.error('❌ Auto-Fill error:', error);
             this.showAutoFillStatus('error', `❌ Error: ${error.message}`);
             UI.showNotification('Auto-Fill failed: ' + error.message, 'error');
 
@@ -1571,14 +1453,12 @@ const App = {
      * @param {Object} data - Recognized item data
      */
     populateFormFromAI(data) {
-        console.log('📝 Populating form with AI data:', data);
 
         // Helper function to set value if exists
         const setValue = (id, value) => {
             const el = document.getElementById(id);
             if (el && value) {
                 el.value = value;
-                console.log(`  ✓ ${id} = ${value}`);
             }
         };
 
@@ -1598,7 +1478,6 @@ const App = {
             notesEl.value = existingNotes ? existingNotes + aiNote : aiNote.substring(0, aiNote.length);
         }
 
-        console.log('✅ Form populated successfully');
     },
 
     /**
@@ -1632,9 +1511,7 @@ const App = {
             // Bind export/import events (one-time binding)
             this.bindExportEvents();
 
-            console.log('✅ Export modal shown with summary:', summary);
         } catch (error) {
-            console.error('❌ Error showing export modal:', error);
             UI.showNotification('Error opening export modal: ' + error.message, 'error');
         }
     },
@@ -1680,7 +1557,6 @@ const App = {
                     window.ExportImport.exportToCSV(collection, 'sets');
                     UI.showNotification('Collection exported to CSV successfully!', 'success');
                 } catch (error) {
-                    console.error('CSV Export error:', error);
                     UI.showNotification('Error exporting to CSV: ' + error.message, 'error');
                 }
             });
@@ -1698,7 +1574,6 @@ const App = {
                     window.ExportImport.exportToJSON(collection, 'sets', metadata);
                     UI.showNotification('Collection exported to JSON successfully!', 'success');
                 } catch (error) {
-                    console.error('JSON Export error:', error);
                     UI.showNotification('Error exporting to JSON: ' + error.message, 'error');
                 }
             });
@@ -1712,7 +1587,6 @@ const App = {
                 try {
                     await this.generateCollectionCard();
                 } catch (error) {
-                    console.error('Card generation error:', error);
                     UI.showNotification('Error generating card: ' + error.message, 'error');
                 }
             });
@@ -1726,7 +1600,6 @@ const App = {
                 try {
                     await this.generateQRCode();
                 } catch (error) {
-                    console.error('QR code generation error:', error);
                     UI.showNotification('Error generating QR code: ' + error.message, 'error');
                 }
             });
@@ -1772,7 +1645,6 @@ const App = {
                     await this.refresh();
 
                 } catch (error) {
-                    console.error('Import error:', error);
                     UI.showNotification('Error importing: ' + error.message, 'error');
                 }
             });
@@ -1794,7 +1666,6 @@ const App = {
                     navigator.clipboard.writeText(publicLink);
                     UI.showNotification('Public link copied to clipboard!', 'success');
                 } catch (error) {
-                    console.error('Public link error:', error);
                     UI.showNotification('Error creating public link: ' + error.message, 'error');
                 }
             });
@@ -1833,9 +1704,7 @@ const App = {
             // Bind card preview events
             this.bindCardPreviewEvents(cardDataUrl, summary);
 
-            console.log('✅ Collection card generated successfully');
         } catch (error) {
-            console.error('❌ Error generating collection card:', error);
             throw error;
         }
     },
@@ -1859,9 +1728,7 @@ const App = {
             link.click();
 
             UI.showNotification('QR code generated and downloaded!', 'success');
-            console.log('✅ QR code generated successfully');
         } catch (error) {
-            console.error('❌ Error generating QR code:', error);
             throw error;
         }
     },
@@ -1923,7 +1790,6 @@ const App = {
                 window.location.href = 'login.html';
             }, 1000);
         } catch (error) {
-            console.error('Logout error:', error);
             UI.showNotification('Error logging out: ' + error.message, 'error');
         }
     }

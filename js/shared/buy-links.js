@@ -3,8 +3,6 @@
  *
  * Generuje linki do sklepów online w zależności od kategorii kolekcji
  * - LEGO: BrickLink, Allegro, Amazon
- * - Books: Audible, Empik, Allegro, Amazon
- * - Games: Steam, Allegro, Amazon
  */
 
 window.BuyLinks = {
@@ -57,65 +55,12 @@ window.BuyLinks = {
                 buildUrl: (query) => `https://www.amazon.com/s?k=${encodeURIComponent(query)}`,
                 color: '#FF9900'
             }
-        ],
-        books: [
-            {
-                name: 'Audible',
-                icon: '🎧',
-                baseUrl: 'https://www.audible.com/search',
-                buildUrl: (query) => `https://www.audible.com/search?keywords=${encodeURIComponent(query)}`,
-                color: '#F56B00'
-            },
-            {
-                name: 'Empik',
-                icon: '📚',
-                baseUrl: 'https://www.empik.com/szukaj/produkt',
-                buildUrl: (query) => `https://www.empik.com/szukaj/produkt?q=${encodeURIComponent(query)}`,
-                color: '#FFD500'
-            },
-            {
-                name: 'Allegro',
-                icon: '🛒',
-                baseUrl: 'https://allegro.pl/listing',
-                buildUrl: (query) => `https://allegro.pl/listing?string=${encodeURIComponent(query)}`,
-                color: '#FF5A00'
-            },
-            {
-                name: 'Amazon',
-                icon: '📦',
-                baseUrl: 'https://www.amazon.com/s',
-                buildUrl: (query) => `https://www.amazon.com/s?k=${encodeURIComponent(query)}&i=stripbooks`,
-                color: '#FF9900'
-            }
-        ],
-        games: [
-            {
-                name: 'Steam',
-                icon: '🎮',
-                baseUrl: 'https://store.steampowered.com/search/',
-                buildUrl: (query) => `https://store.steampowered.com/search/?term=${encodeURIComponent(query)}`,
-                color: '#1B2838'
-            },
-            {
-                name: 'Allegro',
-                icon: '🛒',
-                baseUrl: 'https://allegro.pl/listing',
-                buildUrl: (query) => `https://allegro.pl/listing?string=${encodeURIComponent(query)}`,
-                color: '#FF5A00'
-            },
-            {
-                name: 'Amazon',
-                icon: '📦',
-                baseUrl: 'https://www.amazon.com/s',
-                buildUrl: (query) => `https://www.amazon.com/s?k=${encodeURIComponent(query)}&i=videogames`,
-                color: '#FF9900'
-            }
         ]
     },
 
     /**
      * Pobierz sklepy dla danej kategorii
-     * @param {string} collectionType - 'lego', 'books', 'games'
+     * @param {string} collectionType - 'setsCollection' or 'minifigsCollection'
      * @returns {Array} - Lista sklepów
      */
     getStores(collectionType) {
@@ -233,4 +178,3 @@ window.BuyLinks = {
     }
 };
 
-console.log('🛒 BuyLinks module loaded globally');

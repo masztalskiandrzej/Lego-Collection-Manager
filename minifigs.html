@@ -722,9 +722,7 @@
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();
-            console.log('🔐 Auth module initialized');
         } else {
-            console.error('❌ Auth module not loaded');
         }
     </script>
 
@@ -863,9 +861,7 @@
 
         async function loadCollectionData() {
             try {
-                console.log('📦 Loading collection data...');
                 const collection = await Storage.getCollection();
-                console.log('✅ Collection loaded:', collection.length, 'items');
 
                 if (!collection || collection.length === 0) {
                     // Show empty stats
@@ -878,7 +874,6 @@
 
                 // Calculate summary
                 const summary = window.ExportImport.getExportSummary(collection);
-                console.log('📊 Collection summary:', summary);
 
                 // Update UI with real data
                 document.getElementById('summaryTotalItems').textContent = summary.totalItems;
@@ -886,9 +881,7 @@
                 document.getElementById('summaryThemes').textContent = summary.themes.length;
                 document.getElementById('summaryImages').textContent = `${summary.itemsWithImages}/${summary.totalItems}`;
 
-                console.log('✅ Stats updated successfully');
             } catch (error) {
-                console.error('❌ Error loading collection data:', error);
                 // Show error stats
                 document.getElementById('summaryTotalItems').textContent = '?';
                 document.getElementById('summaryTotalValue').textContent = '?';
@@ -898,34 +891,28 @@
         }
 
         function showExportDialog() {
-            console.log('📤 Export button clicked!');
             const exportModal = document.getElementById('exportModalOverlay');
             if (exportModal) {
                 exportModal.classList.add('active');
-                console.log('✅ Export modal opened');
 
                 // Load collection data when modal opens
                 if (checkModulesReady()) {
                     loadCollectionData();
                 } else {
                     // Wait for modules to be ready
-                    console.log('⏳ Waiting for modules to load...');
                     let attempts = 0;
                     moduleCheckInterval = setInterval(() => {
                         attempts++;
                         if (checkModulesReady()) {
                             clearInterval(moduleCheckInterval);
-                            console.log('✅ Modules ready, loading data');
                             loadCollectionData();
                         } else if (attempts > 30) {
                             clearInterval(moduleCheckInterval);
-                            console.error('❌ Modules failed to load');
                             alert('Required modules not available. Please refresh the page.');
                         }
                     }, 100);
                 }
             } else {
-                console.error('❌ Export modal not found');
                 alert('Export modal not found in the page');
             }
         }
@@ -960,20 +947,16 @@
         });
 
         function setupExportFunctions() {
-            console.log('🔧 Setting up export functions...');
 
             // Export to CSV
             const exportCSVBtn = document.getElementById('exportCSVBtn');
             if (exportCSVBtn) {
                 exportCSVBtn.onclick = async function() {
                     try {
-                        console.log('📊 Exporting to CSV...');
                         const collection = await Storage.getCollection();
                         window.ExportImport.exportToCSV(collection, 'minifigs');
                         alert('Collection exported to CSV successfully!');
-                        console.log('✅ CSV export complete');
                     } catch (error) {
-                        console.error('❌ CSV export error:', error);
                         alert('Error exporting to CSV: ' + error.message);
                     }
                 };
@@ -984,15 +967,12 @@
             if (exportJSONBtn) {
                 exportJSONBtn.onclick = async function() {
                     try {
-                        console.log('📦 Exporting to JSON...');
                         const collection = await Storage.getCollection();
                         const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
                         const metadata = { username, exportDate: new Date().toISOString() };
                         window.ExportImport.exportToJSON(collection, 'minifigs', metadata);
                         alert('Collection exported to JSON successfully!');
-                        console.log('✅ JSON export complete');
                     } catch (error) {
-                        console.error('❌ JSON export error:', error);
                         alert('Error exporting to JSON: ' + error.message);
                     }
                 };
@@ -1003,7 +983,6 @@
             if (generateCardBtn) {
                 generateCardBtn.onclick = async function() {
                     try {
-                        console.log('🎨 Generating collection card...');
                         const collection = await Storage.getCollection();
                         const summary = window.ExportImport.getExportSummary(collection);
                         const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
@@ -1022,9 +1001,7 @@
 
                         // Setup card preview actions
                         setupCardPreviewActions(cardDataUrl, summary);
-                        console.log('✅ Collection card generated');
                     } catch (error) {
-                        console.error('❌ Card generation error:', error);
                         alert('Error generating card: ' + error.message);
                     }
                 };
@@ -1035,7 +1012,6 @@
             if (generateQRBtn) {
                 generateQRBtn.onclick = async function() {
                     try {
-                        console.log('📱 Generating QR code...');
                         const collectionUrl = window.location.href;
                         const qrDataUrl = await window.SocialSharing.generateQRCode(collectionUrl);
 
@@ -1045,9 +1021,7 @@
                         link.click();
 
                         alert('QR code generated and downloaded!');
-                        console.log('✅ QR code generated');
                     } catch (error) {
-                        console.error('❌ QR code generation error:', error);
                         alert('Error generating QR code: ' + error.message);
                     }
                 };
@@ -1058,7 +1032,6 @@
             if (publicLinkBtn) {
                 publicLinkBtn.onclick = async function() {
                     try {
-                        console.log('🔗 Generating public link...');
                         const userId = window.Auth?.getUserId();
                         if (!userId) {
                             alert('You must be logged in to create public links');
@@ -1068,9 +1041,7 @@
                         const publicLink = window.ExportImport.generatePublicLink(userId, 'minifigs');
                         await navigator.clipboard.writeText(publicLink);
                         alert('Public link copied to clipboard!\n\n' + publicLink);
-                        console.log('✅ Public link generated');
                     } catch (error) {
-                        console.error('❌ Public link error:', error);
                         alert('Error creating public link: ' + error.message);
                     }
                 };
@@ -1095,7 +1066,6 @@
                             return;
                         }
 
-                        console.log('📥 Importing from JSON...');
                         const importedData = await window.ExportImport.importFromJSON(file);
 
                         let importCount = 0;
@@ -1107,16 +1077,13 @@
 
                         alert(`Successfully imported ${importCount} items!`);
                         closeExportDialog();
-                        console.log('✅ Import complete');
                         setTimeout(() => location.reload(), 1000);
                     } catch (error) {
-                        console.error('❌ Import error:', error);
                         alert('Error importing: ' + error.message);
                     }
                 };
             }
 
-            console.log('✅ Export functions setup complete');
         }
 
         function setupCardPreviewActions(cardDataUrl, summary) {

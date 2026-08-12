@@ -171,7 +171,6 @@
         // Initialize Theme module
         if (window.Theme) {
             window.Theme.init();
-            console.log('🎨 Theme module initialized');
 
             // Theme toggle button event
             const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -185,17 +184,14 @@
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();
-            console.log('🔐 Auth module initialized');
 
             // Check auth state and redirect if already logged in
             window.Auth.waitForAuthState().then(isLoggedIn => {
                 if (isLoggedIn && window.Auth.isAuthenticated()) {
-                    console.log('✅ Already logged in, redirecting to home...');
                     window.location.href = 'index.html';
                 }
             });
         } else {
-            console.error('❌ Auth module not loaded');
         }
     </script>
 

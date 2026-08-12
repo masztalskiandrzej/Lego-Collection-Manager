@@ -1,11 +1,12 @@
 /**
  * AI Vision Module - LEGO Recognition from Images
- * Uses Tesseract.js for OCR + Rebrickable API for data
+ * Uses Tesseract.js for OCR + server-side Rebrickable lookup.
  *
- * 100% FREE - No server costs!
- * Works client-side in the browser
+ * The Rebrickable API key is NOT stored here. Item DATA lookups are proxied
+ * through the `lookupLegoItem` Cloud Function (key held in Secret Manager).
+ * Item IMAGES are still fetched from the browser via CORS proxies.
  *
- * @version 2.2.0 - Rebrickable API (CORS-friendly)
+ * @version 3.0.0 - server-side Rebrickable lookup (key removed from client)
  * @author Claude Code
  */
 
@@ -13,10 +14,10 @@ const AIVision = {
     // Configuration
     config: {
         tesseractCDN: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
-        // Rebrickable API - FREE tier, has good CORS support
-        rebrickableAPIKey: 'b19eRoKN38',
-        rebrickableBaseURL: 'https://rebrickable.com/api/v3/lego',
-        // CORS Proxies - working list as of 2026-01
+        // CORS proxies used to fetch item IMAGES from the browser.
+        // Item DATA lookups go through the server-side `lookupLegoItem`
+        // Cloud Function, so the Rebrickable key is never exposed to the client.
+        // Working list as of 2026-01.
         corsProxies: [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
@@ -36,13 +37,10 @@ const AIVision = {
      */
     async init() {
         if (this.isInitialized) {
-            console.log('✅ AIVision already initialized');
             return true;
         }
 
-        console.log('🔧 Initializing AIVision module...');
         this.isInitialized = true;
-        console.log('✅ AIVision initialized (Tesseract.js will load on first use)');
         return true;
     },
 
@@ -54,24 +52,14 @@ const AIVision = {
      */
     async recognizeFromImage(imageDataUrl, itemType = 'set') {
         try {
-            console.log('🔍 Starting AI recognition...');
-            console.log('📷 Image size:', imageDataUrl.length, 'characters');
 
             // Step 1: OCR with Tesseract.js (FREE)
-            console.log('📝 Step 1: Running OCR...');
             const ocrResult = await this.performOCR(imageDataUrl);
-            console.log('✅ OCR Result:', {
-                text: ocrResult.text.substring(0, 100) + '...',
-                confidence: ocrResult.confidence + '%'
-            });
 
             // Step 2: Extract set/figure number from text
-            console.log('🎯 Step 2: Extracting item number...');
             const itemNumber = this.extractItemNumber(ocrResult.text, itemType);
 
             if (!itemNumber) {
-                console.warn('⚠️ Could not find item number in OCR text');
-                console.log('📄 Full OCR text:', ocrResult.text);
                 return {
                     success: false,
                     error: 'could_not_find_number',
@@ -80,12 +68,8 @@ const AIVision = {
                 };
             }
 
-            console.log('✅ Extracted item number:', itemNumber);
-
             // Step 3: Query Rebrickable API (FREE)
-            console.log('📦 Step 3: Querying Rebrickable API...');
             const itemData = await this.queryBrickSetAPI(itemNumber, itemType);
-            console.log('✅ Rebrickable data received');
 
             return {
                 success: true,
@@ -95,7 +79,6 @@ const AIVision = {
             };
 
         } catch (error) {
-            console.error('❌ AI recognition failed:', error);
             return {
                 success: false,
                 error: 'recognition_failed',
@@ -112,15 +95,12 @@ const AIVision = {
     async performOCR(imageDataUrl) {
         // Ensure Tesseract is loaded
         if (typeof Tesseract === 'undefined') {
-            console.log('📥 Loading Tesseract.js from CDN...');
             await this.loadTesseract();
-            console.log('✅ Tesseract.js loaded');
         }
 
         // Create image element from data URL
         const img = await this.createImageElement(imageDataUrl);
 
-        console.log('🔠 Starting Tesseract recognition...');
         const startTime = Date.now();
 
         const result = await Tesseract.recognize(
@@ -132,7 +112,6 @@ const AIVision = {
                         const progress = (m.progress * 100).toFixed(0);
                         // Only log every 25% to avoid spam
                         if (progress % 25 === 0) {
-                            console.log(`🔠 OCR Progress: ${progress}%`);
                         }
                     }
                 }
@@ -140,7 +119,6 @@ const AIVision = {
         );
 
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`⏱️ OCR completed in ${elapsed}s`);
 
         return {
             text: result.data.text.trim(),
@@ -172,7 +150,6 @@ const AIVision = {
             script.async = true;
 
             script.onload = () => {
-                console.log('✅ Tesseract.js script loaded');
                 this.isTesseractLoading = false;
                 resolve();
             };
@@ -207,7 +184,6 @@ const AIVision = {
      * @returns {string|null} Item number or null
      */
     extractItemNumber(text, itemType = 'set') {
-        console.log('🔍 Extracting number from text...');
 
         // Clean up the text
         const cleanText = text.replace(/\s+/g, ' ').trim();
@@ -237,7 +213,6 @@ const AIVision = {
             const match = cleanText.match(pattern);
             if (match) {
                 const number = match[1] || match[2];
-                console.log('✅ Pattern matched:', pattern, '=>', number);
                 return number;
             }
         }
@@ -248,11 +223,9 @@ const AIVision = {
         const matches = cleanText.match(fallbackPattern);
 
         if (matches && matches.length > 0) {
-            console.log('⚠️ Using fallback pattern, found:', matches[1]);
             return matches[1];
         }
 
-        console.warn('❌ No set number pattern matched');
         return null;
     },
 
@@ -263,7 +236,6 @@ const AIVision = {
      * @returns {Promise<Object>} Item data
      */
     async queryBrickSetAPI(itemNumber, itemType = 'set') {
-        console.log('🔍 Searching for item:', itemNumber, itemType);
 
         // Use Rebrickable API as primary source
         const data = await this.queryRebrickable(itemNumber, itemType);
@@ -272,103 +244,27 @@ const AIVision = {
         }
 
         // Fallback to image-only data
-        console.log('⚠️ Rebrickable failed, trying CDN image only...');
         return this.createPartialItemData(itemNumber, itemType);
     },
 
     /**
-     * Query Rebrickable API (comprehensive LEGO database)
-     * Rebrickable has better CORS support than BrickLink
+     * Look up an item via the server-side `lookupLegoItem` Cloud Function.
+     *
+     * The Rebrickable API key lives on the server (Secret Manager) and is never
+     * sent to the browser. The Function returns already-mapped item data, or null.
      */
     async queryRebrickable(itemNumber, itemType) {
-        // Rebrickable API format:
-        // Sets: /sets/{set_num}/
-        // Minifigs: /minifigs/{fig_num}/
-        const endpoint = itemType === 'set' ? 'sets' : 'minifigs';
-
-        // Build URL with API key
-        const directURL = `${this.config.rebrickableBaseURL}/${endpoint}/${itemNumber}/?key=${this.config.rebrickableAPIKey}`;
-        console.log('🌐 Rebrickable URL:', directURL.replace(this.config.rebrickableAPIKey, '***'));
-
-        // Try direct request first (Rebrickable may have CORS enabled)
         try {
-            console.log('🔗 Attempt 1: Direct request...');
-            const response = await fetch(directURL);
-            if (response.ok) {
-                const json = await response.json();
-                console.log('✅ Direct response:', json);
-                return this.mapRebrickableData(json, itemType);
-            } else if (response.status === 404) {
-                console.log('⚠️ Item not found (404), trying with variant suffix...');
-                // Try adding -1 suffix for sets
-                if (itemType === 'set' && !itemNumber.includes('-')) {
-                    return await this.queryRebrickable(itemNumber + '-1', itemType);
-                }
+            const functionsInstance = window.getFirebaseFunctions();
+            if (!functionsInstance) {
+                return null;
             }
-        } catch (e) {
-            console.log('⚠️ Direct request failed (CORS), trying proxy...');
-        }
 
-        // Try CORS proxies
-        for (let i = 0; i < this.config.corsProxies.length; i++) {
-            const proxy = this.config.corsProxies[i];
-            try {
-                console.log(`🔗 Attempt ${i + 2}: Using proxy ${proxy.split('/')[2]}...`);
-                const proxiedURL = proxy + encodeURIComponent(directURL);
-                const response = await fetch(proxiedURL);
-
-                if (response.ok) {
-                    const json = await response.json();
-                    console.log(`✅ Proxy ${i + 2} response:`, json);
-                    return this.mapRebrickableData(json, itemType);
-                } else if (response.status === 404) {
-                    console.log('⚠️ Item not found via proxy, trying with variant suffix...');
-                    // Try adding -1 suffix for sets
-                    if (itemType === 'set' && !itemNumber.includes('-')) {
-                        const result = await this.queryRebrickable(itemNumber + '-1', itemType);
-                        if (result && result.name) return result;
-                    }
-                }
-            } catch (e) {
-                console.warn(`❌ Proxy ${i + 1} error:`, e.message);
-            }
-        }
-
-        console.error('❌ All attempts failed');
-        return null;
-    },
-
-    /**
-     * Map Rebrickable API response to our schema
-     */
-    mapRebrickableData(data, itemType) {
-        if (!data) return null;
-
-        if (itemType === 'set') {
-            // Rebrickable set response:
-            // { set_num, name, year, theme_id, num_parts, set_img_url, set_url }
-            const setNum = data.set_num || '';
-            const setNumber = setNum.split('-')[0]; // Remove variant like "-1"
-
-            return {
-                name: data.name || '',
-                theme: data.theme_id?.toString() || '', // Use theme_id as placeholder
-                year: data.year ? parseInt(data.year) : null,
-                imageUrl: data.set_img_url || null,
-                setNumber: setNumber,
-                pieceCount: data.num_parts ? parseInt(data.num_parts) : null,
-                pricePaid: null // Rebrickable doesn't provide pricing in free tier
-            };
-        } else {
-            // Rebrickable minifigure response:
-            // { fig_num, name, year, theme_id, num_parts, fig_img_url, fig_url }
-            return {
-                name: data.name || 'Unknown Minifigure',
-                theme: data.theme_id?.toString() || '',
-                year: data.year ? parseInt(data.year) : null,
-                imageUrl: data.fig_img_url || null,
-                figureNumber: data.fig_num || ''
-            };
+            const lookup = functionsInstance.httpsCallable('lookupLegoItem');
+            const result = await lookup({ itemNumber, itemType });
+            return result.data; // mapped item data, or null
+        } catch (error) {
+            return null;
         }
     },
 
@@ -379,11 +275,8 @@ const AIVision = {
      */
     async fetchImageAsBase64(imageUrl) {
         if (!imageUrl) {
-            console.warn('⚠️ No image URL provided');
             return null;
         }
-
-        console.log('🖼️ Fetching image from API:', imageUrl);
 
         // Try each CORS proxy until one works
         let lastError = null;
@@ -391,7 +284,6 @@ const AIVision = {
             const proxy = this.config.corsProxies[i];
             try {
                 const proxiedURL = proxy + encodeURIComponent(imageUrl);
-                console.log(`🔗 Using CORS proxy ${i + 1}/${this.config.corsProxies.length} for image:`, proxiedURL.substring(0, 80) + '...');
 
                 const response = await fetch(proxiedURL);
                 if (!response.ok) {
@@ -401,11 +293,9 @@ const AIVision = {
                 const blob = await response.blob();
                 const base64 = await this.blobToBase64(blob);
 
-                console.log('✅ Image fetched and converted to base64');
                 return base64;
 
             } catch (error) {
-                console.warn(`❌ Proxy ${i + 1} failed for image:`, error.message);
                 lastError = error;
                 // Try next proxy
                 continue;
@@ -413,7 +303,6 @@ const AIVision = {
         }
 
         // All proxies failed
-        console.error('❌ All CORS proxies failed for image, last error:', lastError);
         return null;
     },
 
@@ -476,7 +365,6 @@ const AIVision = {
      * @returns {Promise<Object>} Item data
      */
     async recognizeByNumber(itemNumber, itemType = 'set') {
-        console.log('🔍 Quick recognition by number:', itemNumber);
         const itemData = await this.queryBrickSetAPI(itemNumber, itemType);
         return {
             success: true,
@@ -486,7 +374,4 @@ const AIVision = {
 };
 
 // Auto-initialize when loaded
-console.log('🧠 AIVision module loaded (Tesseract.js OCR + Rebrickable API v2.2)');
-console.log('🔍 Setting window.AIVision...');
 window.AIVision = AIVision;
-console.log('✅ window.AIVision is now set:', typeof window.AIVision, window.AIVision);

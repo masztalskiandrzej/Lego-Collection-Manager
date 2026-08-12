@@ -13,11 +13,9 @@ function waitForAuth() {
 
     if (window.Auth && window.Auth.init) {
         clearInterval(authCheckInterval);
-        console.log('✅ Auth module found after', authCheckCount * 100, 'ms');
         initLoginPage();
     } else if (authCheckCount >= MAX_AUTH_CHECKS) {
         clearInterval(authCheckInterval);
-        console.error('❌ Auth module not found after', MAX_AUTH_CHECKS * 100, 'ms');
         showNotification('Authentication module not loaded. Please refresh the page.', 'error');
     }
 }
@@ -32,7 +30,6 @@ if (document.readyState === 'loading') {
 }
 
 function initLoginPage() {
-    console.log('🔐 Initializing login page...');
 
     // Forms
     const loginForm = document.getElementById('loginForm');
@@ -115,7 +112,6 @@ function initLoginPage() {
         });
     }
 
-    console.log('✅ Login page initialized');
 }
 
 // ===== Form Switching =====
@@ -184,7 +180,6 @@ async function handleLogin() {
             switchToLogin();
         }
     } catch (error) {
-        console.error('Login error:', error);
         showNotification(error.message || 'Login failed', 'error');
         switchToLogin();
     }
@@ -237,7 +232,6 @@ async function handleRegister() {
             switchToRegister();
         }
     } catch (error) {
-        console.error('Registration error:', error);
         showNotification(error.message || 'Registration failed', 'error');
         switchToRegister();
     }
@@ -272,7 +266,6 @@ async function handleVerifyCode() {
             switchToVerification();
         }
     } catch (error) {
-        console.error('Verification error:', error);
         showNotification(error.message || 'Verification failed', 'error');
         switchToVerification();
     }
@@ -288,7 +281,6 @@ async function handleResendCode() {
         const code = await window.Auth.resendCode();
         showNotification('New verification code sent! Check console.', 'success');
     } catch (error) {
-        console.error('Resend error:', error);
         showNotification('Failed to resend code: ' + error.message, 'error');
     }
 }
@@ -320,4 +312,3 @@ function showNotification(message, type = 'info') {
     }, 4000);
 }
 
-console.log('🔐 Login page script loaded');

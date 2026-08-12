@@ -57,13 +57,12 @@ const ImageHandler = {
     /**
      * Upload obrazu do Firebase Storage
      * @param {File} file - Plik obrazu
-     * @param {string} collectionType - Typ kolekcji ('legoCollection', 'booksCollection', 'gamesCollection')
+     * @param {string} collectionType - Typ kolekcji ('setsCollection', 'minifigsCollection')
      * @param {string} itemId - ID przedmiotu
      * @param {string} userId - ID użytkownika
      * @returns {Promise<string>} - URL do pobranego obrazu
      */
     async uploadImage(file, collectionType, itemId, userId) {
-        console.log('📤 Uploading image...', { file: file.name, size: file.size, type: file.type });
 
         // Walidacja
         const validation = this.validateFile(file);
@@ -81,11 +80,9 @@ const ImageHandler = {
             const ext = file.name.split('.').pop() || 'jpg';
 
             // Ścieżka w Storage: users/{userId}/{collectionType}/{itemId}.{ext}
-            const shortCollection = collectionType.replace('Collection', ''); // 'lego', 'books', 'games'
+            const shortCollection = collectionType.replace('Collection', ''); // 'sets', 'minifigs'
             const fileName = `${itemId}.${ext}`;
             const storagePath = `users/${userId}/${shortCollection}/${fileName}`;
-
-            console.log('📁 Storage path:', storagePath);
 
             // Utwórz referencję do Storage
             const storageRef = ref(storage, storagePath);
@@ -102,19 +99,13 @@ const ImageHandler = {
             };
 
             // Upload pliku
-            console.log('⏳ Uploading to Firebase Storage...');
             const snapshot = await uploadBytes(storageRef, file, metadata);
-
-            console.log('✅ Upload complete!', snapshot.metadata.fullPath);
 
             // Pobierz publiczny URL
             const downloadURL = await getDownloadURL(snapshot.ref);
 
-            console.log('🔗 Download URL:', downloadURL);
-
             return downloadURL;
         } catch (error) {
-            console.error('❌ Upload error:', error);
 
             // Przyjazne komunikaty błędów
             if (error.code === 'storage/unauthorized') {
@@ -136,12 +127,10 @@ const ImageHandler = {
      */
     async deleteImage(imageUrl) {
         if (!imageUrl || !imageUrl.includes('firebasestorage')) {
-            console.log('ℹ️ Not a Firebase Storage URL, skipping delete');
             return;
         }
 
         try {
-            console.log('🗑️ Deleting image:', imageUrl);
 
             // Wyciągnij ścieżkę z URL
             // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}?alt=media&token={token}
@@ -150,21 +139,16 @@ const ImageHandler = {
 
             if (pathMatch) {
                 const storagePath = decodeURIComponent(pathMatch[1]);
-                console.log('📁 Extracted path:', storagePath);
 
                 const storageRef = ref(storage, storagePath);
                 await deleteObject(storageRef);
 
-                console.log('✅ Image deleted successfully');
             } else {
-                console.warn('⚠️ Could not extract storage path from URL');
             }
         } catch (error) {
             // Nie rzucaj błędu - usuwanie obrazu nie jest krytyczne
-            console.error('❌ Delete error (non-critical):', error);
 
             if (error.code === 'storage/object-not-found') {
-                console.log('ℹ️ Image already deleted or does not exist');
             }
         }
     },
@@ -231,7 +215,6 @@ const ImageHandler = {
                 canvas.toBlob(
                     (blob) => {
                         if (blob) {
-                            console.log(`🗜️ Compressed: ${(file.size / 1024).toFixed(0)}KB → ${(blob.size / 1024).toFixed(0)}KB`);
                             resolve(blob);
                         } else {
                             reject(new Error('Compression failed'));

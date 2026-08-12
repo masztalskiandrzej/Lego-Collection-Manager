@@ -49,15 +49,12 @@
         // Initialize Auth module
         if (window.Auth) {
             window.Auth.init();
-            console.log('🔐 Auth module initialized');
 
             // Check auth state and redirect to login if not authenticated
             window.Auth.waitForAuthState().then(isLoggedIn => {
                 if (!isLoggedIn || !window.Auth.isAuthenticated()) {
-                    console.log('🔒 Not logged in, redirecting to login page...');
                     window.location.href = 'login.html';
                 } else {
-                    console.log('✅ User is logged in, showing home page');
                     // Update user button with username
                     const email = window.Auth.getUserEmail();
                     const username = email ? email.split('@')[0] : 'User';
@@ -65,7 +62,6 @@
                 }
             });
         } else {
-            console.error('❌ Auth module not loaded');
             // If Auth not available, redirect to login
             window.location.href = 'login.html';
         }
@@ -77,7 +73,6 @@
                     await window.Auth.logout();
                     window.location.href = 'login.html';
                 } catch (error) {
-                    console.error('Logout error:', error);
                     alert('Błąd wylogowania: ' + error.message);
                 }
             }

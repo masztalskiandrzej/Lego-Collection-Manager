@@ -29,7 +29,6 @@ const Auth = {
     init() {
         // Initialize Firebase first
         if (!window.initFirebase()) {
-            console.error('❌ Cannot initialize Auth - Firebase not available');
             return;
         }
 
@@ -39,9 +38,7 @@ const Auth = {
 
         // Check if Cloud Functions are available
         if (this._functions) {
-            console.log('📧 Email service: Cloud Functions enabled');
         } else {
-            console.log('📧 Email service: Fallback to console (Cloud Functions not available)');
             this.emailServiceEnabled = false;
         }
 
@@ -57,9 +54,7 @@ const Auth = {
                 }
 
                 if (user) {
-                    console.log('👤 Użytkownik zalogowany:', user.email);
                 } else {
-                    console.log('👤 Użytkownik wylogowany');
                 }
 
                 // Resolve promise po ustaleniu stanu
@@ -67,7 +62,6 @@ const Auth = {
             });
         });
 
-        console.log('🔐 Auth module zainicjalizowany');
     },
 
     /**
@@ -96,21 +90,14 @@ const Auth = {
                 });
 
                 if (result.data.success) {
-                    console.log('📧 Email weryfikacyjny wysłany na:', email);
                     return { success: true, method: 'cloud_function' };
                 }
             } catch (error) {
-                console.warn('⚠️ Cloud Function email failed:', error.message);
                 // Fallback to console
             }
         }
 
         // Fallback: Display code in console (for development or if email fails)
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('📧 KOD WERYFIKACYJNY:', code);
-        console.log('   Email:', email);
-        console.log('   (Cloud Functions not deployed - code shown in console)');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
         return { success: true, method: 'console_fallback' };
     },
@@ -126,8 +113,6 @@ const Auth = {
             // Utwórz konto Firebase Auth
             const userCredential = await this._auth.createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
-
-            console.log('✅ Konto utworzone:', user.email);
 
             // Zapisz użytkownika jako oczekującego na weryfikację
             this.pendingUser = user;
@@ -145,11 +130,8 @@ const Auth = {
                     lastLogin: null
                 });
 
-            console.log('✅ Dane użytkownika zapisane w Firestore');
-
             // Wyślij email z kodem weryfikacyjnym
             const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
-            console.log('📧 Email verification method:', emailResult.method);
 
             return {
                 success: true,
@@ -161,7 +143,6 @@ const Auth = {
                 requiresVerification: true
             };
         } catch (error) {
-            console.error('❌ Błąd rejestracji:', error);
             throw this.handleAuthError(error);
         }
     },
@@ -192,7 +173,6 @@ const Auth = {
 
             // Sprawdź kod
             if (userData.verificationCode === code) {
-                console.log('✅ Kod weryfikacyjny poprawny!');
 
                 // Oznacz email jako zweryfikowany
                 await userDocRef.set({
@@ -200,8 +180,6 @@ const Auth = {
                     verificationCode: null,
                     verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
-
-                console.log('✅ Email zweryfikowany pomyślnie');
 
                 // Wyczyść dane tymczasowe
                 this.pendingUser = null;
@@ -212,7 +190,6 @@ const Auth = {
                 throw new Error('Nieprawidłowy kod weryfikacyjny');
             }
         } catch (error) {
-            console.error('❌ Błąd weryfikacji:', error);
             throw error;
         }
     },
@@ -241,11 +218,9 @@ const Auth = {
 
             // Wyślij email z nowym kodem
             const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
-            console.log('✅ Nowy kod wysłany, method:', emailResult.method);
 
             return this.verificationCode;
         } catch (error) {
-            console.error('❌ Błąd wysyłania kodu:', error);
             throw error;
         }
     },
@@ -261,8 +236,6 @@ const Auth = {
             // Zaloguj przez Firebase Auth
             const userCredential = await this._auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
-
-            console.log('🔓 Logowanie...', user.email);
 
             // Sprawdź czy email został zweryfikowany
             const userDocRef = this._db.collection('users').doc(user.uid)
@@ -283,7 +256,6 @@ const Auth = {
                 // Sprawdź czy email zweryfikowany w naszym systemie
                 if (!userData.emailVerified) {
                     await this._auth.signOut();
-                    console.log('⚠️ Email nie zweryfikowany:', user.email);
                     return {
                         success: false,
                         requiresVerification: true,
@@ -299,7 +271,6 @@ const Auth = {
             }
 
             this.currentUser = user;
-            console.log('✅ Zalogowano pomyślnie!');
 
             return {
                 success: true,
@@ -309,7 +280,6 @@ const Auth = {
                 }
             };
         } catch (error) {
-            console.error('❌ Błąd logowania:', error);
             throw this.handleAuthError(error);
         }
     },
@@ -322,9 +292,7 @@ const Auth = {
         try {
             await this._auth.signOut();
             this.currentUser = null;
-            console.log('👋 Wylogowano pomyślnie');
         } catch (error) {
-            console.error('❌ Błąd wylogowania:', error);
             throw error;
         }
     },
@@ -399,4 +367,3 @@ const Auth = {
 
 // Make globally available
 window.Auth = Auth;
-console.log('🔐 Auth module loaded (compat version)');
