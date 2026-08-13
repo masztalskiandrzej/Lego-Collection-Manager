@@ -3,6 +3,9 @@
  * Manages authentication forms on the login page
  */
 
+// Skrót do tłumaczeń (bezpieczny, gdyby I18N nie był dostępny)
+const t = (k, v) => (window.I18N ? window.I18N.t(k, v) : k);
+
 // Wait for Auth module to load
 let authCheckInterval;
 let authCheckCount = 0;
@@ -16,7 +19,7 @@ function waitForAuth() {
         initLoginPage();
     } else if (authCheckCount >= MAX_AUTH_CHECKS) {
         clearInterval(authCheckInterval);
-        showNotification('Authentication module not loaded. Please refresh the page.', 'error');
+        showNotification(t('auth.moduleNotLoadedLong'), 'error');
     }
 }
 
@@ -153,7 +156,7 @@ function hideAllForms() {
 
 async function handleLogin() {
     if (!window.Auth) {
-        showNotification('Authentication module not loaded', 'error');
+        showNotification(t('auth.moduleNotLoaded'), 'error');
         return;
     }
 
@@ -166,7 +169,7 @@ async function handleLogin() {
         const result = await window.Auth.login(email, password);
 
         if (result.success) {
-            showNotification('Login successful! Redirecting...', 'success');
+            showNotification(t('auth.loginSuccess'), 'success');
             // Redirect to index.html after successful login
             setTimeout(() => {
                 window.location.href = 'index.html';
@@ -176,27 +179,27 @@ async function handleLogin() {
             showNotification(result.message, 'warning');
             showResendCodeOptions(email, password);
         } else {
-            showNotification(result.error || 'Login failed', 'error');
+            showNotification(result.error || t('auth.loginFailed'), 'error');
             switchToLogin();
         }
     } catch (error) {
-        showNotification(error.message || 'Login failed', 'error');
+        showNotification(error.message || t('auth.loginFailed'), 'error');
         switchToLogin();
     }
 }
 
 async function showResendCodeOptions(email, password) {
     // Pokaż dialog z opcją ponownego wysłania kodu
-    if (confirm('Your email is not verified.\n\nDo you want to generate a new verification code?\n(Check console F12 to see the code)')) {
+    if (confirm(t('auth.notVerifiedConfirm'))) {
         try {
             const result = await window.Auth.resendCodeForUnverifiedUser(email, password);
 
             if (result.success) {
-                showNotification('New code generated! Check console (F12)', 'success');
+                showNotification(t('auth.newCodeGenerated'), 'success');
                 switchToVerification();
             }
         } catch (error) {
-            showNotification('Error: ' + error.message, 'error');
+            showNotification(t('common.errorPrefix') + error.message, 'error');
             switchToLogin();
         }
     } else {
@@ -206,7 +209,7 @@ async function showResendCodeOptions(email, password) {
 
 async function handleRegister() {
     if (!window.Auth) {
-        showNotification('Authentication module not loaded', 'error');
+        showNotification(t('auth.moduleNotLoaded'), 'error');
         return;
     }
 
@@ -215,7 +218,7 @@ async function handleRegister() {
     const confirmPassword = document.getElementById('registerPasswordConfirm').value;
 
     if (password !== confirmPassword) {
-        showNotification('Passwords do not match', 'error');
+        showNotification(t('auth.passwordsNoMatch'), 'error');
         return;
     }
 
@@ -225,28 +228,28 @@ async function handleRegister() {
         const result = await window.Auth.register(email, password);
 
         if (result.success || result.requiresVerification) {
-            showNotification('Registration successful! Check console for verification code.', 'success');
+            showNotification(t('auth.registerSuccess'), 'success');
             switchToVerification();
         } else {
-            showNotification(result.error || 'Registration failed', 'error');
+            showNotification(result.error || t('auth.registerFailed'), 'error');
             switchToRegister();
         }
     } catch (error) {
-        showNotification(error.message || 'Registration failed', 'error');
+        showNotification(error.message || t('auth.registerFailed'), 'error');
         switchToRegister();
     }
 }
 
 async function handleVerifyCode() {
     if (!window.Auth) {
-        showNotification('Authentication module not loaded', 'error');
+        showNotification(t('auth.moduleNotLoaded'), 'error');
         return;
     }
 
     const code = document.getElementById('verificationCode').value;
 
     if (!code || code.length !== 4) {
-        showNotification('Please enter a 4-digit code', 'error');
+        showNotification(t('auth.enterCode'), 'error');
         return;
     }
 
@@ -256,32 +259,32 @@ async function handleVerifyCode() {
         const verified = await window.Auth.verifyCode(code);
 
         if (verified) {
-            showNotification('Email verified! Redirecting...', 'success');
+            showNotification(t('auth.emailVerified'), 'success');
             // Redirect to index.html after successful verification
             setTimeout(() => {
                 window.location.href = 'index.html';
             }, 1000);
         } else {
-            showNotification('Invalid verification code', 'error');
+            showNotification(t('auth.invalidCode'), 'error');
             switchToVerification();
         }
     } catch (error) {
-        showNotification(error.message || 'Verification failed', 'error');
+        showNotification(error.message || t('auth.verifyFailed'), 'error');
         switchToVerification();
     }
 }
 
 async function handleResendCode() {
     if (!window.Auth) {
-        showNotification('Authentication module not loaded', 'error');
+        showNotification(t('auth.moduleNotLoaded'), 'error');
         return;
     }
 
     try {
         const code = await window.Auth.resendCode();
-        showNotification('New verification code sent! Check console.', 'success');
+        showNotification(t('auth.codeResent'), 'success');
     } catch (error) {
-        showNotification('Failed to resend code: ' + error.message, 'error');
+        showNotification(t('auth.resendFailed') + error.message, 'error');
     }
 }
 
@@ -311,4 +314,3 @@ function showNotification(message, type = 'info') {
         notification.classList.remove('show');
     }, 4000);
 }
-

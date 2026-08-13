@@ -80,8 +80,8 @@ function createFirestoreStorage(collectionType, getUserId) {
                     }
 
                     items.push({
-                        id: doc.id,
-                        ...data
+                        ...data,
+                        id: doc.id
                     });
                 });
 
@@ -261,8 +261,8 @@ function createFirestoreStorage(collectionType, getUserId) {
                     }
 
                     return {
-                        id: docSnap.id,
-                        ...data
+                        ...data,
+                        id: docSnap.id
                     };
                 } else {
                     return null;

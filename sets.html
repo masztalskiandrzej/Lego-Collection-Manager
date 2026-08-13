@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sets Collection - LEGO Manager</title>
+    <title data-i18n="sets.title">Kolekcja zestawów — LEGO Manager</title>
     <link rel="stylesheet" href="css/styles.css">
     <!-- Dark Mode - Load before page render to prevent flicker -->
     <script>
@@ -230,7 +230,7 @@
         <header class="header">
             <div class="header-left">
                 <div class="hamburger-container">
-                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu" aria-expanded="false">
                         <span class="hamburger-line"></span>
                         <span class="hamburger-line"></span>
                         <span class="hamburger-line"></span>
@@ -238,38 +238,42 @@
                 </div>
                 <div class="logo-container">
                     <img src="images/lego-icon.png" class="logo-icon img" alt="LEGO">
-                    <h1 class="logo">Sets</h1>
+                    <h1 class="logo" data-i18n="sets.h1">Zestawy</h1>
                 </div>
             </div>
 
             <!-- Navigation Dropdown (moved outside header-left for proper stacking) -->
             <nav class="nav-dropdown" id="navDropdown" aria-hidden="true">
-                <div class="nav-dropdown-header">Navigation</div>
+                <div class="nav-dropdown-header" data-i18n="nav.navigation">Nawigacja</div>
                 <a href="index.html" class="nav-dropdown-item nav-dropdown-home">
                     <span class="nav-dropdown-icon">🏠</span>
-                    <span>Back to Home</span>
+                    <span data-i18n="nav.home">Strona główna</span>
                     <span class="nav-dropdown-arrow">→</span>
                 </a>
                 <a href="minifigs.html" class="nav-dropdown-item nav-dropdown-secondary">
-                    <img src="images/minifig-icon.png" class="nav-dropdown-icon img" alt="Minifigures">
-                    <span>Go to Minifigures</span>
+                    <img src="images/minifig-icon.png" class="nav-dropdown-icon img" alt="">
+                    <span data-i18n="nav.toMinifigs">Przejdź do minifigurek</span>
                     <span class="nav-dropdown-arrow">→</span>
                 </a>
             </nav>
             <div class="header-actions">
-                <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Visit LEGO.com">🧱 LEGO.com</a>
-                <button class="btn btn-export-header" id="exportBtn" title="Export & Share" onclick="showExportDialog()">
+                <a href="https://www.lego.com" target="_blank" class="btn btn-lego" title="Odwiedź LEGO.com" data-i18n-title="nav.legoCom">🧱 LEGO.com</a>
+                <button class="btn btn-export-header" id="exportBtn" title="Eksport i udostępnianie" data-i18n-title="header.exportShare" onclick="showExportDialog()">
                     <span class="export-icon">📤</span>
                 </button>
-                <button class="btn btn-primary" id="addItemBtn">+ Add Set</button>
-                <button class="btn btn-buy" id="buyBtn">🛒 Buy</button>
-                <button class="btn btn-settings" id="settingsBtn" title="Settings">
+                <button class="btn btn-primary" id="addItemBtn" data-i18n="header.addSet">+ Dodaj zestaw</button>
+                <button class="btn btn-buy" id="buyBtn" data-i18n="header.buy">🛒 Kup</button>
+                <button class="btn btn-settings" id="settingsBtn" title="Ustawienia" data-i18n-title="header.settings">
                     <span class="settings-icon">⚙️</span>
                 </button>
                 <button class="btn btn-user" id="userBtn">
                     <span class="user-icon">👤</span>
-                    <span class="user-name" id="userName">Loading...</span>
+                    <span class="user-name" id="userName">Ładowanie...</span>
                 </button>
+                <div class="lang-switch" role="group" aria-label="Language">
+                    <button type="button" data-lang-btn="pl" class="lang-btn active">PL</button>
+                    <button type="button" data-lang-btn="en" class="lang-btn">EN</button>
+                </div>
             </div>
         </header>
 
@@ -277,47 +281,47 @@
         <main class="main-content">
             <!-- Sidebar Filters -->
             <aside class="sidebar">
-                <h2 class="sidebar-title">Filters</h2>
+                <h2 class="sidebar-title" data-i18n="filters.title">Filtry</h2>
 
                 <!-- Type filter removed - this is sets only page -->
 
                 <div class="filter-group">
-                    <label for="filterTheme">Theme</label>
+                    <label for="filterTheme" data-i18n="filters.theme">Motyw</label>
                     <select id="filterTheme">
-                        <option value="all">All Themes</option>
+                        <option value="all" data-i18n="filters.allThemes">Wszystkie motywy</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="filterStatus">Status</label>
+                    <label for="filterStatus" data-i18n="filters.status">Status</label>
                     <select id="filterStatus">
-                        <option value="all">All</option>
-                        <option value="owned">Owned</option>
-                        <option value="wishlist">Wishlist</option>
-                        <option value="sold">Sold</option>
+                        <option value="all" data-i18n="common.all">Wszystko</option>
+                        <option value="owned" data-i18n="status.owned">Posiadane</option>
+                        <option value="wishlist" data-i18n="status.wishlist">Lista życzeń</option>
+                        <option value="sold" data-i18n="status.sold">Sprzedane</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label for="filterCondition">Condition</label>
+                    <label for="filterCondition" data-i18n="filters.condition">Stan</label>
                     <select id="filterCondition">
-                        <option value="all">All</option>
-                        <option value="new">New</option>
-                        <option value="used">Used</option>
-                        <option value="sealed">Sealed</option>
+                        <option value="all" data-i18n="common.all">Wszystko</option>
+                        <option value="new" data-i18n="condition.new">Nowe</option>
+                        <option value="used" data-i18n="condition.used">Używane</option>
+                        <option value="sealed" data-i18n="condition.sealed">Zafoliowane</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Year Range</label>
+                    <label data-i18n="filters.yearRange">Zakres lat</label>
                     <div class="year-range">
-                        <input type="number" id="yearMin" placeholder="Min" min="1949" max="2030">
+                        <input type="number" id="yearMin" placeholder="Od" data-i18n-placeholder="filters.min" min="1949" max="2030">
                         <span>-</span>
-                        <input type="number" id="yearMax" placeholder="Max" min="1949" max="2030">
+                        <input type="number" id="yearMax" placeholder="Do" data-i18n-placeholder="filters.max" min="1949" max="2030">
                     </div>
                 </div>
 
-                <button class="btn btn-secondary" id="clearFiltersBtn">Clear Filters</button>
+                <button class="btn btn-secondary" id="clearFiltersBtn" data-i18n="filters.clear">Wyczyść filtry</button>
             </aside>
 
             <!-- Collection Area -->
@@ -325,29 +329,29 @@
                 <!-- Search and Sort Bar -->
                 <div class="toolbar">
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search by name, set number, or notes...">
+                        <input type="text" id="searchInput" placeholder="Szukaj po nazwie, numerze zestawu lub notatkach..." data-i18n-placeholder="toolbar.searchSets">
                     </div>
                     <div class="toolbar-controls">
                         <div class="sort-control">
-                            <label for="sortBy">Sort:</label>
+                            <label for="sortBy" data-i18n="toolbar.sortBy">Sortuj:</label>
                             <select id="sortBy">
-                                <option value="name">Name</option>
-                                <option value="number">Set Number</option>
-                                <option value="theme">Theme</option>
-                                <option value="year">Year</option>
-                                <option value="pieces">Piece Count</option>
-                                <option value="price">Price</option>
-                                <option value="dateAdded">Date Added</option>
+                                <option value="name" data-i18n="sort.name">Nazwa</option>
+                                <option value="number" data-i18n="sort.setNumber">Numer zestawu</option>
+                                <option value="theme" data-i18n="sort.theme">Motyw</option>
+                                <option value="year" data-i18n="sort.year">Rok</option>
+                                <option value="pieces" data-i18n="sort.pieces">Liczba elementów</option>
+                                <option value="price" data-i18n="sort.price">Cena</option>
+                                <option value="dateAdded" data-i18n="sort.dateAdded">Data dodania</option>
                             </select>
-                            <button class="btn-icon" id="sortOrderBtn" title="Toggle sort order">
+                            <button class="btn-icon" id="sortOrderBtn" title="Zmień kierunek sortowania" data-i18n-title="toolbar.toggleSort">
                                 <span class="sort-icon">&#9650;</span>
                             </button>
                         </div>
                         <div class="view-toggle">
-                            <button class="btn-icon active" id="gridViewBtn" title="Grid view">
+                            <button class="btn-icon active" id="gridViewBtn" title="Widok siatki" data-i18n-title="toolbar.gridView">
                                 <span class="grid-icon">&#9638;&#9638;</span>
                             </button>
-                            <button class="btn-icon" id="listViewBtn" title="List view">
+                            <button class="btn-icon" id="listViewBtn" title="Widok listy" data-i18n-title="toolbar.listView">
                                 <span class="list-icon">&#9776;</span>
                             </button>
                         </div>
@@ -361,26 +365,26 @@
 
                 <!-- Empty State -->
                 <div class="empty-state" id="emptyState" style="display: none;">
-                    <p>No sets found.</p>
-                    <p>Add your first set or try different filters.</p>
+                    <p data-i18n="empty.sets">Brak zestawów.</p>
+                    <p data-i18n="empty.setsHint">Dodaj swój pierwszy zestaw lub zmień filtry.</p>
                 </div>
 
                 <!-- Pagination -->
                 <div class="pagination" id="pagination">
-                    <button class="pagination-btn" id="paginationFirst" title="First page">
+                    <button class="pagination-btn" id="paginationFirst" title="Pierwsza strona" data-i18n-title="pagination.first">
                         <span class="pagination-icon">&laquo;</span>
                     </button>
-                    <button class="pagination-btn" id="paginationPrev" title="Previous page">
-                        <span class="pagination-icon">&lsaquo;</span> Previous
+                    <button class="pagination-btn" id="paginationPrev" title="Poprzednia" data-i18n-title="pagination.prev">
+                        <span class="pagination-icon">&lsaquo;</span> <span data-i18n="pagination.prev">Poprzednia</span>
                     </button>
                     <div class="pagination-info" id="paginationInfo">
-                        Page <span id="paginationCurrent">1</span> of <span id="paginationTotal">1</span>
-                        (<span id="paginationShowing">0-0</span> of <span id="paginationTotalItems">0</span> items)
+                        <span data-i18n="pagination.page">Strona</span> <span id="paginationCurrent">1</span> <span data-i18n="pagination.of">z</span> <span id="paginationTotal">1</span>
+                        (<span id="paginationShowing">0-0</span> <span data-i18n="pagination.of">z</span> <span id="paginationTotalItems">0</span> <span data-i18n="pagination.itemsSuffix">elementów)</span>
                     </div>
-                    <button class="pagination-btn" id="paginationNext" title="Next page">
-                        Next <span class="pagination-icon">&rsaquo;</span>
+                    <button class="pagination-btn" id="paginationNext" title="Następna" data-i18n-title="pagination.next">
+                        <span data-i18n="pagination.next">Następna</span> <span class="pagination-icon">&rsaquo;</span>
                     </button>
-                    <button class="pagination-btn" id="paginationLast" title="Last page">
+                    <button class="pagination-btn" id="paginationLast" title="Ostatnia strona" data-i18n-title="pagination.last">
                         <span class="pagination-icon">&raquo;</span>
                     </button>
                 </div>
@@ -390,9 +394,9 @@
         <!-- Footer Stats -->
         <footer class="footer">
             <div class="stats" id="stats">
-                <span class="stat-item"><strong id="totalItems">0</strong> sets</span>
-                <span class="stat-item"><strong id="totalPieces">0</strong> total pieces</span>
-                <span class="stat-item">Value: <strong id="totalValue">$0.00</strong></span>
+                <span class="stat-item"><strong id="totalItems">0</strong> <span data-i18n="footer.setsWord">zestawów</span></span>
+                <span class="stat-item"><strong id="totalPieces">0</strong> <span data-i18n="footer.totalPieces">łącznie elementów</span></span>
+                <span class="stat-item"><span data-i18n="footer.value">Wartość:</span> <strong id="totalValue">$0.00</strong></span>
             </div>
         </footer>
     </div>
@@ -401,7 +405,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 id="modalTitle">Add Set</h2>
+                <h2 id="modalTitle" data-i18n="form.addSetTitle">Dodaj zestaw</h2>
                 <button class="btn-close" id="modalCloseBtn">&times;</button>
             </div>
             <form id="itemForm">
@@ -411,86 +415,86 @@
                 <input type="hidden" id="itemType" value="set">
 
                 <div class="form-group">
-                    <label for="itemName">Name *</label>
-                    <input type="text" id="itemName" required placeholder="e.g., Millennium Falcon">
+                    <label for="itemName" data-i18n="form.name">Nazwa *</label>
+                    <input type="text" id="itemName" required placeholder="np. Sokół Millennium" data-i18n-placeholder="form.nameSetPh">
                 </div>
 
                 <div class="form-group">
-                    <label for="itemNumber">Set Number</label>
+                    <label for="itemNumber" data-i18n="form.setNumber">Numer zestawu</label>
                     <div class="input-with-button">
-                        <input type="text" id="itemNumber" placeholder="e.g., 75192">
-                        <button type="button" class="btn btn-small btn-secondary" id="fetchImageBtn" title="Fetch official image from BrickLink">📷 Get Image</button>
+                        <input type="text" id="itemNumber" placeholder="np. 75192" data-i18n-placeholder="form.numberSetPh">
+                        <button type="button" class="btn btn-small btn-secondary" id="fetchImageBtn" title="Pobierz oficjalne zdjęcie z BrickLink" data-i18n-title="form.getImageTitle" data-i18n="form.getImage">📷 Pobierz zdjęcie</button>
                     </div>
-                    <small class="text-muted">Enter set number and click "Get Image" to fetch official photo</small>
+                    <small class="text-muted" data-i18n="form.getImageHintSet">Wpisz numer zestawu i kliknij „Pobierz zdjęcie", aby pobrać oficjalne zdjęcie</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="itemTheme">Theme *</label>
-                    <input type="text" id="itemTheme" required list="themesList" placeholder="e.g., Star Wars">
+                    <label for="itemTheme" data-i18n="form.theme">Motyw *</label>
+                    <input type="text" id="itemTheme" required list="themesList" placeholder="np. Star Wars" data-i18n-placeholder="form.themePh">
                     <datalist id="themesList"></datalist>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="itemYear">Year</label>
+                        <label for="itemYear" data-i18n="form.year">Rok</label>
                         <input type="number" id="itemYear" min="1949" max="2030" placeholder="2024">
                     </div>
                     <div class="form-group">
-                        <label for="itemStatus">Status *</label>
+                        <label for="itemStatus" data-i18n="form.status">Status *</label>
                         <select id="itemStatus" required>
-                            <option value="owned">Owned</option>
-                            <option value="wishlist">Wishlist</option>
-                            <option value="sold">Sold</option>
+                            <option value="owned" data-i18n="status.owned">Posiadane</option>
+                            <option value="wishlist" data-i18n="status.wishlist">Lista życzeń</option>
+                            <option value="sold" data-i18n="status.sold">Sprzedane</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="itemPieceCount">Piece Count</label>
-                    <input type="number" id="itemPieceCount" min="1" placeholder="e.g., 7541">
+                    <label for="itemPieceCount" data-i18n="form.pieceCount">Liczba elementów</label>
+                    <input type="number" id="itemPieceCount" min="1" placeholder="np. 7541" data-i18n-placeholder="form.piecePh">
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="itemPrice">Price Paid ($)</label>
+                        <label for="itemPrice" data-i18n="form.price">Cena ($)</label>
                         <input type="number" id="itemPrice" min="0" step="0.01" placeholder="0.00">
                     </div>
                     <div class="form-group">
-                        <label for="itemCondition">Condition</label>
+                        <label for="itemCondition" data-i18n="form.condition">Stan</label>
                         <select id="itemCondition">
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
-                            <option value="sealed">Sealed</option>
+                            <option value="new" data-i18n="condition.new">Nowe</option>
+                            <option value="used" data-i18n="condition.used">Używane</option>
+                            <option value="sealed" data-i18n="condition.sealed">Zafoliowane</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="itemLocation">Location</label>
-                    <input type="text" id="itemLocation" placeholder="e.g., Display shelf A">
+                    <label for="itemLocation" data-i18n="form.location">Lokalizacja</label>
+                    <input type="text" id="itemLocation" placeholder="np. Półka A" data-i18n-placeholder="form.locationSetPh">
                 </div>
 
                 <div class="form-group">
-                    <label for="itemNotes">Notes</label>
-                    <textarea id="itemNotes" rows="3" placeholder="Additional notes..."></textarea>
+                    <label for="itemNotes" data-i18n="form.notes">Notatki</label>
+                    <textarea id="itemNotes" rows="3" placeholder="Dodatkowe notatki..." data-i18n-placeholder="form.notesPh"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="itemImageFile">Photo</label>
+                    <label for="itemImageFile" data-i18n="form.photo">Zdjęcie</label>
                     <div class="image-upload-container">
                         <input type="file" id="itemImageFile" accept="image/*" style="display: none;">
-                        <button type="button" class="btn btn-secondary btn-small" id="imageUploadBtn">📷 Choose Photo</button>
-                        <span id="imageFileName" class="image-file-name">No file chosen</span>
+                        <button type="button" class="btn btn-secondary btn-small" id="imageUploadBtn" data-i18n="form.choosePhoto">📷 Wybierz zdjęcie</button>
+                        <span id="imageFileName" class="image-file-name" data-i18n="form.noFile">Brak pliku</span>
                     </div>
                     <div id="imagePreview" class="image-preview" style="display: none;">
-                        <img id="imagePreviewImg" src="" alt="Preview">
-                        <button type="button" class="btn btn-danger btn-small" id="removeImageBtn">✕ Remove</button>
+                        <img id="imagePreviewImg" src="" alt="Podgląd" data-i18n-alt="form.previewAlt">
+                        <button type="button" class="btn btn-danger btn-small" id="removeImageBtn">✕ <span data-i18n="common.remove">Usuń</span></button>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn" data-i18n="common.cancel">Anuluj</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="common.save">Zapisz</button>
                 </div>
             </form>
         </div>
@@ -500,16 +504,16 @@
     <div class="modal-overlay" id="deleteModalOverlay">
         <div class="modal modal-small">
             <div class="modal-header">
-                <h2>Confirm Delete</h2>
+                <h2 data-i18n="delete.title">Potwierdź usunięcie</h2>
                 <button class="btn-close" id="deleteModalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete "<span id="deleteItemName"></span>"?</p>
-                <p class="text-muted">This action cannot be undone.</p>
+                <p><span data-i18n="delete.confirmPrefix">Czy na pewno chcesz usunąć</span> "<span id="deleteItemName"></span>"?</p>
+                <p class="text-muted" data-i18n="delete.warning">Tej akcji nie można cofnąć.</p>
             </div>
             <div class="form-actions">
-                <button class="btn btn-secondary" id="deleteCancelBtn">Cancel</button>
-                <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+                <button class="btn btn-secondary" id="deleteCancelBtn" data-i18n="common.cancel">Anuluj</button>
+                <button class="btn btn-danger" id="deleteConfirmBtn" data-i18n="common.delete">Usuń</button>
             </div>
         </div>
     </div>
@@ -518,14 +522,14 @@
     <div class="modal-overlay" id="buyModalOverlay">
         <div class="modal modal-buy">
             <div class="modal-header">
-                <h2 id="buyModalTitle">🛒 Buy Sets</h2>
+                <h2 id="buyModalTitle" data-i18n="buy.buySets">🛒 Kup zestawy</h2>
                 <button class="btn-close" id="buyModalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- LEGO.com Official Store - Priority Link -->
                 <a href="#" class="store-link-btn store-link-lego" id="legoComStoreLink" target="_blank" rel="noopener">
                     <span class="store-icon">🧱</span>
-                    <span class="store-name">LEGO.com Official Store</span>
+                    <span class="store-name" data-i18n="buy.legoOfficial">LEGO.com — sklep oficjalny</span>
                     <span class="store-arrow">→</span>
                 </a>
                 <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 16px 0;">
@@ -539,28 +543,28 @@
     <div class="modal-overlay" id="exportModalOverlay">
         <div class="modal modal-export">
             <div class="modal-header">
-                <h2>📤 Export & Share</h2>
+                <h2 data-i18n="export.title">📤 Eksport i udostępnianie</h2>
                 <button class="btn-close" id="exportModalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <!-- Export Summary -->
                 <div id="exportSummary" class="export-summary">
-                    <h3>📊 Collection Summary</h3>
+                    <h3 data-i18n="export.summary">📊 Podsumowanie kolekcji</h3>
                     <div class="summary-stats">
                         <div class="summary-stat">
-                            <span class="stat-label">Total Items:</span>
+                            <span class="stat-label" data-i18n="export.totalItems">Liczba elementów:</span>
                             <span class="stat-value" id="summaryTotalItems">0</span>
                         </div>
                         <div class="summary-stat">
-                            <span class="stat-label">Total Value:</span>
+                            <span class="stat-label" data-i18n="export.totalValue">Łączna wartość:</span>
                             <span class="stat-value" id="summaryTotalValue">$0</span>
                         </div>
                         <div class="summary-stat">
-                            <span class="stat-label">Themes:</span>
+                            <span class="stat-label" data-i18n="export.themes">Motywy:</span>
                             <span class="stat-value" id="summaryThemes">0</span>
                         </div>
                         <div class="summary-stat">
-                            <span class="stat-label">With Images:</span>
+                            <span class="stat-label" data-i18n="export.withImages">Ze zdjęciami:</span>
                             <span class="stat-value" id="summaryImages">0</span>
                         </div>
                     </div>
@@ -568,20 +572,20 @@
 
                 <!-- Export Options -->
                 <div class="export-section">
-                    <h3 class="export-section-title">Export Data</h3>
+                    <h3 class="export-section-title" data-i18n="export.exportData">Eksport danych</h3>
                     <div class="export-options">
                         <button class="btn btn-export" id="exportCSVBtn">
                             <span class="export-icon">📊</span>
                             <span class="export-text">
-                                <span class="export-title">Export to CSV</span>
-                                <span class="export-desc">Spreadsheet-compatible format</span>
+                                <span class="export-title" data-i18n="export.toCsv">Eksportuj do CSV</span>
+                                <span class="export-desc" data-i18n="export.csvDesc">Format zgodny z arkuszami</span>
                             </span>
                         </button>
                         <button class="btn btn-export" id="exportJSONBtn">
                             <span class="export-icon">📦</span>
                             <span class="export-text">
-                                <span class="export-title">Export to JSON</span>
-                                <span class="export-desc">Full backup with metadata</span>
+                                <span class="export-title" data-i18n="export.toJson">Eksportuj do JSON</span>
+                                <span class="export-desc" data-i18n="export.jsonDesc">Pełna kopia zapasowa z metadanymi</span>
                             </span>
                         </button>
                     </div>
@@ -589,20 +593,20 @@
 
                 <!-- Social Sharing -->
                 <div class="export-section">
-                    <h3 class="export-section-title">Social Sharing</h3>
+                    <h3 class="export-section-title" data-i18n="export.social">Udostępnianie</h3>
                     <div class="export-options">
                         <button class="btn btn-export" id="generateCardBtn">
                             <span class="export-icon">🎨</span>
                             <span class="export-text">
-                                <span class="export-title">Generate Collection Card</span>
-                                <span class="export-desc">Beautiful image for social media</span>
+                                <span class="export-title" data-i18n="export.genCard">Wygeneruj kartę kolekcji</span>
+                                <span class="export-desc" data-i18n="export.cardDesc">Ładny obraz do mediów społecznościowych</span>
                             </span>
                         </button>
                         <button class="btn btn-export" id="generateQRBtn">
                             <span class="export-icon">📱</span>
                             <span class="export-text">
-                                <span class="export-title">Generate QR Code</span>
-                                <span class="export-desc">Share collection link</span>
+                                <span class="export-title" data-i18n="export.genQr">Wygeneruj kod QR</span>
+                                <span class="export-desc" data-i18n="export.qrDesc">Udostępnij link do kolekcji</span>
                             </span>
                         </button>
                     </div>
@@ -610,14 +614,14 @@
 
                 <!-- Import -->
                 <div class="export-section">
-                    <h3 class="export-section-title">Import Data</h3>
+                    <h3 class="export-section-title" data-i18n="export.importData">Import danych</h3>
                     <div class="import-container">
                         <input type="file" id="importFileInput" accept=".json" style="display: none;">
                         <button class="btn btn-import" id="importJSONBtn">
                             <span class="export-icon">📥</span>
                             <span class="export-text">
-                                <span class="export-title">Import from JSON</span>
-                                <span class="export-desc">Restore from backup file</span>
+                                <span class="export-title" data-i18n="export.fromJson">Importuj z JSON</span>
+                                <span class="export-desc" data-i18n="export.importDesc">Przywróć z pliku kopii zapasowej</span>
                             </span>
                         </button>
                     </div>
@@ -625,12 +629,12 @@
 
                 <!-- Public Link -->
                 <div class="export-section">
-                    <h3 class="export-section-title">Public Sharing</h3>
+                    <h3 class="export-section-title" data-i18n="export.publicSharing">Udostępnianie publiczne</h3>
                     <button class="btn btn-export btn-full-width" id="publicLinkBtn">
                         <span class="export-icon">🔗</span>
                         <span class="export-text">
-                            <span class="export-title">Generate Public Link</span>
-                            <span class="export-desc">Create shareable collection URL</span>
+                            <span class="export-title" data-i18n="export.genPublicLink">Wygeneruj publiczny link</span>
+                            <span class="export-desc" data-i18n="export.publicDesc">Utwórz URL kolekcji do udostępnienia</span>
                         </span>
                     </button>
                 </div>
@@ -642,16 +646,16 @@
     <div class="modal-overlay" id="cardPreviewModalOverlay">
         <div class="modal modal-card-preview">
             <div class="modal-header">
-                <h2>🎨 Your Collection Card</h2>
+                <h2 data-i18n="cardPreview.title">🎨 Twoja karta kolekcji</h2>
                 <button class="btn-close" id="cardPreviewCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="cardPreviewContainer" class="card-preview-container">
-                    <div class="card-preview-placeholder">Generating collection card...</div>
+                    <div class="card-preview-placeholder" data-i18n="cardPreview.generating">Generowanie karty kolekcji...</div>
                 </div>
                 <div class="card-preview-actions">
-                    <button class="btn btn-primary" id="downloadCardBtn">📥 Download Card</button>
-                    <button class="btn btn-share" id="shareCardTwitterBtn">🐦 Share on Twitter</button>
+                    <button class="btn btn-primary" id="downloadCardBtn" data-i18n="cardPreview.download">📥 Pobierz kartę</button>
+                    <button class="btn btn-share" id="shareCardTwitterBtn" data-i18n="cardPreview.shareTwitter">🐦 Udostępnij na Twitterze</button>
                 </div>
             </div>
         </div>
@@ -661,16 +665,16 @@
     <div class="modal-overlay" id="settingsModalOverlay">
         <div class="modal modal-settings">
             <div class="modal-header">
-                <h2>⚙️ Settings</h2>
+                <h2 data-i18n="settings.title">⚙️ Ustawienia</h2>
                 <button class="btn-close" id="settingsModalCloseBtn">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="settings-section">
-                    <h3 class="settings-section-title">Appearance</h3>
+                    <h3 class="settings-section-title" data-i18n="settings.appearance">Wygląd</h3>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <span class="settings-item-label">Dark Mode</span>
-                            <span class="settings-item-description">Enable dark theme for the application</span>
+                            <span class="settings-item-label" data-i18n="settings.darkMode">Tryb ciemny</span>
+                            <span class="settings-item-description" data-i18n="settings.darkModeDesc">Włącz ciemny motyw aplikacji</span>
                         </div>
                         <label class="toggle-switch">
                             <input type="checkbox" id="darkModeToggle">
@@ -679,20 +683,20 @@
                     </div>
                 </div>
                 <div class="settings-section">
-                    <h3 class="settings-section-title">Data Management</h3>
+                    <h3 class="settings-section-title" data-i18n="settings.dataMgmt">Zarządzanie danymi</h3>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <span class="settings-item-label">Export Collection</span>
-                            <span class="settings-item-description">Export your data to CSV or JSON</span>
+                            <span class="settings-item-label" data-i18n="settings.exportColl">Eksport kolekcji</span>
+                            <span class="settings-item-description" data-i18n="settings.exportCollDesc">Eksportuj dane do CSV lub JSON</span>
                         </div>
-                        <button class="btn btn-secondary" id="exportSettingsBtn">📤 Export</button>
+                        <button class="btn btn-secondary" id="exportSettingsBtn" data-i18n="settings.exportBtn">📤 Eksport</button>
                     </div>
                     <div class="settings-item">
                         <div class="settings-item-info">
-                            <span class="settings-item-label">Import Collection</span>
-                            <span class="settings-item-description">Import data from backup file</span>
+                            <span class="settings-item-label" data-i18n="settings.importColl">Import kolekcji</span>
+                            <span class="settings-item-description" data-i18n="settings.importCollDesc">Importuj dane z pliku kopii zapasowej</span>
                         </div>
-                        <button class="btn btn-secondary" id="importSettingsBtn">📥 Import</button>
+                        <button class="btn btn-secondary" id="importSettingsBtn" data-i18n="settings.importBtn">📥 Import</button>
                     </div>
                 </div>
             </div>
@@ -717,6 +721,7 @@
 
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
+    <script src="js/shared/i18n.js"></script>
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/keyboard-shortcuts.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
@@ -861,6 +866,8 @@
 
     <!-- Export/Share Dialog Function -->
     <script>
+        const t = (k, v) => (window.I18N ? window.I18N.t(k, v) : k);
+
         // Wait for modules to be available
         let moduleCheckInterval = null;
         let modulesReady = false;
@@ -880,19 +887,20 @@
 
                 // Check if Storage module is available
                 if (!window.Storage) {
-                    document.getElementById('summaryTotalItems').textContent = 'N/A';
-                    document.getElementById('summaryTotalValue').textContent = 'N/A';
-                    document.getElementById('summaryThemes').textContent = 'N/A';
-                    document.getElementById('summaryImages').textContent = 'N/A';
+                    document.getElementById('summaryTotalItems').textContent = t('msg.na');
+                    document.getElementById('summaryTotalValue').textContent = t('msg.na');
+                    document.getElementById('summaryThemes').textContent = t('msg.na');
+                    document.getElementById('summaryImages').textContent = t('msg.na');
                     return;
                 }
 
                 // Check if user is authenticated
                 if (!window.Auth || !window.Auth.isAuthenticated()) {
-                    document.getElementById('summaryTotalItems').textContent = 'Login required';
-                    document.getElementById('summaryTotalValue').textContent = 'Login required';
-                    document.getElementById('summaryThemes').textContent = 'Login required';
-                    document.getElementById('summaryImages').textContent = 'Login required';
+                    const lr = t('msg.loginRequiredShort');
+                    document.getElementById('summaryTotalItems').textContent = lr;
+                    document.getElementById('summaryTotalValue').textContent = lr;
+                    document.getElementById('summaryThemes').textContent = lr;
+                    document.getElementById('summaryImages').textContent = lr;
                     return;
                 }
 
@@ -911,9 +919,9 @@
                 if (!window.ExportImport) {
                     // Show basic stats without detailed summary
                     document.getElementById('summaryTotalItems').textContent = collection.length;
-                    document.getElementById('summaryTotalValue').textContent = 'N/A';
-                    document.getElementById('summaryThemes').textContent = 'N/A';
-                    document.getElementById('summaryImages').textContent = 'N/A';
+                    document.getElementById('summaryTotalValue').textContent = t('msg.na');
+                    document.getElementById('summaryThemes').textContent = t('msg.na');
+                    document.getElementById('summaryImages').textContent = t('msg.na');
                     return;
                 }
 
@@ -928,10 +936,11 @@
 
             } catch (error) {
                 // Show error stats with user-friendly message
-                document.getElementById('summaryTotalItems').textContent = 'Error';
-                document.getElementById('summaryTotalValue').textContent = 'Error';
-                document.getElementById('summaryThemes').textContent = 'Error';
-                document.getElementById('summaryImages').textContent = 'Error';
+                const e = t('msg.errorShort');
+                document.getElementById('summaryTotalItems').textContent = e;
+                document.getElementById('summaryTotalValue').textContent = e;
+                document.getElementById('summaryThemes').textContent = e;
+                document.getElementById('summaryImages').textContent = e;
             }
         }
 
@@ -951,8 +960,6 @@
                     moduleCheckInterval = setInterval(() => {
                         attempts++;
 
-                        // Log current state
-
                         if (checkModulesReady()) {
                             clearInterval(moduleCheckInterval);
                             loadCollectionData();
@@ -965,12 +972,12 @@
                             if (typeof window.ExportImport === 'undefined') missingModules.push('ExportImport');
                             if (typeof window.SocialSharing === 'undefined') missingModules.push('SocialSharing');
 
-                            alert('Required modules not available: ' + missingModules.join(', ') + '\n\nPlease refresh the page and ensure you are logged in.');
+                            alert(t('msg.requiredModulesMissing', { mods: missingModules.join(', ') }));
                         }
                     }, 100);
                 }
             } else {
-                alert('Export modal not found in the page');
+                alert(t('msg.exportModalNotFound'));
             }
         }
 
@@ -1014,23 +1021,23 @@
 
                         // Check if modules are available
                         if (!window.Storage) {
-                            alert('Storage module not loaded. Please refresh the page and ensure you are logged in.');
+                            alert(t('msg.storageMissing'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert('Export module not loaded. Please refresh the page.');
+                            alert(t('msg.exportMissing'));
                             return;
                         }
                         if (!window.Auth || !window.Auth.isAuthenticated()) {
-                            alert('Please log in to export your collection.');
+                            alert(t('msg.loginToExport'));
                             return;
                         }
 
                         const collection = await window.Storage.getCollection();
                         window.ExportImport.exportToCSV(collection, 'sets');
-                        alert('Collection exported to CSV successfully!');
+                        alert(t('msg.exportCsvOk'));
                     } catch (error) {
-                        alert('Error exporting to CSV: ' + error.message);
+                        alert(t('msg.exportCsvErr') + error.message);
                     }
                 };
             }
@@ -1042,11 +1049,11 @@
                     try {
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert('Please log in to export your collection.');
+                            alert(t('msg.loginToExport'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert('Export module not loaded. Please refresh the page.');
+                            alert(t('msg.exportMissing'));
                             return;
                         }
 
@@ -1054,9 +1061,9 @@
                         const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
                         const metadata = { username, exportDate: new Date().toISOString() };
                         window.ExportImport.exportToJSON(collection, 'sets', metadata);
-                        alert('Collection exported to JSON successfully!');
+                        alert(t('msg.exportJsonOk'));
                     } catch (error) {
-                        alert('Error exporting to JSON: ' + error.message);
+                        alert(t('msg.exportJsonErr') + error.message);
                     }
                 };
             }
@@ -1068,11 +1075,11 @@
                     try {
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert('Please log in to generate collection cards.');
+                            alert(t('msg.loginToCard'));
                             return;
                         }
                         if (!window.ExportImport || !window.SocialSharing) {
-                            alert('Required modules not loaded. Please refresh the page.');
+                            alert(t('msg.modulesMissing'));
                             return;
                         }
 
@@ -1085,7 +1092,7 @@
                         const cardPreviewContainer = document.getElementById('cardPreviewContainer');
 
                         if (cardPreviewContainer) {
-                            cardPreviewContainer.innerHTML = `<img src="${cardDataUrl}" alt="Collection Card" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">`;
+                            cardPreviewContainer.innerHTML = `<img src="${cardDataUrl}" alt="${t('cardPreview.alt')}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">`;
                         }
 
                         if (cardPreviewModal) {
@@ -1095,7 +1102,7 @@
                         // Setup card preview actions
                         setupCardPreviewActions(cardDataUrl, summary);
                     } catch (error) {
-                        alert('Error generating card: ' + error.message);
+                        alert(t('msg.cardErr') + error.message);
                     }
                 };
             }
@@ -1107,7 +1114,7 @@
                     try {
 
                         if (!window.SocialSharing) {
-                            alert('Social sharing module not loaded. Please refresh the page.');
+                            alert(t('msg.socialMissing'));
                             return;
                         }
 
@@ -1119,9 +1126,9 @@
                         link.download = 'collection-qr-code.png';
                         link.click();
 
-                        alert('QR code generated and downloaded!');
+                        alert(t('msg.qrDownloaded'));
                     } catch (error) {
-                        alert('Error generating QR code: ' + error.message);
+                        alert(t('msg.qrErr') + error.message);
                     }
                 };
             }
@@ -1133,20 +1140,20 @@
                     try {
 
                         if (!window.Auth || !window.Auth.isAuthenticated()) {
-                            alert('You must be logged in to create public links');
+                            alert(t('msg.loginRequiredPublic'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert('Export module not loaded. Please refresh the page.');
+                            alert(t('msg.exportMissing'));
                             return;
                         }
 
                         const userId = window.Auth.getUserId();
                         const publicLink = window.ExportImport.generatePublicLink(userId, 'sets');
                         await navigator.clipboard.writeText(publicLink);
-                        alert('Public link copied to clipboard!\n\n' + publicLink);
+                        alert(t('msg.publicLinkCopied') + '\n\n' + publicLink);
                     } catch (error) {
-                        alert('Error creating public link: ' + error.message);
+                        alert(t('msg.publicLinkErr') + error.message);
                     }
                 };
             }
@@ -1167,15 +1174,15 @@
                         if (!file) return;
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert('Please log in to import items.');
+                            alert(t('msg.loginToImport'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert('Export module not loaded. Please refresh the page.');
+                            alert(t('msg.exportMissing'));
                             return;
                         }
 
-                        if (!confirm('This will import items and add them to your existing collection. Continue?')) {
+                        if (!confirm(t('msg.importConfirm'))) {
                             return;
                         }
 
@@ -1188,11 +1195,11 @@
                             importCount++;
                         }
 
-                        alert(`Successfully imported ${importCount} items!`);
+                        alert(t('msg.imported', { count: importCount }));
                         closeExportDialog();
                         setTimeout(() => location.reload(), 1000);
                     } catch (error) {
-                        alert('Error importing: ' + error.message);
+                        alert(t('msg.importErr') + error.message);
                     }
                 };
             }
@@ -1223,7 +1230,7 @@
             if (downloadCardBtn) {
                 downloadCardBtn.onclick = function() {
                     window.SocialSharing.downloadImage(cardDataUrl, 'lego-collection-card.png');
-                    alert('Collection card downloaded!');
+                    alert(t('msg.cardDownloaded'));
                 };
             }
 

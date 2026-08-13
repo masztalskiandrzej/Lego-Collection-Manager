@@ -74,7 +74,7 @@ const UI = {
 
         // Build details array
         const details = [];
-        if (item.condition) details.push(this.capitalize(item.condition));
+        if (item.condition) details.push(t('condition.' + item.condition));
         if (item.location) details.push(item.location);
 
         // Image HTML
@@ -89,8 +89,8 @@ const UI = {
         return `
             <div class="item-card" data-id="${item.id}">
                 <div class="card-header">
-                    <span class="card-type minifigure">MINIFIG</span>
-                    <span class="card-status ${item.status}">${this.capitalize(item.status)}</span>
+                    <span class="card-type minifigure">${t('type.minifig')}</span>
+                    <span class="card-status ${item.status}">${t('status.' + item.status)}</span>
                 </div>
                 ${imageHtml}
                 <div class="card-body">
@@ -107,9 +107,9 @@ const UI = {
                     ` : ''}
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-secondary edit-btn" data-id="${item.id}">Edit</button>
-                    <button class="btn btn-buy-item buy-item-btn" data-id="${item.id}" title="Search for this item in stores">🛒 Buy</button>
-                    <button class="btn btn-danger delete-btn" data-id="${item.id}">Delete</button>
+                    <button class="btn btn-secondary edit-btn" data-id="${item.id}">${t('common.edit')}</button>
+                    <button class="btn btn-buy-item buy-item-btn" data-id="${item.id}" title="${t('buy.itemTitle')}">${t('header.buy')}</button>
+                    <button class="btn btn-danger delete-btn" data-id="${item.id}">${t('common.delete')}</button>
                 </div>
             </div>
         `;
@@ -125,7 +125,7 @@ const UI = {
 
         // Update filter dropdown
         const currentValue = select.value;
-        select.innerHTML = '<option value="all">All Themes</option>';
+        select.innerHTML = '<option value="all" data-i18n="filters.allThemes">' + t('filters.allThemes') + '</option>';
         themes.forEach(theme => {
             const option = document.createElement('option');
             option.value = theme;
@@ -170,7 +170,7 @@ const UI = {
 
         if (item) {
             // Edit mode
-            title.textContent = 'Edit Minifigure';
+            title.textContent = t('form.editMinifigTitle');
             document.getElementById('itemId').value = item.id;
             document.getElementById('itemName').value = item.name || '';
             document.getElementById('itemNumber').value = item.figureNumber || '';
@@ -188,7 +188,7 @@ const UI = {
             }
         } else {
             // Add mode
-            title.textContent = 'Add Minifigure';
+            title.textContent = t('form.addMinifigTitle');
         }
 
         modal.classList.add('active');
@@ -205,7 +205,7 @@ const UI = {
         const previewImg = document.getElementById('imagePreviewImg');
 
         if (fileInput) fileInput.value = '';
-        if (fileName) fileName.textContent = 'No file chosen';
+        if (fileName) fileName.textContent = t('form.noFile');
         if (preview) preview.style.display = 'none';
         if (previewImg) previewImg.src = '';
 
@@ -243,9 +243,9 @@ const UI = {
             // Update file name to show existing image
             if (fileName) {
                 if (imageUrl.startsWith('data:')) {
-                    fileName.textContent = 'New image selected';
+                    fileName.textContent = t('form.newImage');
                 } else {
-                    fileName.textContent = 'Current image';
+                    fileName.textContent = t('form.currentImage');
                 }
             }
         } else {

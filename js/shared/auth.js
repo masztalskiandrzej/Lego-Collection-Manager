@@ -86,7 +86,7 @@ const Auth = {
                 const result = await sendEmail({
                     email: email,
                     code: code,
-                    language: 'pl'
+                    language: (window.I18N ? window.I18N.lang : 'pl')
                 });
 
                 if (result.data.success) {

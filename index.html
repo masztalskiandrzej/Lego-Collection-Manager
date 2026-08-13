@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,28 +7,34 @@
     <link rel="stylesheet" href="css/home.css?v=2">
 </head>
 <body>
+    <!-- Language switch -->
+    <div class="lang-switch is-floating" role="group" aria-label="Language">
+        <button type="button" data-lang-btn="pl" class="lang-btn active">PL</button>
+        <button type="button" data-lang-btn="en" class="lang-btn">EN</button>
+    </div>
+
     <!-- User Button (Top Right) -->
     <button class="btn btn-user" id="userBtn">
         <span class="user-icon">👤</span>
-        <span class="user-name" id="userName">Loading...</span>
+        <span class="user-name" id="userName">Ładowanie...</span>
     </button>
 
     <div class="panels-container panels-2">
         <a href="sets.html" class="panel panel-sets">
             <div class="panel-overlay"></div>
             <div class="panel-content">
-                <img src="images/lego-icon.png" class="panel-icon img" alt="Sets">
-                <h2 class="panel-title">Sets</h2>
-                <p class="panel-description">Manage your LEGO sets collection</p>
+                <img src="images/lego-icon.png" class="panel-icon img" alt="">
+                <h2 class="panel-title" data-i18n="index.sets">Zestawy</h2>
+                <p class="panel-description" data-i18n="index.setsDesc">Zarządzaj kolekcją zestawów LEGO</p>
             </div>
         </a>
 
         <a href="minifigs.html" class="panel panel-minifigs">
             <div class="panel-overlay"></div>
             <div class="panel-content">
-                <img src="images/minifig-icon.png" class="panel-icon img" alt="Minifigures">
-                <h2 class="panel-title">Minifigures</h2>
-                <p class="panel-description">Manage your LEGO minifigures collection</p>
+                <img src="images/minifig-icon.png" class="panel-icon img" alt="">
+                <h2 class="panel-title" data-i18n="index.minifigs">Minifigurki</h2>
+                <p class="panel-description" data-i18n="index.minifigsDesc">Zarządzaj kolekcją minifigurek LEGO</p>
             </div>
         </a>
     </div>
@@ -42,6 +48,7 @@
 
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
+    <script src="js/shared/i18n.js"></script>
     <script src="js/shared/auth.js"></script>
 
     <!-- Initialize modules and check login state -->
@@ -50,6 +57,10 @@
         if (window.Auth) {
             window.Auth.init();
 
+            // Lokalizowany tekst ładowania
+            const userNameEl = document.getElementById('userName');
+            if (userNameEl && window.I18N) userNameEl.textContent = window.I18N.t('common.loading');
+
             // Check auth state and redirect to login if not authenticated
             window.Auth.waitForAuthState().then(isLoggedIn => {
                 if (!isLoggedIn || !window.Auth.isAuthenticated()) {
@@ -57,8 +68,8 @@
                 } else {
                     // Update user button with username
                     const email = window.Auth.getUserEmail();
-                    const username = email ? email.split('@')[0] : 'User';
-                    document.getElementById('userName').textContent = username;
+                    const username = email ? email.split('@')[0] : (window.I18N ? window.I18N.t('common.user') : 'User');
+                    if (userNameEl) userNameEl.textContent = username;
                 }
             });
         } else {
@@ -68,12 +79,13 @@
 
         // User button click - logout
         document.getElementById('userBtn').addEventListener('click', async () => {
-            if (confirm('Czy chcesz się wylogować?')) {
+            const t = window.I18N ? window.I18N.t.bind(window.I18N) : (k => k);
+            if (confirm(t('index.logoutConfirm'))) {
                 try {
                     await window.Auth.logout();
                     window.location.href = 'login.html';
                 } catch (error) {
-                    alert('Błąd wylogowania: ' + error.message);
+                    alert(t('index.logoutError') + error.message);
                 }
             }
         });

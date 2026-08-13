@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log In - LEGO Collection Manager</title>
+    <title data-i18n="login.title">Logowanie — LEGO Collection Manager</title>
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
@@ -11,8 +11,14 @@
     <div class="bg-gradient"></div>
     <div class="bg-pattern"></div>
 
+    <!-- Language switch -->
+    <div class="lang-switch is-floating" role="group" aria-label="Language">
+        <button type="button" data-lang-btn="pl" class="lang-btn active">PL</button>
+        <button type="button" data-lang-btn="en" class="lang-btn">EN</button>
+    </div>
+
     <!-- Theme Toggle Button -->
-    <button class="btn-theme-login" id="themeToggleBtn" title="Toggle Dark Mode">🌙</button>
+    <button class="btn-theme-login" id="themeToggleBtn" title="Przełącz tryb ciemny" data-i18n-title="login.themeToggle">🌙</button>
 
     <!-- Login Container -->
     <div class="login-container">
@@ -22,7 +28,7 @@
                 <div class="logo-icon">🧱</div>
             </div>
             <h1 class="login-title">LEGO Collection Manager</h1>
-            <p class="login-subtitle">Manage your LEGO sets and minifigures collection</p>
+            <p class="login-subtitle" data-i18n="login.subtitle">Zarządzaj kolekcją zestawów i minifigurek LEGO</p>
         </div>
 
         <!-- Auth Forms -->
@@ -30,83 +36,85 @@
 
             <!-- Login Form -->
             <form id="loginForm" class="auth-form active">
-                <h2 class="form-title">Welcome Back</h2>
-                <p class="form-subtitle">Sign in to access your collections</p>
+                <h2 class="form-title" data-i18n="login.welcomeBack">Witaj ponownie</h2>
+                <p class="form-subtitle" data-i18n="login.signinSubtitle">Zaloguj się, aby uzyskać dostęp do kolekcji</p>
 
                 <div class="form-group">
                     <label for="loginEmail">
                         <span class="label-icon">📧</span>
-                        Email Address
+                        <span data-i18n="login.email">Adres email</span>
                     </label>
-                    <input type="email" id="loginEmail" required placeholder="your@email.com" autocomplete="email">
+                    <input type="email" id="loginEmail" required placeholder="twoj@email.com" data-i18n-placeholder="login.emailPh" autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label for="loginPassword">
                         <span class="label-icon">🔒</span>
-                        Password
+                        <span data-i18n="login.password">Hasło</span>
                     </label>
                     <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <span class="btn-text">Log In</span>
+                    <span class="btn-text" data-i18n="login.loginBtn">Zaloguj się</span>
                     <span class="btn-icon">→</span>
                 </button>
 
                 <p class="auth-switch">
-                    Don't have an account? <button type="button" class="link-btn" id="showRegisterLink">Sign Up</button>
+                    <span data-i18n="login.noAccount">Nie masz konta?</span>
+                    <button type="button" class="link-btn" id="showRegisterLink" data-i18n="login.signUp">Zarejestruj się</button>
                 </p>
             </form>
 
             <!-- Register Form -->
             <form id="registerForm" class="auth-form">
-                <h2 class="form-title">Create Account</h2>
-                <p class="form-subtitle">Join us and start organizing your collections</p>
+                <h2 class="form-title" data-i18n="login.createAccount">Utwórz konto</h2>
+                <p class="form-subtitle" data-i18n="login.createSubtitle">Dołącz i zacznij organizować swoje kolekcje</p>
 
                 <div class="form-group">
                     <label for="registerEmail">
                         <span class="label-icon">📧</span>
-                        Email Address
+                        <span data-i18n="login.email">Adres email</span>
                     </label>
-                    <input type="email" id="registerEmail" required placeholder="your@email.com" autocomplete="email">
+                    <input type="email" id="registerEmail" required placeholder="twoj@email.com" data-i18n-placeholder="login.emailPh" autocomplete="email">
                 </div>
 
                 <div class="form-group">
                     <label for="registerPassword">
                         <span class="label-icon">🔒</span>
-                        Password
+                        <span data-i18n="login.password">Hasło</span>
                     </label>
-                    <input type="password" id="registerPassword" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
-                    <small class="form-hint">Minimum 6 characters</small>
+                    <input type="password" id="registerPassword" required minlength="6" placeholder="Minimum 6 znaków" data-i18n-placeholder="login.passwordPh" autocomplete="new-password">
+                    <small class="form-hint" data-i18n="login.passwordHint">Minimum 6 znaków</small>
                 </div>
 
                 <div class="form-group">
                     <label for="registerPasswordConfirm">
                         <span class="label-icon">🔒</span>
-                        Confirm Password
+                        <span data-i18n="login.confirmPassword">Potwierdź hasło</span>
                     </label>
-                    <input type="password" id="registerPasswordConfirm" required minlength="6" placeholder="Same as password" autocomplete="new-password">
+                    <input type="password" id="registerPasswordConfirm" required minlength="6" placeholder="Takie samo hasło" data-i18n-placeholder="login.confirmPh" autocomplete="new-password">
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <span class="btn-text">Create Account</span>
+                    <span class="btn-text" data-i18n="login.createAccount">Utwórz konto</span>
                     <span class="btn-icon">→</span>
                 </button>
 
                 <p class="auth-switch">
-                    Already have an account? <button type="button" class="link-btn" id="showLoginLink">Log In</button>
+                    <span data-i18n="login.haveAccount">Masz już konto?</span>
+                    <button type="button" class="link-btn" id="showLoginLink" data-i18n="login.loginBtn">Zaloguj się</button>
                 </p>
             </form>
 
             <!-- Verification Form -->
             <div id="verificationForm" class="auth-form">
                 <div class="verification-icon">✉️</div>
-                <h2 class="form-title">Verify Your Email</h2>
-                <p class="form-subtitle">Enter the 4-digit code to verify your account</p>
+                <h2 class="form-title" data-i18n="login.verifyTitle">Zweryfikuj swój email</h2>
+                <p class="form-subtitle" data-i18n="login.verifySubtitle">Wpisz 4-cyfrowy kod, aby zweryfikować konto</p>
 
                 <div class="verification-info">
-                    <p>A verification code has been generated. Check the browser console (F12) to see it.</p>
+                    <p data-i18n="login.verifyInfo">Kod weryfikacyjny został wygenerowany. Sprawdź konsolę przeglądarki (F12), aby go zobaczyć.</p>
                 </div>
 
                 <div class="code-input-container">
@@ -121,31 +129,31 @@
 
                 <div class="button-group">
                     <button type="button" class="btn btn-primary" id="verifyCodeBtn">
-                        <span class="btn-text">Verify</span>
+                        <span class="btn-text" data-i18n="login.verifyBtn">Zweryfikuj</span>
                         <span class="btn-icon">✓</span>
                     </button>
                     <button type="button" class="btn btn-secondary" id="resendCodeBtn">
-                        <span class="btn-text">Resend Code</span>
+                        <span class="btn-text" data-i18n="login.resendBtn">Wyślij kod ponownie</span>
                         <span class="btn-icon">🔄</span>
                     </button>
                 </div>
 
                 <p class="auth-switch">
-                    <button type="button" class="link-btn" id="backToLoginLink">← Back to Login</button>
+                    <button type="button" class="link-btn" id="backToLoginLink" data-i18n="login.backToLogin">← Wróć do logowania</button>
                 </p>
             </div>
 
             <!-- Loading State -->
             <div id="loadingState" class="loading-state">
                 <div class="spinner"></div>
-                <p class="loading-text">Processing...</p>
+                <p class="loading-text" data-i18n="login.processing">Przetwarzanie...</p>
             </div>
 
         </div>
 
         <!-- Footer -->
         <div class="login-footer">
-            <p>🔒 Your data is secure and encrypted</p>
+            <p data-i18n="login.footer">🔒 Twoje dane są bezpieczne i zaszyfrowane</p>
         </div>
     </div>
 
@@ -163,6 +171,7 @@
 
     <!-- Shared Modules (Regular Scripts) -->
     <script src="js/shared/firebase-config.js"></script>
+    <script src="js/shared/i18n.js"></script>
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/theme.js"></script>
 

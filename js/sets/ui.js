@@ -96,8 +96,8 @@ const UI = {
 
         // Build details array
         const details = [];
-        if (item.condition) details.push(this.capitalize(item.condition));
-        if (item.pieceCount) details.push(`${item.pieceCount.toLocaleString()} pcs`);
+        if (item.condition) details.push(t('condition.' + item.condition));
+        if (item.pieceCount) details.push(t('card.pieces', { n: item.pieceCount.toLocaleString() }));
         if (item.location) details.push(item.location);
 
         // Image HTML
@@ -112,8 +112,8 @@ const UI = {
         return `
             <div class="item-card" data-id="${item.id}">
                 <div class="card-header">
-                    <span class="card-type set">SET</span>
-                    <span class="card-status ${item.status}">${this.capitalize(item.status)}</span>
+                    <span class="card-type set">${t('type.set')}</span>
+                    <span class="card-status ${item.status}">${t('status.' + item.status)}</span>
                 </div>
                 ${imageHtml}
                 <div class="card-body">
@@ -121,7 +121,7 @@ const UI = {
                         <h3 class="card-name">${this.escapeHtml(item.name)}</h3>
                         ${number ? `<p class="card-number">${numberLabel}${this.escapeHtml(number)}</p>` : ''}
                         <p class="card-info">${this.escapeHtml(item.theme)} ${item.year ? `&bull; ${item.year}` : ''}</p>
-                        ${item.pieceCount ? `<p class="card-info">${item.pieceCount.toLocaleString()} pieces</p>` : ''}
+                        ${item.pieceCount ? `<p class="card-info">${t('card.pieces', { n: item.pieceCount.toLocaleString() })}</p>` : ''}
                         <p class="card-info"><strong>${price}</strong></p>
                     </div>
                     ${details.length > 0 ? `
@@ -131,9 +131,9 @@ const UI = {
                     ` : ''}
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-secondary edit-btn" data-id="${item.id}">Edit</button>
-                    <button class="btn btn-buy-item buy-item-btn" data-id="${item.id}" title="Search for this item in stores">🛒 Buy</button>
-                    <button class="btn btn-danger delete-btn" data-id="${item.id}">Delete</button>
+                    <button class="btn btn-secondary edit-btn" data-id="${item.id}">${t('common.edit')}</button>
+                    <button class="btn btn-buy-item buy-item-btn" data-id="${item.id}" title="${t('buy.itemTitle')}">${t('header.buy')}</button>
+                    <button class="btn btn-danger delete-btn" data-id="${item.id}">${t('common.delete')}</button>
                 </div>
             </div>
         `;
@@ -149,7 +149,7 @@ const UI = {
 
         // Update filter dropdown
         const currentValue = select.value;
-        select.innerHTML = '<option value="all">All Themes</option>';
+        select.innerHTML = '<option value="all" data-i18n="filters.allThemes">' + t('filters.allThemes') + '</option>';
         themes.forEach(theme => {
             const option = document.createElement('option');
             option.value = theme;
@@ -195,7 +195,7 @@ const UI = {
 
         if (item) {
             // Edit mode
-            title.textContent = 'Edit Set';
+            title.textContent = t('form.editSetTitle');
             document.getElementById('itemId').value = item.id;
             document.getElementById('itemName').value = item.name || '';
             document.getElementById('itemNumber').value = item.setNumber || '';
@@ -214,7 +214,7 @@ const UI = {
             }
         } else {
             // Add mode
-            title.textContent = 'Add Set';
+            title.textContent = t('form.addSetTitle');
         }
 
         modal.classList.add('active');
@@ -231,7 +231,7 @@ const UI = {
         const previewImg = document.getElementById('imagePreviewImg');
 
         if (fileInput) fileInput.value = '';
-        if (fileName) fileName.textContent = 'No file chosen';
+        if (fileName) fileName.textContent = t('form.noFile');
         if (preview) preview.style.display = 'none';
         if (previewImg) previewImg.src = '';
 
@@ -257,9 +257,9 @@ const UI = {
             // Update file name to show existing image
             if (fileName) {
                 if (imageUrl.startsWith('data:')) {
-                    fileName.textContent = 'New image selected';
+                    fileName.textContent = t('form.newImage');
                 } else {
-                    fileName.textContent = 'Current image';
+                    fileName.textContent = t('form.currentImage');
                 }
             }
         } else {

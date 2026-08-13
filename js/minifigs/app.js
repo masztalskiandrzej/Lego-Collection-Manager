@@ -87,12 +87,12 @@ const App = {
         const userBtn = document.getElementById('userBtn');
         if (userBtn) {
             userBtn.addEventListener('click', async () => {
-                if (confirm('Czy chcesz się wylogować?')) {
+                if (confirm(t('msg.logoutConfirm'))) {
                     try {
                         await window.Auth.logout();
                         window.location.href = 'login.html';
                     } catch (error) {
-                        UI.showNotification('Błąd wylogowania: ' + error.message, 'error');
+                        UI.showNotification(t('msg.logoutError') + error.message, 'error');
                     }
                 }
             });
@@ -147,28 +147,8 @@ const App = {
             this.renderFilteredCollection();
         });
 
-        // Export button - open export modal (with module loading check)
-        const exportBtn = document.getElementById('exportBtn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                if (window.ExportImport) {
-                    this.showExportModal();
-                } else {
-                    // Wait for module to load
-                    let attempts = 0;
-                    const checkModule = setInterval(() => {
-                        attempts++;
-                        if (window.ExportImport) {
-                            clearInterval(checkModule);
-                            this.showExportModal();
-                        } else if (attempts > 20) {
-                            clearInterval(checkModule);
-                            UI.showNotification('Export module not available', 'error');
-                        }
-                    }, 100);
-                }
-            });
-        }
+        // Export button - obsługiwany przez inline showExportDialog() w HTML.
+        // (Usunięto drugi listener app.js — powodował podwójne bindowanie akcji eksportu/importu.)
 
         // View toggle
         document.getElementById('gridViewBtn').addEventListener('click', () => {
@@ -506,7 +486,7 @@ const App = {
                 }
 
                 await Storage.updateItem(formData.id, formData);
-                UI.showNotification('Minifigure updated successfully!', 'success');
+                UI.showNotification(t('msg.minifigUpdated'), 'success');
             } else {
                 // Check for duplicate figure number
                 if (formData.figureNumber) {
@@ -522,13 +502,13 @@ const App = {
 
                 delete formData.id;
                 await Storage.addItem(formData);
-                UI.showNotification('Minifigure added successfully!', 'success');
+                UI.showNotification(t('msg.minifigAdded'), 'success');
             }
 
             UI.hideModal();
             await this.refresh();
         } catch (error) {
-            UI.showNotification('Error: ' + error.message, 'error');
+            UI.showNotification(t('common.errorPrefix') + error.message, 'error');
         }
     },
 
@@ -539,7 +519,7 @@ const App = {
         const id = UI.elements.deleteModalOverlay.dataset.deleteId;
         if (id) {
             await Storage.deleteItem(id);
-            UI.showNotification('Minifigure deleted.', 'success');
+            UI.showNotification(t('msg.minifigDeleted'), 'success');
             UI.hideDeleteModal();
             await this.refresh();
         }
@@ -557,13 +537,13 @@ const App = {
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
-            UI.showNotification('Please select an image file', 'error');
+            UI.showNotification(t('msg.selectImage'), 'error');
             return;
         }
 
         // Validate file size (max 10MB before compression)
         if (file.size > 10 * 1024 * 1024) {
-            UI.showNotification('Image file must be smaller than 10MB', 'error');
+            UI.showNotification(t('msg.imageTooBig'), 'error');
             return;
         }
 
@@ -605,7 +585,7 @@ const App = {
 
                 // Warn if still too large for Firestore
                 if (parseFloat(compressedSizeKB) > 500) {
-                    UI.showNotification('Image is large. Consider using a smaller image.', 'warning');
+                    UI.showNotification(t('msg.imageLarge'), 'warning');
                 }
 
                 // Show preview and store compressed data URL
@@ -626,16 +606,16 @@ const App = {
                 // Update file name display
                 const fileName = document.getElementById('imageFileName');
                 if (fileName) {
-                    fileName.textContent = file.name + ' (compressed: ' + compressedSizeKB + ' KB)';
+                    fileName.textContent = file.name + ' (' + t('msg.compressed') + ': ' + compressedSizeKB + ' KB)';
                 }
             };
             img.onerror = () => {
-                UI.showNotification('Error loading image', 'error');
+                UI.showNotification(t('msg.imageLoadError'), 'error');
             };
             img.src = e.target.result;
         };
         reader.onerror = () => {
-            UI.showNotification('Error reading image file', 'error');
+            UI.showNotification(t('msg.imageReadError'), 'error');
         };
         reader.readAsDataURL(file);
     },
@@ -657,7 +637,7 @@ const App = {
         const figureNumber = figureNumberInput ? figureNumberInput.value.trim() : '';
 
         if (!figureNumber) {
-            alert('Please enter a figure number first (e.g., sw0999)');
+            alert(t('msg.enterMinifigNumber'));
             figureNumberInput.focus();
             return;
         }
@@ -689,7 +669,7 @@ const App = {
                     // Update file name
                     const fileName = document.getElementById('imageFileName');
                     if (fileName) {
-                        fileName.textContent = `Official image: ${figureNumber}`;
+                        fileName.textContent = t('form.officialImage', { n: figureNumber });
                     }
 
                     success = true;
@@ -701,7 +681,7 @@ const App = {
         }
 
         if (!success) {
-            alert(`Could not find official image for figure "${figureNumber}".\n\nMake sure the figure number is correct (e.g., sw0999, sw0001, col001).\n\nYou can still upload your own photo manually.`);
+            alert(t('msg.noOfficialImageMinifig', { n: figureNumber }));
         }
     },
 
@@ -869,7 +849,7 @@ const App = {
             const email = this.state.user ? this.state.user.email : '';
             const username = email.split('@')[0];
             userName.textContent = username;
-            userBtn.title = `Zalogowany jako ${email} - kliknij aby się wylogować`;
+            userBtn.title = t('msg.loggedInAs', { email: email });
         }
     },
 
@@ -947,7 +927,7 @@ const App = {
     showBuyModal(item = null) {
         try {
             if (!window.BuyLinks) {
-                UI.showNotification('Buy Links feature not available', 'error');
+                UI.showNotification(t('msg.buyNotAvail'), 'error');
                 return;
             }
 
@@ -976,7 +956,7 @@ const App = {
             buyModalContent.innerHTML = linksHTML;
             buyModal.classList.add('active');
         } catch (error) {
-            UI.showNotification('Error opening Buy modal: ' + error.message, 'error');
+            UI.showNotification(t('msg.buyOpenError') + error.message, 'error');
         }
     },
 
@@ -1272,7 +1252,7 @@ const App = {
     async showExportModal() {
         try {
             if (!window.ExportImport) {
-                UI.showNotification('Export module not available', 'error');
+                UI.showNotification(t('msg.exportNotAvail'), 'error');
                 return;
             }
 
@@ -1298,7 +1278,7 @@ const App = {
             this.bindExportEvents();
 
         } catch (error) {
-            UI.showNotification('Error opening export modal: ' + error.message, 'error');
+            UI.showNotification(t('msg.exportOpenError') + error.message, 'error');
         }
     },
 
@@ -1341,9 +1321,9 @@ const App = {
                 try {
                     const collection = await Storage.getCollection();
                     window.ExportImport.exportToCSV(collection, 'minifigs');
-                    UI.showNotification('Collection exported to CSV successfully!', 'success');
+                    UI.showNotification(t('msg.exportCsvOk'), 'success');
                 } catch (error) {
-                    UI.showNotification('Error exporting to CSV: ' + error.message, 'error');
+                    UI.showNotification(t('msg.exportCsvErr') + error.message, 'error');
                 }
             });
             exportCSVBtn.dataset.bound = 'true';
@@ -1358,9 +1338,9 @@ const App = {
                     const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
                     const metadata = { username, exportDate: new Date().toISOString() };
                     window.ExportImport.exportToJSON(collection, 'minifigs', metadata);
-                    UI.showNotification('Collection exported to JSON successfully!', 'success');
+                    UI.showNotification(t('msg.exportJsonOk'), 'success');
                 } catch (error) {
-                    UI.showNotification('Error exporting to JSON: ' + error.message, 'error');
+                    UI.showNotification(t('msg.exportJsonErr') + error.message, 'error');
                 }
             });
             exportJSONBtn.dataset.bound = 'true';
@@ -1373,7 +1353,7 @@ const App = {
                 try {
                     await this.generateCollectionCard();
                 } catch (error) {
-                    UI.showNotification('Error generating card: ' + error.message, 'error');
+                    UI.showNotification(t('msg.cardErr') + error.message, 'error');
                 }
             });
             generateCardBtn.dataset.bound = 'true';
@@ -1386,7 +1366,7 @@ const App = {
                 try {
                     await this.generateQRCode();
                 } catch (error) {
-                    UI.showNotification('Error generating QR code: ' + error.message, 'error');
+                    UI.showNotification(t('msg.qrErr') + error.message, 'error');
                 }
             });
             generateQRBtn.dataset.bound = 'true';
@@ -1409,11 +1389,11 @@ const App = {
                     const file = e.target.files[0];
                     if (!file) return;
 
-                    if (!confirm('This will import items and add them to your existing collection. Continue?')) {
+                    if (!confirm(t('msg.importConfirm'))) {
                         return;
                     }
 
-                    UI.showNotification('Importing collection...', 'info');
+                    UI.showNotification(t('msg.importing'), 'info');
 
                     const importedData = await window.ExportImport.importFromJSON(file);
 
@@ -1426,12 +1406,12 @@ const App = {
                         importCount++;
                     }
 
-                    UI.showNotification(`Successfully imported ${importCount} items!`, 'success');
+                    UI.showNotification(t('msg.imported', { count: importCount }), 'success');
                     this.hideExportModal();
                     await this.refresh();
 
                 } catch (error) {
-                    UI.showNotification('Error importing: ' + error.message, 'error');
+                    UI.showNotification(t('msg.importErr') + error.message, 'error');
                 }
             });
             importFileInput.dataset.bound = 'true';
@@ -1444,15 +1424,15 @@ const App = {
                 try {
                     const userId = window.Auth.getUserId();
                     if (!userId) {
-                        UI.showNotification('You must be logged in to create public links', 'error');
+                        UI.showNotification(t('msg.loginRequiredPublic'), 'error');
                         return;
                     }
 
                     const publicLink = window.ExportImport.generatePublicLink(userId, 'minifigs');
                     navigator.clipboard.writeText(publicLink);
-                    UI.showNotification('Public link copied to clipboard!', 'success');
+                    UI.showNotification(t('msg.publicLinkCopied'), 'success');
                 } catch (error) {
-                    UI.showNotification('Error creating public link: ' + error.message, 'error');
+                    UI.showNotification(t('msg.publicLinkErr') + error.message, 'error');
                 }
             });
             publicLinkBtn.dataset.bound = 'true';
@@ -1465,7 +1445,7 @@ const App = {
     async generateCollectionCard() {
         try {
             if (!window.SocialSharing) {
-                throw new Error('Social sharing module not available');
+                throw new Error(t('msg.socialMissing'));
             }
 
             const collection = await Storage.getCollection();
@@ -1480,7 +1460,7 @@ const App = {
             const cardPreviewContainer = document.getElementById('cardPreviewContainer');
 
             if (cardPreviewContainer) {
-                cardPreviewContainer.innerHTML = `<img src="${cardDataUrl}" alt="Collection Card" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">`;
+                cardPreviewContainer.innerHTML = `<img src="${cardDataUrl}" alt="${t('cardPreview.alt')}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">`;
             }
 
             if (cardPreviewModal) {
@@ -1501,7 +1481,7 @@ const App = {
     async generateQRCode() {
         try {
             if (!window.SocialSharing) {
-                throw new Error('Social sharing module not available');
+                throw new Error(t('msg.socialMissing'));
             }
 
             const collectionUrl = window.location.href;
@@ -1513,7 +1493,7 @@ const App = {
             link.download = 'collection-qr-code.png';
             link.click();
 
-            UI.showNotification('QR code generated and downloaded!', 'success');
+            UI.showNotification(t('msg.qrDownloaded'), 'success');
         } catch (error) {
             throw error;
         }
@@ -1540,7 +1520,7 @@ const App = {
         if (downloadCardBtn && !downloadCardBtn.dataset.bound) {
             downloadCardBtn.addEventListener('click', () => {
                 window.SocialSharing.downloadImage(cardDataUrl, 'lego-minifigs-collection-card.png');
-                UI.showNotification('Collection card downloaded!', 'success');
+                UI.showNotification(t('msg.cardDownloaded'), 'success');
             });
             downloadCardBtn.dataset.bound = 'true';
         }
@@ -1571,12 +1551,12 @@ const App = {
     async handleLogout() {
         try {
             await window.Auth.logout();
-            UI.showNotification('Logged out successfully', 'success');
+            UI.showNotification(t('msg.loggedOut'), 'success');
             setTimeout(() => {
                 window.location.href = 'login.html';
             }, 1000);
         } catch (error) {
-            UI.showNotification('Error logging out: ' + error.message, 'error');
+            UI.showNotification(t('msg.logoutError') + error.message, 'error');
         }
     }
 };
