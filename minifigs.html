@@ -1077,8 +1077,8 @@
 
                         let importCount = 0;
                         for (const item of importedData.data) {
-                            item.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-                            await Storage.addItem(item);
+                            delete item.id;
+                            await window.Storage.addItem(item);
                             importCount++;
                         }
 
