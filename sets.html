@@ -722,6 +722,7 @@
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/i18n.js"></script>
+    <script src="js/shared/dialogs.js"></script>
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/keyboard-shortcuts.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
@@ -972,12 +973,12 @@
                             if (typeof window.ExportImport === 'undefined') missingModules.push('ExportImport');
                             if (typeof window.SocialSharing === 'undefined') missingModules.push('SocialSharing');
 
-                            alert(t('msg.requiredModulesMissing', { mods: missingModules.join(', ') }));
+                            Dialogs.alert(t('msg.requiredModulesMissing', { mods: missingModules.join(', ') }));
                         }
                     }, 100);
                 }
             } else {
-                alert(t('msg.exportModalNotFound'));
+                Dialogs.alert(t('msg.exportModalNotFound'));
             }
         }
 
@@ -1021,23 +1022,23 @@
 
                         // Check if modules are available
                         if (!window.Storage) {
-                            alert(t('msg.storageMissing'));
+                            Dialogs.alert(t('msg.storageMissing'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert(t('msg.exportMissing'));
+                            Dialogs.alert(t('msg.exportMissing'));
                             return;
                         }
                         if (!window.Auth || !window.Auth.isAuthenticated()) {
-                            alert(t('msg.loginToExport'));
+                            Dialogs.alert(t('msg.loginToExport'));
                             return;
                         }
 
                         const collection = await window.Storage.getCollection();
                         window.ExportImport.exportToCSV(collection, 'sets');
-                        alert(t('msg.exportCsvOk'));
+                        Dialogs.alert(t('msg.exportCsvOk'));
                     } catch (error) {
-                        alert(t('msg.exportCsvErr') + error.message);
+                        Dialogs.alert(t('msg.exportCsvErr') + error.message);
                     }
                 };
             }
@@ -1049,11 +1050,11 @@
                     try {
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert(t('msg.loginToExport'));
+                            Dialogs.alert(t('msg.loginToExport'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert(t('msg.exportMissing'));
+                            Dialogs.alert(t('msg.exportMissing'));
                             return;
                         }
 
@@ -1061,9 +1062,9 @@
                         const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
                         const metadata = { username, exportDate: new Date().toISOString() };
                         window.ExportImport.exportToJSON(collection, 'sets', metadata);
-                        alert(t('msg.exportJsonOk'));
+                        Dialogs.alert(t('msg.exportJsonOk'));
                     } catch (error) {
-                        alert(t('msg.exportJsonErr') + error.message);
+                        Dialogs.alert(t('msg.exportJsonErr') + error.message);
                     }
                 };
             }
@@ -1075,11 +1076,11 @@
                     try {
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert(t('msg.loginToCard'));
+                            Dialogs.alert(t('msg.loginToCard'));
                             return;
                         }
                         if (!window.ExportImport || !window.SocialSharing) {
-                            alert(t('msg.modulesMissing'));
+                            Dialogs.alert(t('msg.modulesMissing'));
                             return;
                         }
 
@@ -1102,7 +1103,7 @@
                         // Setup card preview actions
                         setupCardPreviewActions(cardDataUrl, summary);
                     } catch (error) {
-                        alert(t('msg.cardErr') + error.message);
+                        Dialogs.alert(t('msg.cardErr') + error.message);
                     }
                 };
             }
@@ -1114,7 +1115,7 @@
                     try {
 
                         if (!window.SocialSharing) {
-                            alert(t('msg.socialMissing'));
+                            Dialogs.alert(t('msg.socialMissing'));
                             return;
                         }
 
@@ -1126,9 +1127,9 @@
                         link.download = 'collection-qr-code.png';
                         link.click();
 
-                        alert(t('msg.qrDownloaded'));
+                        Dialogs.alert(t('msg.qrDownloaded'));
                     } catch (error) {
-                        alert(t('msg.qrErr') + error.message);
+                        Dialogs.alert(t('msg.qrErr') + error.message);
                     }
                 };
             }
@@ -1140,20 +1141,20 @@
                     try {
 
                         if (!window.Auth || !window.Auth.isAuthenticated()) {
-                            alert(t('msg.loginRequiredPublic'));
+                            Dialogs.alert(t('msg.loginRequiredPublic'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert(t('msg.exportMissing'));
+                            Dialogs.alert(t('msg.exportMissing'));
                             return;
                         }
 
                         const userId = window.Auth.getUserId();
                         const publicLink = window.ExportImport.generatePublicLink(userId, 'sets');
                         await navigator.clipboard.writeText(publicLink);
-                        alert(t('msg.publicLinkCopied') + '\n\n' + publicLink);
+                        Dialogs.alert(t('msg.publicLinkCopied') + '\n\n' + publicLink);
                     } catch (error) {
-                        alert(t('msg.publicLinkErr') + error.message);
+                        Dialogs.alert(t('msg.publicLinkErr') + error.message);
                     }
                 };
             }
@@ -1174,15 +1175,15 @@
                         if (!file) return;
 
                         if (!window.Storage || !window.Auth?.isAuthenticated()) {
-                            alert(t('msg.loginToImport'));
+                            Dialogs.alert(t('msg.loginToImport'));
                             return;
                         }
                         if (!window.ExportImport) {
-                            alert(t('msg.exportMissing'));
+                            Dialogs.alert(t('msg.exportMissing'));
                             return;
                         }
 
-                        if (!confirm(t('msg.importConfirm'))) {
+                        if (!await Dialogs.confirm(t('msg.importConfirm'))) {
                             return;
                         }
 
@@ -1195,11 +1196,11 @@
                             importCount++;
                         }
 
-                        alert(t('msg.imported', { count: importCount }));
+                        Dialogs.alert(t('msg.imported', { count: importCount }));
                         closeExportDialog();
                         setTimeout(() => location.reload(), 1000);
                     } catch (error) {
-                        alert(t('msg.importErr') + error.message);
+                        Dialogs.alert(t('msg.importErr') + error.message);
                     }
                 };
             }
@@ -1230,7 +1231,7 @@
             if (downloadCardBtn) {
                 downloadCardBtn.onclick = function() {
                     window.SocialSharing.downloadImage(cardDataUrl, 'lego-collection-card.png');
-                    alert(t('msg.cardDownloaded'));
+                    Dialogs.alert(t('msg.cardDownloaded'));
                 };
             }
 

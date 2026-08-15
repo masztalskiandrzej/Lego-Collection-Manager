@@ -99,7 +99,7 @@ const App = {
         const userBtn = document.getElementById('userBtn');
         if (userBtn) {
             userBtn.addEventListener('click', async () => {
-                if (confirm(t('msg.logoutConfirm'))) {
+                if (await Dialogs.confirm(t('msg.logoutConfirm'))) {
                     try {
                         await window.Auth.logout();
                         window.location.href = 'login.html';
@@ -536,7 +536,7 @@ const App = {
                 if (formData.setNumber) {
                     const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber, formData.id);
                     if (duplicate) {
-                        const confirmed = confirm(t('msg.dupSetConfirm', { n: formData.setNumber }));
+                        const confirmed = await Dialogs.confirm(t('msg.dupSetConfirm', { n: formData.setNumber }));
                         if (!confirmed) {
                             return;
                         }
@@ -693,7 +693,7 @@ const App = {
         const setNumber = setNumberInput ? setNumberInput.value.trim() : '';
 
         if (!setNumber) {
-            alert(t('msg.enterSetNumber'));
+            Dialogs.alert(t('msg.enterSetNumber'));
             setNumberInput.focus();
             return;
         }
@@ -738,7 +738,7 @@ const App = {
         }
 
         if (!success) {
-            alert(t('msg.noOfficialImageSet', { n: setNumber }));
+            Dialogs.alert(t('msg.noOfficialImageSet', { n: setNumber }));
         }
     },
 
@@ -998,8 +998,8 @@ const App = {
                 e.preventDefault();
                 e.stopPropagation();
 
-                const confirm = window.confirm('Are you sure you want to log out?');
-                if (confirm) {
+                const confirmed = await Dialogs.confirm(t('msg.logoutConfirm'), { danger: true });
+                if (confirmed) {
                     try {
                         await window.Auth.logout();
                         UI.showNotification('Logged out successfully', 'success');
@@ -1204,7 +1204,7 @@ const App = {
     },
 
     async showResendCodeOptions(email, password) {
-        if (confirm('Twój email nie został zweryfikowany.\n\nCzy chcesz wygenerować nowy kod weryfikacyjny?\n(Sprawdź konsolę F12 aby zobaczyć kod)')) {
+        if (await Dialogs.confirm(t('auth.notVerifiedConfirm'))) {
             try {
                 const result = await window.Auth.resendCodeForUnverifiedUser(email, password);
 
@@ -1592,7 +1592,7 @@ const App = {
                     const file = e.target.files[0];
                     if (!file) return;
 
-                    if (!confirm(t('msg.importConfirm'))) {
+                    if (!await Dialogs.confirm(t('msg.importConfirm'))) {
                         return;
                     }
 

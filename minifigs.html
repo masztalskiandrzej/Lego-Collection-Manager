@@ -713,6 +713,7 @@
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/i18n.js"></script>
+    <script src="js/shared/dialogs.js"></script>
     <script src="js/shared/auth.js"></script>
     <script src="js/shared/keyboard-shortcuts.js"></script>
     <script src="js/shared/firestore-storage.js"></script>
@@ -915,12 +916,12 @@
                             loadCollectionData();
                         } else if (attempts > 30) {
                             clearInterval(moduleCheckInterval);
-                            alert(t('msg.modulesMissing'));
+                            Dialogs.alert(t('msg.modulesMissing'));
                         }
                     }, 100);
                 }
             } else {
-                alert(t('msg.exportModalNotFound'));
+                Dialogs.alert(t('msg.exportModalNotFound'));
             }
         }
 
@@ -962,9 +963,9 @@
                     try {
                         const collection = await Storage.getCollection();
                         window.ExportImport.exportToCSV(collection, 'minifigs');
-                        alert(t('msg.exportCsvOk'));
+                        Dialogs.alert(t('msg.exportCsvOk'));
                     } catch (error) {
-                        alert(t('msg.exportCsvErr') + error.message);
+                        Dialogs.alert(t('msg.exportCsvErr') + error.message);
                     }
                 };
             }
@@ -978,9 +979,9 @@
                         const username = document.getElementById('userName')?.textContent || 'LEGO Collector';
                         const metadata = { username, exportDate: new Date().toISOString() };
                         window.ExportImport.exportToJSON(collection, 'minifigs', metadata);
-                        alert(t('msg.exportJsonOk'));
+                        Dialogs.alert(t('msg.exportJsonOk'));
                     } catch (error) {
-                        alert(t('msg.exportJsonErr') + error.message);
+                        Dialogs.alert(t('msg.exportJsonErr') + error.message);
                     }
                 };
             }
@@ -1009,7 +1010,7 @@
                         // Setup card preview actions
                         setupCardPreviewActions(cardDataUrl, summary);
                     } catch (error) {
-                        alert(t('msg.cardErr') + error.message);
+                        Dialogs.alert(t('msg.cardErr') + error.message);
                     }
                 };
             }
@@ -1027,9 +1028,9 @@
                         link.download = 'collection-qr-code.png';
                         link.click();
 
-                        alert(t('msg.qrDownloaded'));
+                        Dialogs.alert(t('msg.qrDownloaded'));
                     } catch (error) {
-                        alert(t('msg.qrErr') + error.message);
+                        Dialogs.alert(t('msg.qrErr') + error.message);
                     }
                 };
             }
@@ -1041,15 +1042,15 @@
                     try {
                         const userId = window.Auth?.getUserId();
                         if (!userId) {
-                            alert(t('msg.loginRequiredPublic'));
+                            Dialogs.alert(t('msg.loginRequiredPublic'));
                             return;
                         }
 
                         const publicLink = window.ExportImport.generatePublicLink(userId, 'minifigs');
                         await navigator.clipboard.writeText(publicLink);
-                        alert(t('msg.publicLinkCopied') + '\n\n' + publicLink);
+                        Dialogs.alert(t('msg.publicLinkCopied') + '\n\n' + publicLink);
                     } catch (error) {
-                        alert(t('msg.publicLinkErr') + error.message);
+                        Dialogs.alert(t('msg.publicLinkErr') + error.message);
                     }
                 };
             }
@@ -1069,7 +1070,7 @@
                         const file = e.target.files[0];
                         if (!file) return;
 
-                        if (!confirm(t('msg.importConfirm'))) {
+                        if (!await Dialogs.confirm(t('msg.importConfirm'))) {
                             return;
                         }
 
@@ -1082,11 +1083,11 @@
                             importCount++;
                         }
 
-                        alert(t('msg.imported', { count: importCount }));
+                        Dialogs.alert(t('msg.imported', { count: importCount }));
                         closeExportDialog();
                         setTimeout(() => location.reload(), 1000);
                     } catch (error) {
-                        alert(t('msg.importErr') + error.message);
+                        Dialogs.alert(t('msg.importErr') + error.message);
                     }
                 };
             }
@@ -1117,7 +1118,7 @@
             if (downloadCardBtn) {
                 downloadCardBtn.onclick = function() {
                     window.SocialSharing.downloadImage(cardDataUrl, 'lego-minifigs-collection-card.png');
-                    alert(t('msg.cardDownloaded'));
+                    Dialogs.alert(t('msg.cardDownloaded'));
                 };
             }
 

@@ -4,18 +4,18 @@
  */
 const KeyboardShortcuts = {
     shortcuts: [
-        { key: 'N', description: 'Add new item', action: 'newItem' },
-        { key: 'S', description: 'Focus search', action: 'focusSearch' },
-        { key: '/', description: 'Focus search (alt)', action: 'focusSearch' },
-        { key: 'G', description: 'Grid view', action: 'gridView' },
-        { key: 'L', description: 'List view', action: 'listView' },
-        { key: 'D', description: 'Toggle dark mode', action: 'toggleTheme' },
-        { key: '1', description: 'Show all items', action: 'filterAll' },
-        { key: '2', description: 'Show owned', action: 'filterOwned' },
-        { key: '3', description: 'Show wishlist', action: 'filterWishlist' },
-        { key: '4', description: 'Show sold', action: 'filterSold' },
-        { key: '?', description: 'Show this help', action: 'showHelp' },
-        { key: 'Esc', description: 'Close modal/menu', action: 'closeModal' }
+        { key: 'N', description: 'kbd.newItem', action: 'newItem' },
+        { key: 'S', description: 'kbd.focusSearch', action: 'focusSearch' },
+        { key: '/', description: 'kbd.focusSearchAlt', action: 'focusSearch' },
+        { key: 'G', description: 'kbd.gridView', action: 'gridView' },
+        { key: 'L', description: 'kbd.listView', action: 'listView' },
+        { key: 'D', description: 'kbd.toggleTheme', action: 'toggleTheme' },
+        { key: '1', description: 'kbd.filterAll', action: 'filterAll' },
+        { key: '2', description: 'kbd.filterOwned', action: 'filterOwned' },
+        { key: '3', description: 'kbd.filterWishlist', action: 'filterWishlist' },
+        { key: '4', description: 'kbd.filterSold', action: 'filterSold' },
+        { key: '?', description: 'kbd.showHelp', action: 'showHelp' },
+        { key: 'Esc', description: 'kbd.closeModal', action: 'closeModal' }
     ],
 
     callbacks: {},
@@ -133,7 +133,7 @@ const KeyboardShortcuts = {
             modal.innerHTML = `
                 <div class="modal modal-shortcuts">
                     <div class="modal-header">
-                        <h2>Keyboard Shortcuts</h2>
+                        <h2>${t('kbd.title')}</h2>
                         <button class="btn-close" id="shortcutsCloseBtn">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -141,11 +141,11 @@ const KeyboardShortcuts = {
                             ${this.shortcuts.map(s => `
                                 <div class="shortcut-item">
                                     <kbd>${this.formatKey(s.key)}</kbd>
-                                    <span>${s.description}</span>
+                                    <span>${t(s.description)}</span>
                                 </div>
                             `).join('')}
                         </div>
-                        <p class="shortcuts-note">Press <kbd>?</kbd> anytime to show this help</p>
+                        <p class="shortcuts-note">${t('kbd.helpNote')}</p>
                     </div>
                 </div>
             `;

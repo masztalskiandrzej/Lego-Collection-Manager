@@ -87,7 +87,7 @@ const App = {
         const userBtn = document.getElementById('userBtn');
         if (userBtn) {
             userBtn.addEventListener('click', async () => {
-                if (confirm(t('msg.logoutConfirm'))) {
+                if (await Dialogs.confirm(t('msg.logoutConfirm'))) {
                     try {
                         await window.Auth.logout();
                         window.location.href = 'login.html';
@@ -473,12 +473,7 @@ const App = {
                 if (formData.figureNumber) {
                     const duplicate = await Storage.checkDuplicateByFigureNumber(formData.figureNumber, formData.id);
                     if (duplicate) {
-                        const confirmed = confirm(
-                            `⚠️ A minifigure with number "${formData.figureNumber}" already exists in your collection:\n\n` +
-                            `Name: ${duplicate.name || 'N/A'}\n` +
-                            `Status: ${duplicate.status || 'N/A'}\n\n` +
-                            `Do you want to save anyway?`
-                        );
+                        const confirmed = await Dialogs.confirm(t('msg.dupMinifigConfirm', { n: formData.figureNumber }));
                         if (!confirmed) {
                             return;
                         }
@@ -637,7 +632,7 @@ const App = {
         const figureNumber = figureNumberInput ? figureNumberInput.value.trim() : '';
 
         if (!figureNumber) {
-            alert(t('msg.enterMinifigNumber'));
+            Dialogs.alert(t('msg.enterMinifigNumber'));
             figureNumberInput.focus();
             return;
         }
@@ -681,7 +676,7 @@ const App = {
         }
 
         if (!success) {
-            alert(t('msg.noOfficialImageMinifig', { n: figureNumber }));
+            Dialogs.alert(t('msg.noOfficialImageMinifig', { n: figureNumber }));
         }
     },
 
@@ -1002,7 +997,7 @@ const App = {
     },
 
     async showResendCodeOptions(email, password) {
-        if (confirm('Twój email nie został zweryfikowany.\n\nCzy chcesz wygenerować nowy kod weryfikacyjny?\n(Sprawdź konsolę F12 aby zobaczyć kod)')) {
+        if (await Dialogs.confirm(t('auth.notVerifiedConfirm'))) {
             try {
                 const result = await window.Auth.resendCodeForUnverifiedUser(email, password);
 
@@ -1389,7 +1384,7 @@ const App = {
                     const file = e.target.files[0];
                     if (!file) return;
 
-                    if (!confirm(t('msg.importConfirm'))) {
+                    if (!await Dialogs.confirm(t('msg.importConfirm'))) {
                         return;
                     }
 

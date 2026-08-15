@@ -108,13 +108,13 @@ window.BuyLinks = {
 
         if (item) {
             html += `<div class="buy-modal-header">
-                <h3>Find: ${item.name || item.title}</h3>
+                <h3>${t('buy.find')} ${item.name || item.title}</h3>
                 <p class="buy-search-query">${query}</p>
             </div>`;
         } else {
             html += `<div class="buy-modal-header">
-                <h3>Browse Stores</h3>
-                <p class="buy-search-query">Search for items in your favorite stores</p>
+                <h3>${t('buy.browseStores')}</h3>
+                <p class="buy-search-query">${t('buy.browseDesc')}</p>
             </div>`;
         }
 
@@ -141,8 +141,8 @@ window.BuyLinks = {
 
         // Info footer
         html += `<div class="buy-modal-footer">
-            <p>🔗 Links open in new tab</p>
-            <p>💡 Search results may vary by region</p>
+            <p>${t('buy.linksNewTab')}</p>
+            <p>${t('buy.resultsVary')}</p>
         </div>`;
 
         html += '</div>';

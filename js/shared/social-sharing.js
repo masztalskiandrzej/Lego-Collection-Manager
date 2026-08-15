@@ -62,7 +62,7 @@ const SocialSharing = {
             return imageDataUrl;
 
         } catch (error) {
-            throw new Error('Failed to generate collection card: ' + error.message);
+            throw new Error(t('share.cardErr') + error.message);
         }
     },
 
@@ -95,7 +95,7 @@ const SocialSharing = {
             const qrCanvas = qrCode.querySelector('canvas');
 
             if (!qrCanvas) {
-                throw new Error('Failed to generate QR code canvas');
+                throw new Error(t('share.qrCanvasErr'));
             }
 
             const qrDataUrl = qrCanvas.toDataURL('image/png');
@@ -103,7 +103,7 @@ const SocialSharing = {
             return qrDataUrl;
 
         } catch (error) {
-            throw new Error('Failed to generate QR code: ' + error.message);
+            throw new Error(t('share.qrErr') + error.message);
         }
     },
 
@@ -172,7 +172,7 @@ const SocialSharing = {
                             font-size: 14px;
                             color: #666;
                             font-weight: 500;
-                        ">MY COLLECTION</div>
+                        ">${t('share.myCollection')}</div>
                         <div style="
                             font-size: 28px;
                             font-weight: 700;
@@ -208,7 +208,7 @@ const SocialSharing = {
                             color: #666;
                             text-transform: uppercase;
                             letter-spacing: 1px;
-                        ">Total Items</div>
+                        ">${t('share.totalItems')}</div>
                     </div>
 
                     <div style="
@@ -229,7 +229,7 @@ const SocialSharing = {
                             color: #666;
                             text-transform: uppercase;
                             letter-spacing: 1px;
-                        ">Themes</div>
+                        ">${t('share.themes')}</div>
                     </div>
 
                     <div style="
@@ -250,7 +250,7 @@ const SocialSharing = {
                             color: #666;
                             text-transform: uppercase;
                             letter-spacing: 1px;
-                        ">Total Value</div>
+                        ">${t('share.totalValue')}</div>
                     </div>
                 </div>
 
@@ -268,7 +268,7 @@ const SocialSharing = {
                         color: #666;
                         margin-bottom: 10px;
                         font-weight: 600;
-                    ">Top Themes:</div>
+                    ">${t('share.topThemes')}</div>
                     <div style="
                         display: flex;
                         gap: 10px;
@@ -295,7 +295,7 @@ const SocialSharing = {
                     font-size: 10px;
                     color: #999;
                 ">
-                    Generated with LEGO Collection Manager
+                    ${t('share.generatedWith')}
                 </div>
             </div>
         `;
@@ -319,7 +319,7 @@ const SocialSharing = {
             };
 
             script.onerror = () => {
-                reject(new Error('Failed to load html2canvas library'));
+                reject(new Error(t('share.html2canvasErr')));
             };
 
             document.head.appendChild(script);
@@ -344,7 +344,7 @@ const SocialSharing = {
             };
 
             script.onerror = () => {
-                reject(new Error('Failed to load QRCode library'));
+                reject(new Error(t('share.qrLibErr')));
             };
 
             document.head.appendChild(script);
@@ -377,7 +377,7 @@ const SocialSharing = {
         if (shareUrl) {
             window.open(shareUrl, '_blank', 'width=600,height=400');
         } else {
-            throw new Error(`Unsupported platform: ${platform}`);
+            throw new Error(t('share.unsupportedPlatform', { p: platform }));
         }
     },
 
@@ -410,15 +410,14 @@ const SocialSharing = {
      * @returns {string} - Share text
      */
     generateShareText(data, collectionType = 'sets') {
-        const typeLabel = collectionType === 'sets' ? 'LEGO Sets' : 'LEGO Minifigures';
+        const typeLabel = t(collectionType === 'sets' ? 'share.legoSets' : 'share.legoMinifigs');
 
-        return `Check out my ${typeLabel} collection! 🧱
-
-📊 ${data.totalItems} items
-💰 $${Math.round(data.totalValue)} total value
-🎨 ${data.themes?.length || 0} different themes
-
-Managed with LEGO Collection Manager #LEGO #Collection`;
+        return t('share.textBody', {
+            type: typeLabel,
+            items: data.totalItems,
+            value: '$' + Math.round(data.totalValue),
+            themes: data.themes?.length || 0
+        });
     }
 };
 

@@ -190,7 +190,7 @@ async function handleLogin() {
 
 async function showResendCodeOptions(email, password) {
     // Pokaż dialog z opcją ponownego wysłania kodu
-    if (confirm(t('auth.notVerifiedConfirm'))) {
+    if (await Dialogs.confirm(t('auth.notVerifiedConfirm'))) {
         try {
             const result = await window.Auth.resendCodeForUnverifiedUser(email, password);
 

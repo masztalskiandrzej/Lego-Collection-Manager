@@ -49,6 +49,7 @@
     <!-- Shared Modules (Regular Scripts - no ES6 modules) -->
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/i18n.js"></script>
+    <script src="js/shared/dialogs.js"></script>
     <script src="js/shared/auth.js"></script>
 
     <!-- Initialize modules and check login state -->
@@ -80,12 +81,12 @@
         // User button click - logout
         document.getElementById('userBtn').addEventListener('click', async () => {
             const t = window.I18N ? window.I18N.t.bind(window.I18N) : (k => k);
-            if (confirm(t('index.logoutConfirm'))) {
+            if (await Dialogs.confirm(t('index.logoutConfirm'))) {
                 try {
                     await window.Auth.logout();
                     window.location.href = 'login.html';
                 } catch (error) {
-                    alert(t('index.logoutError') + error.message);
+                    Dialogs.alert(t('index.logoutError') + error.message);
                 }
             }
         });
