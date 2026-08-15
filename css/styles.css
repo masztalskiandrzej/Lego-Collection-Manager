@@ -3474,3 +3474,18 @@ body {
 [data-theme="dark"] .skeleton-block::after {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
 }
+
+/* ===== Dark mode: native dropdown options & placeholders ===== */
+[data-theme="dark"] select option,
+[data-theme="dark"] select optgroup {
+    background: #1e2430;
+    color: #e8e8e8;
+}
+
+[data-theme="dark"] .form-group input::placeholder,
+[data-theme="dark"] .form-group textarea::placeholder,
+[data-theme="dark"] .search-box input::placeholder,
+[data-theme="dark"] .year-range input::placeholder {
+    color: #7a8194;
+    opacity: 1;
+}
