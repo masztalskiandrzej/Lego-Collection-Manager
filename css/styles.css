@@ -3489,3 +3489,62 @@ body {
     color: #7a8194;
     opacity: 1;
 }
+
+/* ===== Mobile audit: header actions & modal ergonomics ===== */
+@media (max-width: 768px) {
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .header-actions .btn {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .modal {
+        width: 96%;
+        max-height: 94vh;
+    }
+
+    .form-actions {
+        flex-wrap: wrap;
+    }
+
+    .form-actions .btn {
+        flex: 1;
+    }
+
+    .sort-control select {
+        max-width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-actions .user-name {
+        display: none;
+    }
+
+    .header-actions .btn-user {
+        padding: 8px;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .pagination-info {
+        width: 100%;
+        text-align: center;
+        order: -1;
+    }
+}
+
+/* form-actions had a hardcoded light background that broke dark mode */
+[data-theme="dark"] .form-actions {
+    background: #16162a;
+    border-top-color: #333;
+}
