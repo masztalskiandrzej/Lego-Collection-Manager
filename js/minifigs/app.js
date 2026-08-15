@@ -100,9 +100,15 @@ const App = {
         }
 
         // Search input
+        // Search input (debounced)
+        let searchDebounce;
         document.getElementById('searchInput').addEventListener('input', (e) => {
             this.state.filters.search = e.target.value;
-            this.renderFilteredCollection();
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                this.resetPagination();
+                this.renderFilteredCollection();
+            }, 250);
         });
 
         // Filter controls (no type filter for minifigures only)
