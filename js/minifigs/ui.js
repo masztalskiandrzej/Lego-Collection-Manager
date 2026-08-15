@@ -44,6 +44,35 @@ const UI = {
      * Render collection items to the grid
      * @param {Array} items - Array of items to render
      */
+    /**
+     * Show skeleton placeholder cards while the collection loads.
+     * @param {number} count - How many skeleton cards to render
+     */
+    showSkeleton(count = 8) {
+        const grid = this.elements.collectionGrid;
+        if (!grid) return;
+        this.elements.emptyState.style.display = 'none';
+        const card = `
+            <div class="item-card skeleton-card">
+                <div class="skeleton-block sk-image"></div>
+                <div class="sk-body">
+                    <div class="sk-badges">
+                        <div class="skeleton-block sk-badge"></div>
+                        <div class="skeleton-block sk-badge"></div>
+                    </div>
+                    <div class="skeleton-block sk-line w60"></div>
+                    <div class="skeleton-block sk-line w40"></div>
+                    <div class="skeleton-block sk-line w80"></div>
+                </div>
+                <div class="sk-actions">
+                    <div class="skeleton-block sk-btn"></div>
+                    <div class="skeleton-block sk-btn"></div>
+                    <div class="skeleton-block sk-btn"></div>
+                </div>
+            </div>`;
+        grid.innerHTML = card.repeat(count);
+    },
+
     renderCollection(items) {
         const grid = this.elements.collectionGrid;
         const emptyState = this.elements.emptyState;

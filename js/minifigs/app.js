@@ -70,7 +70,8 @@ const App = {
         // Bind event listeners
         this.bindEvents();
 
-        // Initial render
+        // Initial render (skeleton first, then real content)
+        UI.showSkeleton();
         this.refresh();
     },
 
@@ -805,6 +806,7 @@ const App = {
      * Full refresh of the UI
      */
     async refresh() {
+        UI.showSkeleton();
         const themes = await Storage.getThemes();
         UI.renderThemeFilter(themes);
 
