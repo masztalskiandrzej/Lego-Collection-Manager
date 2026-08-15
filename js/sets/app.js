@@ -565,6 +565,11 @@ const App = {
                 delete formData.id;
                 await Storage.addItem(formData);
                 UI.showNotification(t('msg.setAdded'), 'success');
+
+                // Zaproponuj dodanie figurek z tego zestawu (nowy, posiadany, z numerem)
+                if (formData.setNumber && formData.status === 'owned') {
+                    this.offerSetMinifigs(formData);
+                }
             }
 
             UI.hideModal();
@@ -1318,6 +1323,139 @@ const App = {
         } catch (error) {
             UI.showNotification(error.message, 'error');
         }
+    },
+
+    // ===== SET MINIFIGURES OFFER =====
+
+    /**
+     * Po dodaniu zestawu: zapytaj Rebrickable o figurki w zestawie
+     * i zaproponuj dodanie wybranych do kolekcji minifigurek.
+     * @param {Object} formData - dane właśnie zapisanego zestawu
+     */
+    async offerSetMinifigs(formData) {
+        try {
+            const functionsInstance = window.getFirebaseFunctions();
+            if (!functionsInstance) return;
+
+            const lookup = functionsInstance.httpsCallable('lookupLegoItem');
+            const result = await lookup({
+                itemNumber: formData.setNumber,
+                itemType: 'set',
+                listMinifigs: true
+            });
+
+            const minifigs = (result.data && result.data.minifigs) || [];
+            if (minifigs.length === 0) return; // zestaw bez figurek — cisza
+
+            // Magazyn minifigurek (strona zestawów nie ma własnego Storage minifigs)
+            const minifigsStorage = window.createFirestoreStorage(
+                'minifigsCollection',
+                () => window.Auth.getUserId()
+            );
+            const existing = await minifigsStorage.getCollection();
+            const ownedNums = new Set(
+                existing.map(i => (i.figureNumber || '').toString().trim().toLowerCase())
+            );
+
+            const result_ = await this.showMinifigsOfferModal(formData, minifigs, ownedNums);
+            if (!result_ || result_.length === 0) return;
+
+            let added = 0;
+            for (const fig of result_) {
+                await minifigsStorage.addItem({
+                    type: 'minifigure',
+                    figureNumber: fig.figureNumber,
+                    name: fig.name,
+                    theme: formData.theme || '',
+                    year: formData.year || null,
+                    status: 'owned',
+                    condition: formData.condition || 'new',
+                    location: formData.location || '',
+                    notes: t('mf.fromSet', { set: formData.setNumber }) +
+                           (fig.quantity > 1 ? ' x' + fig.quantity : ''),
+                    imageUrl: fig.imageUrl || null
+                });
+                added++;
+            }
+
+            const skipped = minifigs.filter(
+                m => ownedNums.has((m.figureNumber || '').toLowerCase())
+            ).length;
+
+            let summary = added > 0
+                ? t('mf.added', { n: added })
+                : t('mf.none');
+            if (skipped > 0) summary += t('mf.skipped', { k: skipped });
+            Dialogs.alert(summary, { type: added > 0 ? 'success' : 'info' });
+        } catch (error) {
+            Dialogs.alert(t('mf.error'), { type: 'warning' });
+        }
+    },
+
+    /**
+     * Modal z listą figurek; zwraca Promise<Array> wybranych figurek
+     * (pusty = pominięto).
+     */
+    showMinifigsOfferModal(formData, minifigs, ownedNums) {
+        return new Promise(resolve => {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay active';
+            overlay.style.zIndex = '10050';
+
+            const rows = minifigs.map((fig, idx) => {
+                const owned = ownedNums.has((fig.figureNumber || '').toLowerCase());
+                return `
+                    <label class="mf-item${owned ? ' mf-owned' : ''}">
+                        <input type="checkbox" data-idx="${idx}" ${owned ? 'disabled' : 'checked'}>
+                        <img src="${fig.imageUrl || ''}" alt="" loading="lazy"
+                             onerror="this.style.visibility='hidden'">
+                        <span class="mf-item-info">
+                            <span class="mf-item-name">${fig.name || fig.figureNumber}</span>
+                            <span class="mf-item-meta">#${fig.figureNumber}${fig.quantity > 1 ? ' &times; ' + fig.quantity : ''}${owned ? ' — ' + t('mf.have') : ''}</span>
+                        </span>
+                    </label>`;
+            }).join('');
+
+            overlay.innerHTML = `
+                <div class="modal" style="max-width:560px">
+                    <div class="modal-header">
+                        <h2>${t('mf.title')}</h2>
+                        <button type="button" class="btn-close" data-act="skip">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>${t('mf.desc', { set: formData.setNumber, n: minifigs.length })}</p>
+                        <label class="mf-selectall">
+                            <input type="checkbox" id="mfSelectAll" checked>
+                            ${t('mf.addAll')}
+                        </label>
+                        <div class="mf-list">${rows}</div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" data-act="skip">${t('mf.skip')}</button>
+                        <button type="button" class="btn btn-primary" data-act="add">${t('mf.add')}</button>
+                    </div>
+                </div>`;
+
+            const finish = val => { overlay.remove(); resolve(val); };
+
+            overlay.addEventListener('click', e => {
+                if (e.target === overlay) finish([]);
+                const act = e.target.closest('[data-act]');
+                if (!act) return;
+                if (act.dataset.act === 'skip') { finish([]); return; }
+                // add
+                const selected = Array.from(overlay.querySelectorAll('input[data-idx]:checked'))
+                    .map(cb => minifigs[parseInt(cb.dataset.idx, 10)]);
+                finish(selected);
+            });
+
+            overlay.querySelector('#mfSelectAll').addEventListener('change', function () {
+                overlay.querySelectorAll('input[data-idx]:not(:disabled)')
+                    .forEach(cb => { cb.checked = this.checked; });
+            });
+
+            document.body.appendChild(overlay);
+        });
     },
 
     // ===== AI VISION METHODS =====

@@ -164,8 +164,11 @@ exports.resendVerificationCode = functions
  * never committed). On the Blaze plan you could swap this for Secret Manager
  * + runWith({ secrets }).
  *
- * Called from client with: { itemNumber, itemType }  (itemType: 'set' | 'minifigure')
- * Returns mapped item data, or null if not found.
+ * Called from client with: { itemNumber, itemType, listMinifigs }
+ *   - itemType: 'set' | 'minifigure'
+ *   - listMinifigs: true  ->  for a SET, return the list of minifigures it
+ *     contains (Rebrickable /sets/{num}/minifigs/) instead of set details.
+ * Returns mapped item data, { minifigs: [...] }, or null if not found.
  */
 exports.lookupLegoItem = functions
     .region('europe-west1')
@@ -178,7 +181,7 @@ exports.lookupLegoItem = functions
             );
         }
 
-        const { itemNumber, itemType = 'set' } = data || {};
+        const { itemNumber, itemType = 'set', listMinifigs = false } = data || {};
 
         if (!itemNumber) {
             throw new functions.https.HttpsError(
@@ -205,7 +208,49 @@ exports.lookupLegoItem = functions
             return res.json();
         };
 
+        // Fetch the minifigures contained in a set (paginated; collect all pages).
+        const fetchSetMinifigs = async (setNum) => {
+            const results = [];
+            let url = `${baseUrl}/sets/${setNum}/minifigs/?key=${apiKey}&page_size=100`;
+            while (url) {
+                const res = await fetch(url);
+                if (!res.ok) return null;
+                const json = await res.json();
+                results.push(...(json.results || []));
+                url = json.next ? json.next.replace('https://rebrickable.com/api/v3/lego', baseUrl) : null;
+            }
+            return results.map(function (r) {
+                // Listing returns identifiers like "sw0999" or "sw0999-1";
+                // our collection stores the base number without variant.
+                const raw = r.set_num || r.fig_num || '';
+                // Strip variant suffix ("-1", "-2"); keep zero-padded ids like
+                // "fig-002544" intact.
+                const figNum = raw.replace(/-\d{1,2}$/, '');
+                return {
+                    figureNumber: figNum,
+                    name: r.set_name || r.name || '',
+                    quantity: r.quantity || 1,
+                    imageUrl: r.set_img_url || r.fig_img_url || null
+                };
+            });
+        };
+
         try {
+            if (listMinifigs && itemType === 'set') {
+                let setNum = itemNumber;
+                let minifigs = await fetchSetMinifigs(setNum);
+
+                // Bare set numbers return an EMPTY 200 list (not 404);
+                // retry with the "-1" variant before concluding "no minifigs".
+                if ((!minifigs || minifigs.length === 0) && !setNum.includes('-')) {
+                    setNum = `${setNum}-1`;
+                    minifigs = await fetchSetMinifigs(setNum);
+                }
+
+                if (minifigs === null) return null;
+                return { minifigs };
+            }
+
             let json = await fetchItem(itemNumber);
 
             // Sets are often stored with a "-1" variant suffix; retry if not found.

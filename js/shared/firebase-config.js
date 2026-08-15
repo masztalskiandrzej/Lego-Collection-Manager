@@ -49,6 +49,16 @@ function initFirebase() {
         if (typeof firebase.functions === 'function') {
             // Use Europe region (same as Cloud Functions deployment)
             firebaseFunctions = firebase.app().functions('europe-west1');
+
+            // Local development: when served from localhost, route callable
+            // functions to the Firebase Emulator (firebase emulators:start).
+            // Production hosting is unaffected.
+            if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                try {
+                    firebaseFunctions.useFunctionsEmulator('http://localhost:5001');
+                } catch (e) {
+                }
+            }
         } else {
         }
 

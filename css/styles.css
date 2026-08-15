@@ -3548,3 +3548,79 @@ body {
     background: #16162a;
     border-top-color: #333;
 }
+
+/* ===== Minifigure offer modal (after adding a set) ===== */
+.mf-list {
+    max-height: 46vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: var(--spacing-sm) 0;
+}
+
+.mf-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid #e4e7ee;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.mf-item:hover { background: #f4f6fa; }
+
+.mf-item.mf-owned {
+    opacity: .55;
+    cursor: default;
+}
+
+.mf-item img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #f4f6fa;
+    flex-shrink: 0;
+}
+
+.mf-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mf-item-name {
+    font-size: .88rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mf-item-meta {
+    font-size: .75rem;
+    color: var(--text-secondary);
+}
+
+.mf-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.mf-selectall {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: var(--spacing-xs) 0;
+}
+
+[data-theme="dark"] .mf-item { border-color: #333a4d; }
+[data-theme="dark"] .mf-item:hover { background: #232a3d; }
+[data-theme="dark"] .mf-item img { background: #232a3d; }
