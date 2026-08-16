@@ -260,7 +260,20 @@ exports.lookupLegoItem = functions
 
             if (!json) return null;
 
-            return mapRebrickableData(json, itemType);
+            const mapped = mapRebrickableData(json, itemType);
+
+            // Resolve numeric theme_id (e.g. 171) to a human name (e.g. Star Wars).
+            if (mapped && json.theme_id != null) {
+                try {
+                    const res = await fetch(`${baseUrl}/themes/${json.theme_id}/?key=${apiKey}`);
+                    if (res.ok) {
+                        const theme = await res.json();
+                        if (theme.name) mapped.themeName = theme.name;
+                    }
+                } catch (e) { /* nazwa motywu opcjonalna */ }
+            }
+
+            return mapped;
         } catch (error) {
             console.error('Rebrickable lookup failed:', error);
             return null;
@@ -288,13 +301,13 @@ function mapRebrickableData(data, itemType) {
         };
     }
 
-    // Rebrickable minifig response: { fig_num, name, year, theme_id, num_parts, fig_img_url }
+    // Rebrickable minifig response: { fig_num | set_num, name, year, theme_id, fig_img_url | set_img_url }
     return {
         name: data.name || 'Unknown Minifigure',
         theme: data.theme_id != null ? data.theme_id.toString() : '',
         year: data.year ? parseInt(data.year) : null,
-        imageUrl: data.fig_img_url || null,
-        figureNumber: data.fig_num || ''
+        imageUrl: data.fig_img_url || data.set_img_url || null,
+        figureNumber: (data.fig_num || data.set_num || '').replace(/-\d{1,2}$/, '')
     };
 }
 

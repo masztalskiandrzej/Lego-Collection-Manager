@@ -238,6 +238,14 @@ const App = {
             });
         }
 
+        // Auto-Fill data button
+        const autoFillDataBtn = document.getElementById('autoFillDataBtn');
+        if (autoFillDataBtn) {
+            autoFillDataBtn.addEventListener('click', () => {
+                this.handleAutoFillData();
+            });
+        }
+
         // Delete modal controls
         document.getElementById('deleteModalCloseBtn').addEventListener('click', () => {
             UI.hideDeleteModal();
@@ -1324,6 +1332,61 @@ const App = {
             UI.showNotification('Verification code resent! Check console (F12).', 'success');
         } catch (error) {
             UI.showNotification(error.message, 'error');
+        }
+    },
+
+    /**
+     * Auto-Fill: wpisz numer -> pobierz i uzupełnij dane z Rebrickable.
+     */
+    async handleAutoFillData() {
+        const numInput = document.getElementById('itemNumber');
+        const num = numInput ? numInput.value.trim() : '';
+
+        if (!num) {
+            Dialogs.alert(t('msg.enterSetNumber'), { type: 'warning' });
+            if (numInput) numInput.focus();
+            return;
+        }
+
+        const btn = document.getElementById('autoFillDataBtn');
+        const original = btn ? btn.innerHTML : '';
+        if (btn) { btn.disabled = true; btn.innerHTML = t('msg.loadingEllipsis'); }
+
+        try {
+            const functionsInstance = window.getFirebaseFunctions();
+            if (!functionsInstance) {
+                throw new Error(t('msg.autoFillUnavailable'));
+            }
+
+            const lookup = functionsInstance.httpsCallable('lookupLegoItem');
+            const result = await lookup({ itemNumber: num, itemType: 'set' });
+            const data = result && result.data;
+
+            if (!data || !data.name) {
+                Dialogs.alert(t('msg.notFoundSetShort', { n: num }), { type: 'warning' });
+                return;
+            }
+
+            // Wypełnij pola danymi z API (cena pozostaje do ręcznego wpisania)
+            const set = (id, value) => {
+                const el = document.getElementById(id);
+                if (el && value !== null && value !== undefined && value !== '') el.value = value;
+            };
+            set('itemName', data.name);
+            set('itemTheme', data.themeName || data.theme || '');
+            set('itemYear', data.year);
+            set('itemPieceCount', data.pieceCount);
+            if (data.imageUrl) {
+                UI.showImagePreview(data.imageUrl);
+                const fileName = document.getElementById('imageFileName');
+                if (fileName) fileName.textContent = t('form.officialImage', { n: num });
+            }
+
+            UI.showNotification(t('msg.autoFilled'), 'success');
+        } catch (error) {
+            Dialogs.alert(error.message || t('msg.autoFillUnavailable'), { type: 'warning' });
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = original; }
         }
     },
 

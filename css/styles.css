@@ -747,6 +747,7 @@ body {
 /* Input with button (for Get Image feature) */
 .input-with-button {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--spacing-sm);
 }
 

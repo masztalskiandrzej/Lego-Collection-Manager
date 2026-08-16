@@ -257,6 +257,10 @@
             'mf.error': 'Nie udało się pobrać listy figurek.',
             'mf.fromSet': 'z zestawu {set}',
 
+            'form.autoFillBtn': '✨ Uzupełnij dane',
+            'msg.autoFilled': 'Uzupełniono dane z Rebrickable',
+            'msg.autoFillUnavailable': 'Usługa uzupełniania niedostępna — czy lokalny serwer funkcji działa?',
+
             'export.title': '📤 Eksport i udostępnianie',
             'export.summary': '📊 Podsumowanie kolekcji',
             'export.totalItems': 'Liczba elementów:',
@@ -600,6 +604,10 @@
             'mf.skipped': ' Skipped {k} — already in collection.',
             'mf.error': 'Failed to fetch the minifigure list.',
             'mf.fromSet': 'from set {set}',
+
+            'form.autoFillBtn': '✨ Auto-Fill',
+            'msg.autoFilled': 'Data filled from Rebrickable',
+            'msg.autoFillUnavailable': 'Auto-Fill service unavailable — is the local functions server running?',
 
             'export.title': '📤 Export & Share',
             'export.summary': '📊 Collection Summary',

@@ -103,9 +103,10 @@ async function lookupLegoItem(data) {
     if (!json) return null;
 
     // Mapowanie jak w functions/index.js
+    let mapped;
     if (itemType === 'set') {
         const setNumber = (json.set_num || '').split('-')[0];
-        return {
+        mapped = {
             name: json.name || '',
             theme: json.theme_id != null ? json.theme_id.toString() : '',
             year: json.year ? parseInt(json.year) : null,
@@ -114,14 +115,28 @@ async function lookupLegoItem(data) {
             pieceCount: json.num_parts ? parseInt(json.num_parts) : null,
             pricePaid: null
         };
+    } else {
+        mapped = {
+            name: json.name || 'Unknown Minifigure',
+            theme: json.theme_id != null ? json.theme_id.toString() : '',
+            year: json.year ? parseInt(json.year) : null,
+            imageUrl: json.fig_img_url || json.set_img_url || null,
+            figureNumber: (json.fig_num || json.set_num || '').replace(/-\d{1,2}$/, '')
+        };
     }
-    return {
-        name: json.name || 'Unknown Minifigure',
-        theme: json.theme_id != null ? json.theme_id.toString() : '',
-        year: json.year ? parseInt(json.year) : null,
-        imageUrl: json.fig_img_url || null,
-        figureNumber: json.fig_num || ''
-    };
+
+    // Rozwiąż numeryczne theme_id na nazwę (np. 171 -> Star Wars)
+    if (json.theme_id != null) {
+        try {
+            const res = await fetch(`${BASE}/themes/${json.theme_id}/?key=${API_KEY}`);
+            if (res.ok) {
+                const theme = await res.json();
+                if (theme.name) mapped.themeName = theme.name;
+            }
+        } catch (e) { /* nazwa motywu opcjonalna */ }
+    }
+
+    return mapped;
 }
 
 const HANDLERS = { lookupLegoItem };
