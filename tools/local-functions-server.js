@@ -49,9 +49,9 @@ function decodeUid(req) {
 }
 
 async function lookupLegoItem(data) {
-    const { itemNumber, itemType = 'set', listMinifigs = false } = data || {};
+    const { itemNumber, itemType = 'set', listMinifigs = false, themes = false } = data || {};
 
-    if (!itemNumber) throw Object.assign(new Error('itemNumber is required'), { code: 'invalid-argument' });
+    if (!itemNumber && !themes) throw Object.assign(new Error('itemNumber is required'), { code: 'invalid-argument' });
     if (!API_KEY) throw Object.assign(new Error('Lookup service is not configured.'), { code: 'internal' });
 
     const endpoint = itemType === 'minifigure' ? 'minifigs' : 'sets';
@@ -83,6 +83,23 @@ async function lookupLegoItem(data) {
             };
         });
     };
+
+    // Pełna mapa motywów (id -> nazwa)
+    if (themes) {
+        const map = {};
+        let url = `${BASE}/themes/?key=${API_KEY}&page_size=1000`;
+        while (url) {
+            const res = await fetch(url);
+            if (!res.ok) break;
+            const json = await res.json();
+            for (const th of (json.results || [])) {
+                if (th.id != null) map[th.id.toString()] = th.name || '';
+            }
+            url = json.next ? json.next.replace('https://rebrickable.com/api/v3/lego', BASE) : null;
+        }
+        if (Object.keys(map).length === 0) return null;
+        return { themes: map };
+    }
 
     if (listMinifigs && itemType === 'set') {
         let setNum = itemNumber;

@@ -181,9 +181,9 @@ exports.lookupLegoItem = functions
             );
         }
 
-        const { itemNumber, itemType = 'set', listMinifigs = false } = data || {};
+        const { itemNumber, itemType = 'set', listMinifigs = false, themes = false } = data || {};
 
-        if (!itemNumber) {
+        if (!itemNumber && !themes) {
             throw new functions.https.HttpsError(
                 'invalid-argument',
                 'itemNumber is required'
@@ -236,6 +236,23 @@ exports.lookupLegoItem = functions
         };
 
         try {
+            // Pełna mapa motywów (id -> nazwa), do migracji starych danych.
+            if (themes) {
+                const map = {};
+                let url = `${baseUrl}/themes/?key=${apiKey}&page_size=1000`;
+                while (url) {
+                    const res = await fetch(url);
+                    if (!res.ok) break;
+                    const json = await res.json();
+                    for (const th of (json.results || [])) {
+                        if (th.id != null) map[th.id.toString()] = th.name || '';
+                    }
+                    url = json.next ? json.next.replace('https://rebrickable.com/api/v3/lego', baseUrl) : null;
+                }
+                if (Object.keys(map).length === 0) return null;
+                return { themes: map };
+            }
+
             if (listMinifigs && itemType === 'set') {
                 let setNum = itemNumber;
                 let minifigs = await fetchSetMinifigs(setNum);
