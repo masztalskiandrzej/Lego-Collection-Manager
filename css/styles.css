@@ -801,7 +801,7 @@ body {
     opacity: 0;
     visibility: hidden;
     transition: transform var(--transition-normal), opacity var(--transition-normal), visibility var(--transition-normal);
-    z-index: 1001;
+    z-index: 10500;
 }
 
 .notification.show {

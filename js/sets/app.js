@@ -557,8 +557,10 @@ const App = {
                 if (formData.setNumber) {
                     const duplicate = await Storage.checkDuplicateBySetNumber(formData.setNumber);
                     if (duplicate) {
-                        UI.showNotification(t('msg.dupSetConfirm', { n: formData.setNumber }), 'warning');
-                        return;
+                        const confirmed = await Dialogs.confirm(t('msg.dupSetConfirm', { n: formData.setNumber }));
+                        if (!confirmed) {
+                            return;
+                        }
                     }
                 }
 

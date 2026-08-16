@@ -494,11 +494,10 @@ const App = {
                 if (formData.figureNumber) {
                     const duplicate = await Storage.checkDuplicateByFigureNumber(formData.figureNumber);
                     if (duplicate) {
-                        UI.showNotification(
-                            `⚠️ Minifigure "${formData.figureNumber}" already exists: ${duplicate.name || 'N/A'}`,
-                            'warning'
-                        );
-                        return;
+                        const confirmed = await Dialogs.confirm(t('msg.dupMinifigConfirm', { n: formData.figureNumber }));
+                        if (!confirmed) {
+                            return;
+                        }
                     }
                 }
 
