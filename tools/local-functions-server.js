@@ -126,11 +126,27 @@ async function lookupLegoItem(data) {
 
 const HANDLERS = { lookupLegoItem };
 
+// CORS: przeglądarka (localhost:8765) -> tu (localhost:5001) to żądanie
+// cross-origin; SDK wysyła preflight OPTIONS, który musimy obsłużyć.
+const CORS_HEADERS = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, content-type, x-client-version, x-firebase-gmpid',
+    'Access-Control-Max-Age': '86400'
+};
+
 const server = http.createServer(async (req, res) => {
+    // Preflight
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204, CORS_HEADERS);
+        res.end();
+        return;
+    }
+
     // Protokół callable: POST /{project}/{region}/{function}
     const m = req.url.match(new RegExp(`/${PROJECT}/${REGION}/([a-zA-Z]+)`));
     if (req.method !== 'POST' || !m || !HANDLERS[m[1]]) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.writeHead(404, Object.assign({ 'Content-Type': 'application/json' }, CORS_HEADERS));
         res.end(JSON.stringify({ error: { message: 'not found' } }));
         return;
     }
@@ -141,19 +157,21 @@ const server = http.createServer(async (req, res) => {
         let data = {};
         try { data = JSON.parse(body).data || {}; } catch (e) {}
 
+        console.log(`→ ${m[1]} ${JSON.stringify(data).slice(0, 120)}`);
+
         // Wymagaj zalogowania (jak funkcja w chmurze)
         if (!decodeUid(req)) {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, CORS_HEADERS));
             res.end(JSON.stringify({ error: { status: 'UNAUTHENTICATED', message: 'You must be signed in.' } }));
             return;
         }
 
         try {
             const result = await HANDLERS[m[1]](data);
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, CORS_HEADERS));
             res.end(JSON.stringify({ result }));
         } catch (err) {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.writeHead(200, Object.assign({ 'Content-Type': 'application/json' }, CORS_HEADERS));
             res.end(JSON.stringify({ error: { status: err.code || 'INTERNAL', message: err.message } }));
         }
     });
