@@ -73,33 +73,16 @@ const Auth = {
     },
 
     /**
-     * Wyślij email z kodem weryfikacyjnym przez Cloud Function
-     * @param {string} email - Adres email odbiorcy
-     * @param {string} code - 4-cyfrowy kod weryfikacyjny
-     * @returns {Promise<{success: boolean, method: string}>}
+     * Wyślij natywny link weryfikacyjny Firebase (opcja A)
+     * Google wysyła maila z linkiem; po kliknięciu user.emailVerified = true.
+     * @param {object} user - Zalogowany użytkownik Firebase
      */
-    async sendVerificationEmail(email, code) {
-        // Try Cloud Function first
-        if (this.emailServiceEnabled && this._functions) {
-            try {
-                const sendEmail = this._functions.httpsCallable('sendVerificationEmail');
-                const result = await sendEmail({
-                    email: email,
-                    code: code,
-                    language: (window.I18N ? window.I18N.lang : 'pl')
-                });
-
-                if (result.data.success) {
-                    return { success: true, method: 'cloud_function' };
-                }
-            } catch (error) {
-                // Fallback to console
-            }
-        }
-
-        // Fallback: Display code in console (for development or if email fails)
-
-        return { success: true, method: 'console_fallback' };
+    async sendVerificationLink(user) {
+        const actionCodeSettings = {
+            url: window.location.origin + '/login.html',
+            handleCodeInApp: false
+        };
+        await user.sendEmailVerification(actionCodeSettings);
     },
 
     /**
@@ -117,25 +100,21 @@ const Auth = {
             // Zapisz użytkownika jako oczekującego na weryfikację
             this.pendingUser = user;
 
-            // Wygeneruj 4-cyfrowy kod
-            this.verificationCode = this.generateVerificationCode();
-
-            // Zapisz dane użytkownika w Firestore z kodem weryfikacyjnym
+            // Zapisz profil w Firestore (flaga emailVerified podniesie się
+            // po kliknięciu natywnego linku Firebase)
             await this._db.collection('users').doc(user.uid)
                 .collection('profile').doc('userData').set({
                     email: user.email,
                     emailVerified: false,
-                    verificationCode: this.verificationCode,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: null
                 });
 
-            // Wyślij email z kodem weryfikacyjnym
-            const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
+            // Wyślij natywny link weryfikacyjny
+            await this.sendVerificationLink(user);
 
             return {
                 success: true,
-                code: this.verificationCode,
                 user: {
                     email: user.email,
                     uid: user.uid
@@ -148,81 +127,41 @@ const Auth = {
     },
 
     /**
-     * Zweryfikuj 4-cyfrowy kod
-     * @param {string} code - Kod wprowadzony przez użytkownika
-     * @returns {Promise<boolean>} - True jeśli kod poprawny
+     * Sprawdź, czy użytkownik kliknął link w mailu (odświeża token).
+     * @returns {Promise<boolean>} - True jeśli email zweryfikowany
      */
-    async verifyCode(code) {
-        const user = this.currentUser;
-
+    async checkVerification() {
+        const user = this.pendingUser || this.currentUser;
         if (!user) {
-            throw new Error('Brak zalogowanego użytkownika. Zarejestruj się ponownie.');
+            throw new Error('Brak użytkownika do weryfikacji.');
         }
 
-        try {
-            // Pobierz dane użytkownika z Firestore
-            const userDocRef = this._db.collection('users').doc(user.uid)
-                .collection('profile').doc('userData');
-            const userDoc = await userDocRef.get();
+        await user.reload();
 
-            if (!userDoc.exists) {
-                throw new Error('Nie znaleziono danych użytkownika');
-            }
-
-            const userData = userDoc.data();
-
-            // Sprawdź kod
-            if (userData.verificationCode === code) {
-
-                // Oznacz email jako zweryfikowany
-                await userDocRef.set({
+        if (user.emailVerified) {
+            // Podnieś flagę w Firestore (bramka dostępu do aplikacji)
+            await this._db.collection('users').doc(user.uid)
+                .collection('profile').doc('userData').set({
                     emailVerified: true,
                     verificationCode: null,
                     verifiedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
 
-                // Wyczyść dane tymczasowe
-                this.pendingUser = null;
-                this.verificationCode = null;
-
-                return true;
-            } else {
-                throw new Error('Nieprawidłowy kod weryfikacyjny');
-            }
-        } catch (error) {
-            throw error;
+            this.pendingUser = null;
+            return true;
         }
+        return false;
     },
 
     /**
-     * Wyślij ponownie kod weryfikacyjny
-     * @returns {Promise<string>} - Nowy kod
+     * Wyślij link weryfikacyjny ponownie (Firebase sam limituje częstotliwość)
      */
-    async resendCode() {
-        if (!this.pendingUser && !this.currentUser) {
-            throw new Error('Brak użytkownika do weryfikacji');
-        }
-
+    async resendVerification() {
         const user = this.pendingUser || this.currentUser;
-
-        try {
-            // Wygeneruj nowy kod
-            this.verificationCode = this.generateVerificationCode();
-
-            // Zaktualizuj w Firestore
-            await this._db.collection('users').doc(user.uid)
-                .collection('profile').doc('userData').set({
-                    verificationCode: this.verificationCode,
-                    codeResentAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-
-            // Wyślij email z nowym kodem
-            const emailResult = await this.sendVerificationEmail(user.email, this.verificationCode);
-
-            return this.verificationCode;
-        } catch (error) {
-            throw error;
+        if (!user) {
+            throw new Error('Brak użytkownika do weryfikacji.');
         }
+        await this.sendVerificationLink(user);
     },
 
     /**
@@ -237,7 +176,9 @@ const Auth = {
             const userCredential = await this._auth.signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
-            // Sprawdź czy email został zweryfikowany
+            // Odśwież token, żeby emailVerified był aktualny (po kliknięciu linku)
+            await user.reload();
+
             const userDocRef = this._db.collection('users').doc(user.uid)
                 .collection('profile').doc('userData');
             const userDoc = await userDocRef.get();
@@ -246,28 +187,39 @@ const Auth = {
                 // Nowy użytkownik bez profilu - utwórz profil
                 await userDocRef.set({
                     email: user.email,
-                    emailVerified: true,
+                    emailVerified: user.emailVerified === true,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } else {
                 const userData = userDoc.data();
 
-                // Sprawdź czy email zweryfikowany w naszym systemie
                 if (!userData.emailVerified) {
-                    await this._auth.signOut();
-                    return {
-                        success: false,
-                        requiresVerification: true,
-                        email: user.email,
-                        message: 'Email nie został zweryfikowany. Sprawdź konsolę (F12) aby zobaczyć kod weryfikacyjny.'
-                    };
+                    if (user.emailVerified) {
+                        // Kliknięto link (natywnie OK) -> podnieś flagę i wpuszczaj
+                        await userDocRef.set({
+                            emailVerified: true,
+                            verifiedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                    } else {
+                        // Nieweryfikowany: wyślij link, wyloguj, poproś o powrót
+                        await this.sendVerificationLink(user);
+                        await this._auth.signOut();
+                        return {
+                            success: false,
+                            requiresVerification: true,
+                            email: user.email,
+                            message: window.t ? window.t('auth.linkSentRelogin', { email: user.email })
+                                               : 'Zweryfikuj email linkiem i zaloguj się ponownie.'
+                        };
+                    }
+                } else {
+                    // Zweryfikowany (także legacy konta sprzed migracji) -> wpuszczaj
+                    await userDocRef.set({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
                 }
-
-                // Zaktualizuj czas ostatniego logowania
-                await userDocRef.set({
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
             }
 
             this.currentUser = user;

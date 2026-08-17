@@ -90,28 +90,13 @@ function initLoginPage() {
     // Verification
     if (verifyCodeBtn) {
         verifyCodeBtn.addEventListener('click', async () => {
-            await handleVerifyCode();
+            await handleCheckVerification();
         });
     }
 
     if (resendCodeBtn) {
         resendCodeBtn.addEventListener('click', async () => {
             await handleResendCode();
-        });
-    }
-
-    // Handle Enter key in verification code input
-    const verificationInput = document.getElementById('verificationCode');
-    if (verificationInput) {
-        verificationInput.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter' && verificationInput.value.length === 4) {
-                await handleVerifyCode();
-            }
-        });
-
-        // Auto-format input (only numbers, max 4 digits)
-        verificationInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
         });
     }
 
@@ -132,12 +117,8 @@ function switchToRegister() {
 function switchToVerification() {
     hideAllForms();
     document.getElementById('verificationForm').classList.add('active');
-    // Clear and focus verification code input
-    const codeInput = document.getElementById('verificationCode');
-    if (codeInput) {
-        codeInput.value = '';
-        codeInput.focus();
-    }
+    const checkBtn = document.getElementById('verifyCodeBtn');
+    if (checkBtn) checkBtn.focus();
 }
 
 function showLoading() {
@@ -175,34 +156,16 @@ async function handleLogin() {
                 window.location.href = 'index.html';
             }, 1000);
         } else if (result.requiresVerification) {
-            // Email nie jest zweryfikowany - zaoferuj ponowne wysłanie kodu
+            // Email niezweryfikowany — link wysłany; zaloguj się po kliknięciu
             showNotification(result.message, 'warning');
-            showResendCodeOptions(email, password);
+            Dialogs.alert(result.message, { type: 'info' });
+            switchToLogin();
         } else {
             showNotification(result.error || t('auth.loginFailed'), 'error');
             switchToLogin();
         }
     } catch (error) {
         showNotification(error.message || t('auth.loginFailed'), 'error');
-        switchToLogin();
-    }
-}
-
-async function showResendCodeOptions(email, password) {
-    // Pokaż dialog z opcją ponownego wysłania kodu
-    if (await Dialogs.confirm(t('auth.notVerifiedConfirm'))) {
-        try {
-            const result = await window.Auth.resendCodeForUnverifiedUser(email, password);
-
-            if (result.success) {
-                showNotification(t('auth.newCodeGenerated'), 'success');
-                switchToVerification();
-            }
-        } catch (error) {
-            showNotification(t('common.errorPrefix') + error.message, 'error');
-            switchToLogin();
-        }
-    } else {
         switchToLogin();
     }
 }
@@ -228,7 +191,7 @@ async function handleRegister() {
         const result = await window.Auth.register(email, password);
 
         if (result.success || result.requiresVerification) {
-            showNotification(t('auth.registerSuccess'), 'success');
+            showNotification(t('auth.regLinkSent'), 'success');
             switchToVerification();
         } else {
             showNotification(result.error || t('auth.registerFailed'), 'error');
@@ -240,23 +203,16 @@ async function handleRegister() {
     }
 }
 
-async function handleVerifyCode() {
+async function handleCheckVerification() {
     if (!window.Auth) {
         showNotification(t('auth.moduleNotLoaded'), 'error');
-        return;
-    }
-
-    const code = document.getElementById('verificationCode').value;
-
-    if (!code || code.length !== 4) {
-        showNotification(t('auth.enterCode'), 'error');
         return;
     }
 
     showLoading();
 
     try {
-        const verified = await window.Auth.verifyCode(code);
+        const verified = await window.Auth.checkVerification();
 
         if (verified) {
             showNotification(t('auth.emailVerified'), 'success');
@@ -265,7 +221,7 @@ async function handleVerifyCode() {
                 window.location.href = 'index.html';
             }, 1000);
         } else {
-            showNotification(t('auth.invalidCode'), 'error');
+            showNotification(t('auth.notVerifiedYet'), 'warning');
             switchToVerification();
         }
     } catch (error) {
@@ -281,10 +237,10 @@ async function handleResendCode() {
     }
 
     try {
-        const code = await window.Auth.resendCode();
-        showNotification(t('auth.codeResent'), 'success');
+        await window.Auth.resendVerification();
+        showNotification(t('auth.linkResent'), 'success');
     } catch (error) {
-        showNotification(t('auth.resendFailed') + error.message, 'error');
+        showNotification(error.message, 'error');
     }
 }
 

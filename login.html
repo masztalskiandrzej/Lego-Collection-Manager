@@ -111,29 +111,19 @@
             <div id="verificationForm" class="auth-form">
                 <div class="verification-icon">✉️</div>
                 <h2 class="form-title" data-i18n="login.verifyTitle">Zweryfikuj swój email</h2>
-                <p class="form-subtitle" data-i18n="login.verifySubtitle">Wpisz 4-cyfrowy kod, aby zweryfikować konto</p>
+                <p class="form-subtitle" data-i18n="login.verifySubtitle">Sprawdź swoją skrzynkę i kliknij link weryfikacyjny</p>
 
                 <div class="verification-info">
-                    <p data-i18n="login.verifyInfo">Kod weryfikacyjny został wygenerowany. Sprawdź konsolę przeglądarki (F12), aby go zobaczyć.</p>
-                </div>
-
-                <div class="code-input-container">
-                    <input type="text" id="verificationCode" maxlength="4" pattern="[0-9]{4}" placeholder="• • • •" autocomplete="off">
-                    <div class="code-dashes">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
+                    <p data-i18n="login.verifyInfo">Wyśliśliśmy email z linkiem. Kliknij go w swojej skrzynce, a następnie wróć tutaj i naciśnij „Sprawdziłem maila”.</p>
                 </div>
 
                 <div class="button-group">
                     <button type="button" class="btn btn-primary" id="verifyCodeBtn">
-                        <span class="btn-text" data-i18n="login.verifyBtn">Zweryfikuj</span>
+                        <span class="btn-text" data-i18n="login.verifyBtn">Sprawdziłem maila ✓</span>
                         <span class="btn-icon">✓</span>
                     </button>
                     <button type="button" class="btn btn-secondary" id="resendCodeBtn">
-                        <span class="btn-text" data-i18n="login.resendBtn">Wyślij kod ponownie</span>
+                        <span class="btn-text" data-i18n="login.resendBtn">Wyślij link ponownie</span>
                         <span class="btn-icon">🔄</span>
                     </button>
                 </div>
