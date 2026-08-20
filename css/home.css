@@ -908,3 +908,131 @@ body, html {
     border-color: rgba(255, 255, 255, 0.5);
     transform: scale(1.1);
 }
+
+
+/* ===== Dashboard (strona główna) ===== */
+.dash-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+    position: relative;
+    z-index: 1;
+}
+
+.dash-title {
+    text-align: center;
+    font-size: 1.6rem;
+    margin: 0 0 20px;
+    color: #1a2b4a;
+}
+
+.dash-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.dash-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 16px;
+    padding: 18px 12px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 31, 63, 0.10);
+}
+
+.dash-card-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #001f3f;
+}
+
+.dash-card-label {
+    font-size: 0.78rem;
+    color: #5a6b85;
+    margin-top: 4px;
+}
+
+.dash-block {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 6px 20px rgba(0, 31, 63, 0.10);
+    margin-bottom: 18px;
+}
+
+.dash-block-title {
+    margin: 0 0 12px;
+    font-size: 1.02rem;
+    color: #1a2b4a;
+}
+
+.dash-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0;
+}
+
+.dash-row-label {
+    flex: 0 0 150px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #33445e;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dash-bar-track {
+    flex: 1;
+    height: 12px;
+    background: #e8ecf3;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.dash-bar {
+    height: 100%;
+    border-radius: 8px;
+    min-width: 2px;
+}
+
+.dash-bar-owned { background: linear-gradient(90deg, #4CAF50, #66BB6A); }
+.dash-bar-wishlist { background: linear-gradient(90deg, #FF9800, #FFB74D); }
+.dash-bar-sold { background: linear-gradient(90deg, #90A4AE, #B0BEC5); }
+.dash-bar-theme { background: linear-gradient(90deg, #001f3f, #006DB7); }
+.dash-bar-year { background: linear-gradient(90deg, #E3000B, #FF5252); }
+
+.dash-row-value {
+    flex: 0 0 140px;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #5a6b85;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-empty {
+    text-align: center;
+    color: #44536b;
+    padding: 30px 10px;
+    font-size: 1rem;
+}
+
+[data-theme="dark"] .dash-title { color: #e8eaf0; }
+[data-theme="dark"] .dash-card,
+[data-theme="dark"] .dash-block { background: rgba(26, 26, 46, 0.88); }
+[data-theme="dark"] .dash-card-value { color: #e8eaf0; }
+[data-theme="dark"] .dash-card-label,
+[data-theme="dark"] .dash-row-value { color: #9aa5b8; }
+[data-theme="dark"] .dash-block-title { color: #dfe3ea; }
+[data-theme="dark"] .dash-row-label { color: #c4ccda; }
+[data-theme="dark"] .dash-bar-track { background: #2a3140; }
+
+@media (max-width: 720px) {
+    .dash-cards { grid-template-columns: repeat(2, 1fr); }
+    .dash-row-label { flex-basis: 105px; }
+    .dash-row-value { flex-basis: 100px; font-size: 0.72rem; }
+}

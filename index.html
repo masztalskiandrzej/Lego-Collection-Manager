@@ -39,6 +39,9 @@
         </a>
     </div>
 
+    <!-- Dashboard (statystyki kolekcji) -->
+    <section id="dashboardSection" class="dash-container" style="display: none;"></section>
+
     <!-- Scripts -->
     <!-- Firebase Compat SDK (loaded from CDN - works with file:// protocol) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -50,6 +53,8 @@
     <script src="js/shared/firebase-config.js"></script>
     <script src="js/shared/i18n.js"></script>
     <script src="js/shared/dialogs.js"></script>
+    <script src="js/shared/firestore-storage.js"></script>
+    <script src="js/shared/dashboard.js"></script>
     <script src="js/shared/auth.js"></script>
 
     <!-- Initialize modules and check login state -->
@@ -71,6 +76,14 @@
                     const email = window.Auth.getUserEmail();
                     const username = email ? email.split('@')[0] : (window.I18N ? window.I18N.t('common.user') : 'User');
                     if (userNameEl) userNameEl.textContent = username;
+
+                    // Dashboard statystyk (re-render przy zmianie języka)
+                    if (window.Dashboard) {
+                        window.Dashboard.render();
+                        document.addEventListener('languagechange', function () {
+                            if (window.Dashboard) window.Dashboard.render();
+                        });
+                    }
                 }
             });
         } else {
