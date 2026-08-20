@@ -249,6 +249,14 @@ const App = {
             });
         }
 
+        // Podgląd wartości na BrickEconomy
+        const bePreviewBtn = document.getElementById('bePreviewBtn');
+        if (bePreviewBtn) {
+            bePreviewBtn.addEventListener('click', () => {
+                this.showBePreview();
+            });
+        }
+
         // Auto-Fill data button
         const autoFillDataBtn = document.getElementById('autoFillDataBtn');
         if (autoFillDataBtn) {
@@ -1463,6 +1471,43 @@ const App = {
         } finally {
             if (btn) { btn.disabled = false; btn.innerHTML = original; }
         }
+    },
+
+    /**
+     * Podgląd wartości zestawu na BrickEconomy w modalu (iframe).
+     */
+    showBePreview() {
+        const numInput = document.getElementById('itemNumber');
+        const num = numInput ? numInput.value.trim() : '';
+        if (!num) {
+            Dialogs.alert(t('msg.enterNumberShortSet'), { type: 'warning' });
+            if (numInput) numInput.focus();
+            return;
+        }
+
+        const url = 'https://www.brickeconomy.com/set/' + encodeURIComponent(num) + '-1';
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay active';
+        overlay.style.zIndex = '10060';
+        overlay.innerHTML =
+            '<div class="modal" style="max-width:720px">' +
+                '<div class="modal-header"><h2>BrickEconomy — ' + num + '</h2>' +
+                '<button type="button" class="btn-close" data-close="1">&times;</button></div>' +
+                '<div class="modal-body" style="padding:10px">' +
+                    '<iframe src="' + url + '" style="width:100%;height:64vh;border:0;border-radius:8px;background:#fff" ' +
+                    'title="BrickEconomy" loading="lazy"></iframe>' +
+                '</div>' +
+            '</div>';
+
+        const close = () => overlay.remove();
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay || e.target.closest('[data-close]')) close();
+        });
+        document.addEventListener('keydown', function esc(e) {
+            if (e.key === 'Escape') { document.removeEventListener('keydown', esc); close(); }
+        });
+        document.body.appendChild(overlay);
     },
 
     // ===== SET MINIFIGURES OFFER =====
