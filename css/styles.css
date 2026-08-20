@@ -3651,3 +3651,8 @@ body {
 }
 
 .card-be-link:hover { opacity: 1; }
+
+/* Input z przyciskiem nie ściska pola poniżej użytecznej szerokości */
+.input-with-button input {
+    min-width: 140px;
+}
