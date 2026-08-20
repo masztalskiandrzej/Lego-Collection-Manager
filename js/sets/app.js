@@ -44,6 +44,7 @@ const App = {
 
         // Initialize UI
         UI.init();
+        this.loadViewPrefs();
 
         // Wait for Auth module to be available (polling mechanism)
         let authWaitCount = 0;
@@ -84,7 +85,8 @@ const App = {
 
         // Initial render (skeleton first, then real content)
         UI.showSkeleton();
-        this.refresh();
+        await this.refresh();
+        this.applyViewPrefsToUI();
     },
 
     /**
@@ -126,30 +128,35 @@ const App = {
         // Filter controls (no type filter for sets only)
         document.getElementById('filterTheme').addEventListener('change', (e) => {
             this.state.filters.theme = e.target.value;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('filterStatus').addEventListener('change', (e) => {
             this.state.filters.status = e.target.value;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('filterCondition').addEventListener('change', (e) => {
             this.state.filters.condition = e.target.value;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('yearMin').addEventListener('change', (e) => {
             this.state.filters.yearMin = e.target.value ? parseInt(e.target.value) : null;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('yearMax').addEventListener('change', (e) => {
             this.state.filters.yearMax = e.target.value ? parseInt(e.target.value) : null;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
@@ -162,12 +169,14 @@ const App = {
         // Sort controls
         document.getElementById('sortBy').addEventListener('change', (e) => {
             this.state.sort.by = e.target.value;
+            this.saveViewPrefs();
             this.resetPagination();
             this.renderFilteredCollection();
         });
 
         document.getElementById('sortOrderBtn').addEventListener('click', () => {
             this.state.sort.ascending = !this.state.sort.ascending;
+            this.saveViewPrefs();
             UI.updateSortIcon(this.state.sort.ascending);
             this.resetPagination();
             this.renderFilteredCollection();
@@ -179,11 +188,13 @@ const App = {
         // View toggle
         document.getElementById('gridViewBtn').addEventListener('click', () => {
             this.state.view = 'grid';
+            this.saveViewPrefs();
             UI.updateViewToggle('grid');
         });
 
         document.getElementById('listViewBtn').addEventListener('click', () => {
             this.state.view = 'list';
+            this.saveViewPrefs();
             UI.updateViewToggle('list');
         });
 
@@ -782,6 +793,7 @@ const App = {
         document.getElementById('yearMin').value = '';
         document.getElementById('yearMax').value = '';
         document.getElementById('searchInput').value = '';
+        this.saveViewPrefs();
 
         this.resetPagination();
         this.renderFilteredCollection();
@@ -973,6 +985,69 @@ const App = {
 
         await this.renderFilteredCollection();
 
+    },
+
+    // ===== VIEW PERSISTENCE =====
+
+    /**
+     * Wczytaj zapamiętane ustawienia widoku (sort/filtry/tryb) z localStorage.
+     * Wyszukiwanie nie jest pamiętane — to dane sesyjne.
+     */
+    loadViewPrefs() {
+        try {
+            const prefs = JSON.parse(localStorage.getItem('setsViewPrefs') || 'null');
+            if (!prefs) return;
+            if (prefs.sort) this.state.sort = Object.assign(this.state.sort, prefs.sort);
+            if (prefs.view) this.state.view = prefs.view;
+            if (prefs.filters) {
+                this.state.filters = Object.assign(this.state.filters, prefs.filters);
+                this.state.filters.search = '';
+            }
+        } catch (e) { /* uszkodzone prefs — ignoruj */ }
+    },
+
+    /**
+     * Zapisz aktualne ustawienia widoku do localStorage.
+     */
+    saveViewPrefs() {
+        try {
+            const f = this.state.filters;
+            localStorage.setItem('setsViewPrefs', JSON.stringify({
+                sort: this.state.sort,
+                view: this.state.view,
+                filters: {
+                    theme: f.theme,
+                    status: f.status,
+                    condition: f.condition,
+                    yearMin: f.yearMin,
+                    yearMax: f.yearMax
+                }
+            }));
+        } catch (e) { /* localStorage niedostępny — pomiń */ }
+    },
+
+    /**
+     * Przenieś wczytane ustawienia na kontrolki DOM (po pierwszym renderze,
+     * bo lista motywów dopiero wtedy istnieje). Nieistniejący motyw -> reset.
+     */
+    applyViewPrefsToUI() {
+        const f = this.state.filters;
+
+        const themeSelect = document.getElementById('filterTheme');
+        if (themeSelect && f.theme !== 'all') {
+            const exists = Array.from(themeSelect.options).some(function (o) { return o.value === f.theme; });
+            if (!exists) f.theme = 'all';
+            themeSelect.value = f.theme;
+        }
+
+        document.getElementById('filterStatus').value = f.status;
+        document.getElementById('filterCondition').value = f.condition;
+        document.getElementById('yearMin').value = f.yearMin || '';
+        document.getElementById('yearMax').value = f.yearMax || '';
+        document.getElementById('sortBy').value = this.state.sort.by;
+
+        UI.updateSortIcon(this.state.sort.ascending);
+        UI.updateViewToggle(this.state.view);
     },
 
     // ===== AUTHENTICATION METHODS =====
