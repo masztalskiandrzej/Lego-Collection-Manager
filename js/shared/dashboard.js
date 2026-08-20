@@ -147,4 +147,19 @@
     };
 
     window.Dashboard = Dashboard;
+
+    // Teaser na dolnej krawędzi paneli -> płynny scroll do dashboardu
+    function initTeaser() {
+        const btn = document.getElementById('dashTeaser');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            const sec = document.getElementById('dashboardSection');
+            if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTeaser);
+    } else {
+        initTeaser();
+    }
 })();
