@@ -227,14 +227,6 @@ const App = {
             });
         }
 
-        // Scan button (kamera)
-        const scanBtn = document.getElementById('scanBtn');
-        if (scanBtn) {
-            scanBtn.addEventListener('click', () => {
-                this.handleScan();
-            });
-        }
-
         // Delete modal controls
         document.getElementById('deleteModalCloseBtn').addEventListener('click', () => {
             UI.hideDeleteModal();
@@ -1184,45 +1176,6 @@ const App = {
         }
     },
 
-
-    /**
-     * Skaner: kamerą czyta QR/kod kreskowy, wyciąga numer i odpala Auto-Fill.
-     */
-    handleScan() {
-        window.Scanner.open({
-            onResult: (text, format) => {
-                const num = this.extractScannedNumber(text);
-                if (num) {
-                    const numInput = document.getElementById('itemNumber');
-                    if (numInput) numInput.value = num;
-                    UI.showNotification(t('scan.found', { n: num }), 'success');
-                    this.handleAutoFillData();
-                    return;
-                }
-                if (/^\d{8,14}$/.test(text.trim())) {
-                    Dialogs.alert(t('scan.eanInfo'), { type: 'info', title: 'EAN/UPC: ' + text.trim() });
-                } else {
-                    Dialogs.alert(t('scan.nothing'), { type: 'warning' });
-                }
-            }
-        });
-    },
-
-    /**
-     * Wyciągnij numer z zeskanowanego tekstu (QR-link lego.com, QR z numerem, itd.).
-     */
-    extractScannedNumber(text) {
-        const s = String(text || '');
-        // Linki lego.com zawierają numer produktu
-        const urlMatch = s.match(/lego\.com[^\d]{0,40}?(\d{4,7})/i);
-        if (urlMatch) return urlMatch[1];
-                // Numery figurek: sw0999, col001, fig-002544 lub zwykły 4-7-cyfrowy
-        const figMatch = s.match(/\b((?:sw|col)[-_]?\d{3,6}|fig[-_]?\d{4,6})\b/i);
-        if (figMatch) return figMatch[1];
-        const numMatch = s.match(/\b(\d{4,7})\b/);
-        if (numMatch) return numMatch[1];
-        return null;
-    },
     // ===== AI VISION METHODS =====
 
     /**
