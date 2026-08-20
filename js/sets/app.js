@@ -1485,7 +1485,9 @@ const App = {
             return;
         }
 
-        const url = 'https://www.brickeconomy.com/set/' + encodeURIComponent(num) + '-1';
+        // BE wymaga sluga w URL zestawu; stabilnaalternatywa to search z numerem
+        const bare = num.replace(/-\d+$/, '');
+        const url = 'https://www.brickeconomy.com/set/search?query=' + encodeURIComponent(bare);
 
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay active';
