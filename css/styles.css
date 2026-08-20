@@ -3625,3 +3625,29 @@ body {
 [data-theme="dark"] .mf-item { border-color: #333a4d; }
 [data-theme="dark"] .mf-item:hover { background: #232a3d; }
 [data-theme="dark"] .mf-item img { background: #232a3d; }
+
+
+/* ===== ROI badge (karty) ===== */
+.roi-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.roi-up { background: rgba(76, 175, 80, 0.15); color: #2e7d32; }
+.roi-down { background: rgba(229, 57, 53, 0.12); color: #c62828; }
+
+[data-theme="dark"] .roi-up { background: rgba(76, 175, 80, 0.22); color: #81c784; }
+[data-theme="dark"] .roi-down { background: rgba(229, 57, 53, 0.2); color: #e57373; }
+
+.card-be-link {
+    text-decoration: none;
+    font-size: 0.85rem;
+    opacity: 0.55;
+    margin-left: 2px;
+}
+
+.card-be-link:hover { opacity: 1; }

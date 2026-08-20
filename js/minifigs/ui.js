@@ -100,6 +100,9 @@ const UI = {
 
         // Format price
         const price = item.pricePaid ? `$${parseFloat(item.pricePaid).toFixed(2)}` : '-';
+        const mv = parseFloat(item.marketValue) || 0;
+        const pp = parseFloat(item.pricePaid) || 0;
+        const roi = (mv > 0 && pp > 0) ? ((mv - pp) / pp) * 100 : null;
 
         // Build details array
         const details = [];
@@ -128,6 +131,7 @@ const UI = {
                         ${number ? `<p class="card-number">${numberLabel}${this.escapeHtml(number)}</p>` : ''}
                         <p class="card-info">${this.escapeHtml(item.theme)} ${item.year ? `&bull; ${item.year}` : ''}</p>
                         <p class="card-info"><strong>${price}</strong></p>
+                        ${mv > 0 ? `<p class="card-info"><strong>$${mv.toFixed(2)}</strong>${roi !== null ? ` <span class="roi-badge ${roi >= 0 ? 'roi-up' : 'roi-down'}">${roi >= 0 ? '&#9650; +' : '&#9660; '}${roi.toFixed(0)}%</span>` : ''}</p>` : ''}
                     </div>
                     ${details.length > 0 ? `
                         <div class="card-details">
@@ -207,6 +211,7 @@ const UI = {
             document.getElementById('itemYear').value = item.year || '';
             document.getElementById('itemStatus').value = item.status || 'owned';
             document.getElementById('itemPrice').value = item.pricePaid || '';
+            document.getElementById('itemMarketValue').value = item.marketValue || '';
             document.getElementById('itemCondition').value = item.condition || 'new';
             document.getElementById('itemLocation').value = item.location || '';
             document.getElementById('itemNotes').value = item.notes || '';
@@ -370,6 +375,7 @@ const UI = {
             year: parseInt(document.getElementById('itemYear').value) || null,
             status: document.getElementById('itemStatus').value,
             pricePaid: parseFloat(document.getElementById('itemPrice').value) || 0,
+            marketValue: parseFloat(document.getElementById('itemMarketValue').value) || null,
             condition: document.getElementById('itemCondition').value,
             location: document.getElementById('itemLocation').value.trim(),
             notes: document.getElementById('itemNotes').value.trim()
